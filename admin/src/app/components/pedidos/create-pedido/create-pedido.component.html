@@ -1,0 +1,121 @@
+<app-sidebar></app-sidebar>
+
+<!-- Page title-->
+<div class="border-bottom pt-4 mt-2 ">
+    <h1 class="mt-2 mt-md-4  pt-4">Crear Orden</h1>
+</div>
+
+<form #registroForm="ngForm" (ngSubmit)="registro(registroForm)">
+
+    <div class="card box-shadow-sm">
+        <div class="card-header">
+            <h5 style="margin-bottom: 0px;">Buscar cliente</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Buscar por DNI" name="filtro"
+                            [(ngModel)]="filtro">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" (click)="filtrar()" type="button">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label for="validationCustom01" class="form-label">Nombres</label>
+                    <input disabled class="form-control" type="text" placeholder="Nombres" required name="nombres"
+                        [(ngModel)]="cliente.nombres">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="validationCustom01" class="form-label">Apellidos</label>
+                    <input disabled class="form-control" type="text" placeholder="Apellidos" required name="apellidos"
+                        [(ngModel)]="cliente.apellidos">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="validationCustom01" class="form-label">Correo electrónico</label>
+                    <input disabled class="form-control" type="email" placeholder="Correo electrónico" required
+                        name="email" [(ngModel)]="cliente.email">
+                </div>
+
+                <div class="col-md-3 form-group">
+                    <label for="validationCustom01" class="form-label">Telefono</label>
+                    <input disabled class="form-control" type="text" placeholder="Telefono" required name="telefono"
+                        [(ngModel)]="cliente.telefono">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card box-shadow-sm">
+        <div class="card-header">
+            <h5 style="margin-bottom: 0px;">Datos del producto</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-lg-12 form-group">
+                            <label for="">Titulo de producto</label>
+                            <input type="text" class="form-control" placeholder="Titulo de producto" required
+                                name="titulo" [(ngModel)]="producto.titulo">
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label for="">Precio</label>
+                            <input type="number" class="form-control" placeholder="Precio" required name="precio"
+                                [(ngModel)]="producto.precio">
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label for="">Categoría</label>
+                            <select class="form-control custom-select" id="select-input" required name="categoria"
+                                [(ngModel)]="producto.categoria">
+                                <option value="" selected disabled>Seleccionar</option>
+                                <option value="{{item.titulo}}" *ngFor="let item of config_global.categorias">
+                                    {{item.titulo}}</option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-lg-12 form-group">
+                            <label for="">Observaciones</label>
+                            <textarea class="form-control" placeholder="Observaciones" required rows="5"
+                                name="descripcion" [(ngModel)]="producto.descripcion"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-12 form-group">
+                            <label for="">Portada</label>
+                            <div class="custom-file">
+                                <input class="custom-file-input" type="file" id="file-input"
+                                    (change)="fileChangeEvent($event)">
+                                <label class="custom-file-label" id="input-portada" for="file-input"
+                                    style="white-space:nowrap;overflow:hidden">Seleccionar imagen</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <img [src]="imgSelect" class="img-thumbnail" alt="Rounded image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Crear Orden</button>
+            <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
+                <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                Creando...
+            </button>
+            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Regresar</a>
+        </div>
+    </div>
+</form>
