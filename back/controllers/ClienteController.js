@@ -139,9 +139,7 @@ const registro_cliente_admin = async function(req, res) {
 const obtener_cliente_admin = async function(req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
-
             var id = req.params['id'];
-
             try {
                 var reg = await Cliente.findById({ _id: id });
 
@@ -149,7 +147,20 @@ const obtener_cliente_admin = async function(req, res) {
             } catch (error) {
                 res.status(200).send({ data: undefined });
             }
+        } else {
+            res.status(500).send({ message: 'NoAccess' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
 
+const obtener_cliente = async function(req, res) {
+    if (req.user) {
+        if (req.user.role == 'admin') {
+            var filtro = req.params['filtro'];
+            let reg = await Cliente.find({ dni: new RegExp(filtro, 'i') });
+            res.status(200).send({ data: reg });
         } else {
             res.status(500).send({ message: 'NoAccess' });
         }
@@ -418,5 +429,6 @@ module.exports = {
     obtener_detalles_ordenes_cliente,
     emitir_review_producto_cliente,
     obtener_review_producto_cliente,
-    obtener_reviews_cliente
+    obtener_reviews_cliente,
+    obtener_cliente
 }

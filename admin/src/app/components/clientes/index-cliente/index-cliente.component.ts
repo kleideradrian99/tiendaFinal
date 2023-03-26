@@ -37,7 +37,6 @@ export class IndexClienteComponent implements OnInit {
   init_Data(){
     this._clienteService.listar_clientes_filtro_admin(null,null,this.token).subscribe(
       response=>{
-        
         this.clientes = response.data;
         this.load_data = false;
         /* setTimeout(()=>{
@@ -46,7 +45,6 @@ export class IndexClienteComponent implements OnInit {
       },
       error=>{
         console.log(error);
-        
       }
     );
   }
