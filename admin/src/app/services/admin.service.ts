@@ -39,8 +39,6 @@ export class AdminService {
     try {
       const helper = new JwtHelperService();
       var decodedToken = helper.decodeToken(token);
-
-      console.log(decodedToken);
       
       if(helper.isTokenExpired(token)){
         localStorage.clear();

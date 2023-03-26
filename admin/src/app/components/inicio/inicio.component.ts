@@ -29,7 +29,7 @@ export class InicioComponent implements OnInit {
   init_data(){
     this._adminService.kpi_ganancias_mensuales_admin(this.token).subscribe(
       response=>{
-        console.log(response);
+        // console.log(response);
         this.total_ganancia = response.total_ganancia;
         this.total_mes = response.total_mes;
         this.count_ventas = response.count_ventas;

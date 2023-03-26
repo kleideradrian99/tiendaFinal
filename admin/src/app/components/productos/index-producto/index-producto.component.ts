@@ -40,7 +40,7 @@ export class IndexProductoComponent implements OnInit {
   init_data(){
     this._productoService.listar_productos_admin(this.filtro,this.token).subscribe(
       response=>{
-          console.log(response);
+          // console.log(response);
           this.productos = response.data;
           this.productos.forEach(element => {
               this.arr_productos.push({
@@ -51,7 +51,7 @@ export class IndexProductoComponent implements OnInit {
                 nventas: element.nventas
               });
           });
-          console.log(this.arr_productos);
+          // console.log(this.arr_productos);
           
           this.load_data = false;
       },
@@ -66,7 +66,7 @@ export class IndexProductoComponent implements OnInit {
       if(this.filtro){
         this._productoService.listar_productos_admin(this.filtro,this.token).subscribe(
           response=>{
-              console.log(response);
+              // console.log(response);
               this.productos = response.data;
               this.load_data = false;
           },
