@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
+import { ClienteService } from 'src/app/services/cliente.service';
 
 declare var iziToast;
 declare var jQuery: any;
@@ -12,13 +13,16 @@ declare var $: any;
 })
 export class CreatePedidoComponent implements OnInit {
 
-
+  public clientes: Array<any> = [];
   public cliente: any = {
     genero: ''
   };
+
+  public load_data = true;
   public token;
   public load_btn = false;
   public filtro = '';
+  public productos: Array<any> = [];
   public producto: any = {
     categoria: ''
   };
@@ -28,8 +32,9 @@ export class CreatePedidoComponent implements OnInit {
 
   constructor(
     private _adminService: AdminService,
+    private _clienteService: ClienteService,
   ) {
-
+    this.token = this._adminService.getToken();
     this._adminService.obtener_config_publico().subscribe(
       response => {
         this.config_global = response.data;
@@ -39,6 +44,21 @@ export class CreatePedidoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.init_Data();
+  }
+
+  init_Data() {
+    //Cargamos los clientes en BD
+    this._clienteService.listar_clientes_filtro_admin(null, null, this.token).subscribe(
+      response => {
+        this.clientes = response.data;
+        this.load_data = false;
+        console.log("Estos son los clientes " + this.clientes)
+      },
+      error => {
+        console.log(error);
+      }
+    );
   }
 
   registro(registroForm) {
@@ -46,12 +66,23 @@ export class CreatePedidoComponent implements OnInit {
   }
 
   filtrar() {
-    // this._cuponService.listar_cupones_admin(this.filtro,this.token).subscribe(
-    //   response=>{
-    //     this.cupones = response.data;
-    //     this.load_data = false;
-    //   }
-    // )
+    if (this.filtro) {
+      this._clienteService.obtener_cliente(this.filtro, this.token).subscribe(
+        response => {
+          this.productos = response.data;
+          console.log(this.productos);
+        }
+      )
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Ingrese un filtro para buscar'
+      });
+    }
   }
 
   fileChangeEvent(event: any): void {
