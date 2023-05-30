@@ -93,6 +93,7 @@ export class CreatePedidoComponent implements OnInit {
   }
 
   calcularTotal(precio, cantidad) {
+    this.producto.total = 0;
     this.cal_total = precio * cantidad;
     this.producto.total = this.cal_total;
   }
@@ -101,6 +102,11 @@ export class CreatePedidoComponent implements OnInit {
 
   }
   // Cliente
+  BuscarCliente() { }
+
+
+  // PRODUCTOS
+
   filtrar() {
     if (this.filtro) {
       this._clienteService.obtener_cliente(this.filtro, this.token).subscribe(
@@ -121,13 +127,44 @@ export class CreatePedidoComponent implements OnInit {
     }
   }
 
-  // PRODUCTO
+  
   filtrarProducto() {
+    if (this.filtro) {
+      this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
+        response => {
+          this.productos = response.data;
+          this.load_data = false;
+        }, error => {
+          console.log(error);
+        }
+      );
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Ingrese un filtro para buscar'
+      });
+    }
+  }
+
+  resetar() {
+    this.filtro = '';
+    this.init_Data();
+  }
+
+  valueReset() {
+    this.producto.cantidad = 0;
+    this.producto.total = 0;
 
   }
 
-  resetar() { }
+  agregarItem(id) {
 
-  eliminar(id) { }
+
+    this.valueReset();
+  }
 
 }

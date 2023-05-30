@@ -2,7 +2,7 @@
 
 <!-- Page title-->
 <div class="border-bottom pt-4 mt-2 ">
-    <h1 class="mt-2 mt-md-4  pt-4">Crear Orden</h1>
+    <h1 class="mt-2 mt-md-4  pt-4">Crear Pedido</h1>
 </div>
 
 <form #registroForm="ngForm" (ngSubmit)="registro(registroForm)">
@@ -19,7 +19,7 @@
                         <input class="form-control" type="text" placeholder="Buscar por DNI" name="filtro"
                             [(ngModel)]="filtro">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" (click)="filtrar()" type="button">Buscar</button>
+                            <button class="btn btn-primary" (click)="BuscarCliente()" type="button">Buscar</button>
                         </div>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
             </div>
             <div class="card-header">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-8">
                         <div class="input-group">
                             <input class="form-control" type="text" placeholder="Titulo del producto" name="filtro"
                                 [(ngModel)]="filtro">
@@ -119,11 +119,11 @@
                                                 aria-expanded="false">OPCIONES</button>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
-                                                    [attr.data-target]="'#delete-'+item._id">Seleccionar Producto</a>
+                                                    [attr.data-target]="'#selected-'+item._id" >Seleccionar Producto</a>
                                             </div>
                                         </div>
 
-                                        <div class="modal fade" id="delete-{{item._id}}" tabindex="-1"
+                                        <div class="modal fade" id="selected-{{item._id}}" tabindex="-1"
                                             style="display: none;" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
@@ -154,7 +154,7 @@
                                                                     <div class="col-lg-4 form-group">
                                                                         <label for="">Total</label>
                                                                         <input disabled type="number"
-                                                                            class="form-control" placeholder="0"
+                                                                            class="form-control" placeholder="0.00"
                                                                             required name="total"
                                                                             [(ngModel)]="producto.total">
                                                                     </div>
@@ -171,10 +171,10 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button class="btn btn-secondary btn-sm" type="button"
-                                                            data-dismiss="modal">Cancelar</button>
+                                                            data-dismiss="modal" (click)="valueReset()">Cancelar</button>
                                                         <button *ngIf="!load_btn"
                                                             class="btn btn-primary btn-shadow btn-sm"
-                                                            (click)="eliminar(item._id)"
+                                                            (click)="agregarItem(item._id)"
                                                             type="button">Confirmar</button>
                                                         <button *ngIf="load_btn" type="button" class="btn btn-secondary"
                                                             disabled>
@@ -190,8 +190,6 @@
                                 </tr>
                             </tbody>
                         </ng-container>
-
-
                     </table>
                 </div>
             </div>
@@ -202,12 +200,12 @@
         </div>
         <!-- NO USAR HASTA AQUI -->
         <div class="card-footer">
-            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Agregar Producto</button>
+            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Terminar Pedido</button>
             <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
                 <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
                 Agregando...
             </button>
-            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Visualizar Orden</a>
+            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Visualizar Pedido</a>
         </div>
     </div>
 </form>
