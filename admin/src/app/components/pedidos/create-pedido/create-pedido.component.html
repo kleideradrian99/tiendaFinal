@@ -52,80 +52,162 @@
         </div>
     </div>
 
+    <!-- LIST PRODUCTS -->
     <div class="card box-shadow-sm">
-        <div class="card-header">
-            <h5 style="margin-bottom: 0px;">Datos del producto</h5>
-        </div>
-
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="row">
-                        <div class="col-lg-12 form-group">
-                            <label for="">Titulo de producto</label>
-                            <input type="text" class="form-control" placeholder="Titulo de producto" required
-                                name="titulo" [(ngModel)]="producto.titulo">
-                        </div>
-                        <div class="col-lg-4 form-group">
-                            <label for="">Precio</label>
-                            <input type="number" class="form-control" placeholder="$ 00.00" required name="precio"
-                                [(ngModel)]="producto.precio">
-                        </div>
-                        <div class="col-lg-4 form-group">
-                            <label for="">Cantidad</label>
-                            <input type="number" class="form-control" placeholder="0" required name="cantidad"
-                                [(ngModel)]="producto.cantidad">
-                        </div>
-                        <div class="col-lg-4 form-group">
-                            <label for="">Categoría</label>
-                            <select class="form-control custom-select" id="select-input" required name="categoria"
-                                [(ngModel)]="producto.categoria">
-                                <option value="" selected disabled>Seleccionar</option>
-                                <option value="{{item.titulo}}" *ngFor="let item of config_global.categorias">
-                                    {{item.titulo}}</option>
-
-                            </select>
-                        </div>
-                        <div class="col-lg-4 form-group">
-                            <label for="">Precio de Envió</label>
-                            <input type="number" class="form-control" placeholder="$ 00.00" required
-                                name="envio_precio" [(ngModel)]="producto.envio_precio">
-                        </div>
-
-                        <div class="col-lg-12 form-group">
-                            <label for="">Observaciones</label>
-                            <textarea class="form-control" placeholder="Observaciones" required rows="5"
-                                name="descripcion" [(ngModel)]="producto.descripcion"></textarea>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="row">
-                        <div class="col-lg-12 form-group">
-                            <label for="">Portada</label>
-                            <div class="custom-file">
-                                <input class="custom-file-input" type="file" id="file-input"
-                                    (change)="fileChangeEvent($event)">
-                                <label class="custom-file-label" id="input-portada" for="file-input"
-                                    style="white-space:nowrap;overflow:hidden">Seleccionar imagen</label>
+        <div class="card box-shadow-sm">
+            <div class="card-header">
+                <h5 style="margin-bottom: 0px;">Filtro de productos</h5>
+            </div>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Titulo del producto" name="filtro"
+                                [(ngModel)]="filtro">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button"
+                                    (click)="filtrarProducto()">Filtrar</button>
+                                <button class="btn btn-info" type="button" (click)="resetar()">Resetear</button>
                             </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <img [src]="imgSelect" class="img-thumbnail" alt="Rounded image">
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Titulo</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Categoria</th>
+                                <th>Ventas</th>
+                                <th>OP</th>
+                            </tr>
+                        </thead>
 
+                        <tbody *ngIf="load_data">
+                            <tr>
+                                <td class="text-center" colspan="7">
+                                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <ng-container *ngIf="!load_data">
+                            <tbody
+                                *ngFor="let item of productos| slice: (page-1)*pageSize : (page-1) * pageSize + pageSize">
+                                <tr>
+                                    <td>
+                                        <h6 style="padding-bottom: 0;margin-bottom: 0;">
+                                            <img style="width:50px" [src]="url +'obtener_portada/'+item.portada"
+                                                class="img-thumbnail rounded-0" alt="Square image">
+                                            {{item.titulo}}
+                                        </h6>
+                                    </td>
+                                    <td>{{item.stock}}</td>
+                                    <td>{{item.precio}}</td>
+                                    <td>{{item.categoria}}</td>
+                                    <td>{{item.nventas}}</td>
+                                    <td>
+                                        <div class="btn-group dropdown d-inline-block mb-3 mr-2">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                                type="button" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">OPCIONES</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
+                                                    [attr.data-target]="'#delete-'+item._id">Seleccionar Producto</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="delete-{{item._id}}" tabindex="-1"
+                                            style="display: none;" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title">Producto: <b>{{item.titulo}}</b></h4>
+                                                        <button class="close" type="button" data-dismiss="modal"
+                                                            aria-label="Close"><span
+                                                                aria-hidden="true">×</span></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- FORMULARIO SELECCION -->
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-4 form-group">
+                                                                        <label for="">Precio</label>
+                                                                        <input type="number" class="form-control"
+                                                                            disabled placeholder="$ 00.00" required
+                                                                            name="precio" value="{{item.precio}}">
+                                                                    </div>
+                                                                    <div class="col-lg-4 form-group">
+                                                                        <label for="">Cantidad</label>
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="0" required name="cantidad"
+                                                                            (change)="calcularTotal(item.precio,producto.cantidad)"
+                                                                            [(ngModel)]="producto.cantidad">
+                                                                    </div>
+                                                                    <div class="col-lg-4 form-group">
+                                                                        <label for="">Total</label>
+                                                                        <input disabled type="number"
+                                                                            class="form-control" placeholder="0"
+                                                                            required name="total"
+                                                                            [(ngModel)]="producto.total">
+                                                                    </div>
+                                                                    <div class="col-lg-12 form-group">
+                                                                        <label for="">Observaciones</label>
+                                                                        <textarea class="form-control"
+                                                                            placeholder="Observaciones" required
+                                                                            rows="5" name="descripcion"
+                                                                            [(ngModel)]="producto.descripcion"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary btn-sm" type="button"
+                                                            data-dismiss="modal">Cancelar</button>
+                                                        <button *ngIf="!load_btn"
+                                                            class="btn btn-primary btn-shadow btn-sm"
+                                                            (click)="eliminar(item._id)"
+                                                            type="button">Confirmar</button>
+                                                        <button *ngIf="load_btn" type="button" class="btn btn-secondary"
+                                                            disabled>
+                                                            <span class="spinner-grow spinner-grow-sm mr-2"
+                                                                role="status" aria-hidden="true"></span>
+                                                            Agregando...
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </ng-container>
+
+
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <ngb-pagination [(page)]="page" [pageSize]="pageSize"
+                    [collectionSize]="productos.length"></ngb-pagination>
+            </div>
+        </div>
+        <!-- NO USAR HASTA AQUI -->
         <div class="card-footer">
-            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Crear Orden</button>
+            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Agregar Producto</button>
             <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
                 <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
-                Creando...
+                Agregando...
             </button>
-            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Regresar</a>
+            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Visualizar Orden</a>
         </div>
     </div>
 </form>
