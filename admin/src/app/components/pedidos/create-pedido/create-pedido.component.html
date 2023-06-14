@@ -6,7 +6,7 @@
 </div>
 
 <form #registroForm="ngForm" (ngSubmit)="registro(registroForm)">
-
+    <!-- CLIENTE -->
     <div class="card box-shadow-sm">
         <div class="card-header">
             <h5 style="margin-bottom: 0px;">Buscar cliente</h5>
@@ -16,39 +16,40 @@
             <div class="row">
                 <div class="col-6">
                     <div class="input-group">
-                        <input class="form-control" type="text" placeholder="Buscar por DNI" name="filtro"
-                            [(ngModel)]="filtro">
+                        <input class="form-control" type="text" placeholder="Buscar por DNI" name="filtroCliente"
+                            [(ngModel)]="filtroCliente">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" (click)="filtrar()" type="button">Buscar</button>
+                            <button class="btn btn-primary" (click)="filtrarCliente()" type="button">Buscar</button>
                         </div>
                     </div>
                 </div>
             </div>
             <br>
-            <div class="row">
-                <div class="col-md-3 form-group">
-                    <label for="validationCustom01" class="form-label">Nombres</label>
-                    <input disabled class="form-control" type="text" placeholder="Nombres" required name="nombres"
-                        [(ngModel)]="cliente.nombres">
-                </div>
-                <div class="col-md-3 form-group">
-                    <label for="validationCustom01" class="form-label">Apellidos</label>
-                    <input disabled class="form-control" type="text" placeholder="Apellidos" required name="apellidos"
-                        [(ngModel)]="cliente.apellidos">
-                </div>
-                <div class="col-md-3 form-group">
-                    <label for="validationCustom01" class="form-label">Correo electrónico</label>
-                    <input disabled class="form-control" type="email" placeholder="Correo electrónico" required
-                        name="email" [(ngModel)]="cliente.email">
-                </div>
+            <div *ngIf="clientes != undefined">
+                <div class="row" *ngFor="let item of clientes">
+                    <div class="col-md-3 form-group">
+                        <label for="validationCustom01" class="form-label">Nombres</label>
+                        <input disabled class="form-control" type="text" placeholder="Nombres" required name="nombres"
+                            [value]="item.nombres">
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label for="validationCustom01" class="form-label">Apellidos</label>
+                        <input disabled class="form-control" type="text" placeholder="Apellidos" required
+                            name="apellidos" [value]="item.apellidos">
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label for="validationCustom01" class="form-label">Correo electrónico</label>
+                        <input disabled class="form-control" type="email" placeholder="Correo electrónico" required
+                            name="email" [value]="item.email">
+                    </div>
 
-                <div class="col-md-3 form-group">
-                    <label for="validationCustom01" class="form-label">Telefono</label>
-                    <input disabled class="form-control" type="text" placeholder="Telefono" required name="telefono"
-                        [(ngModel)]="cliente.telefono">
+                    <div class="col-md-3 form-group">
+                        <label for="validationCustom01" class="form-label">Telefono</label>
+                        <input disabled class="form-control" type="text" placeholder="Telefono" required name="telefono"
+                            [value]="item.telefono">
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 

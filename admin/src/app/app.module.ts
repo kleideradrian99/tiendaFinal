@@ -64,7 +64,6 @@ import { EditPedidoComponent } from './components/pedidos/edit-pedido/edit-pedid
     IndexPedidosComponent,
     CreatePedidoComponent,
     EditPedidoComponent,
-
   ],
   imports: [
     BrowserModule,

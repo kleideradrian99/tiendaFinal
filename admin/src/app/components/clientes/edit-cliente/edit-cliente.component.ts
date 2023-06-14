@@ -52,8 +52,6 @@ export class EditClienteComponent implements OnInit {
       this.load_btn = true;
       this._clienteService.actulizar_cliente_admin(this.id, this.cliente, this.token).subscribe(
         response => {
-
-
           iziToast.show({
             title: 'SUCCESS',
             titleColor: '#1DC74C',

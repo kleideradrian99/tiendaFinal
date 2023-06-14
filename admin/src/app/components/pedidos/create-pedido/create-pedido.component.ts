@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { element } from 'protractor';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
@@ -15,10 +16,10 @@ declare var $: any;
 })
 export class CreatePedidoComponent implements OnInit {
 
+  // CLIENTE
   public clientes: Array<any> = [];
-  public cliente: any = {
-    genero: ''
-  };
+  public cliente: any = {};
+  public filtroCliente = '';
 
   public load_data = true;
   public token;
@@ -28,6 +29,7 @@ export class CreatePedidoComponent implements OnInit {
   public file: File = undefined;
   public imgSelect: any | ArrayBuffer = 'assets/img/01.jpg';
   public config_global: any = {};
+
 
   // PRODUCTO
   public page = 1;
@@ -58,20 +60,18 @@ export class CreatePedidoComponent implements OnInit {
 
   init_Data() {
     //Cargamos los clientes en BD
-    this._clienteService.listar_clientes_filtro_admin(null, null, this.token).subscribe(
-      response => {
-        this.clientes = response.data;
-        this.load_data = false;
-        console.log("Estos son los clientes " + this.clientes)
-      },
-      error => {
-        console.log(error);
-      }
-    );
+    // this._clienteService.listar_clientes_filtro_admin(null, null, this.token).subscribe(
+    //   response => {
+    //     this.clientes = response.data;
+    //     this.load_data = false;
+    //   },
+    //   error => {
+    //     console.log(error);
+    //   }
+    // );
     // Cargamos los productos
     this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
       response => {
-        // console.log(response);
         this.productos = response.data;
         this.productos.forEach(element => {
           this.arr_productos.push({
@@ -82,7 +82,6 @@ export class CreatePedidoComponent implements OnInit {
             nventas: element.nventas
           });
         });
-        console.log(this.arr_productos);
         this.load_data = false;
       },
       error => {
@@ -101,12 +100,15 @@ export class CreatePedidoComponent implements OnInit {
 
   }
   // Cliente
-  filtrar() {
-    if (this.filtro) {
-      this._clienteService.obtener_cliente(this.filtro, this.token).subscribe(
+  filtrarCliente() {
+    if (this.filtroCliente) {
+      this._clienteService.obtener_cliente(this.filtroCliente, this.token).subscribe(
         response => {
-          this.productos = response.data;
-          console.log(this.productos);
+          if (response.data == undefined) {
+            this.clientes = undefined;
+          } else {
+            this.clientes = response.data;
+          }
         }
       )
     } else {
@@ -118,6 +120,7 @@ export class CreatePedidoComponent implements OnInit {
         position: 'topRight',
         message: 'Ingrese un filtro para buscar'
       });
+      this.clientes = undefined;
     }
   }
 

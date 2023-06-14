@@ -38,7 +38,7 @@
       <table class="table table-bordered">
         <thead class="thead-dark">
           <tr>
-            <th>#</th>
+            <th>DNI</th>
             <th>Nombres</th>
             <th>Apellidos</th>
             <th>Correo</th>
@@ -59,7 +59,7 @@
           <tbody
             *ngFor="let item of clientes| slice: (page-1)*pageSize : (page-1) * pageSize + pageSize; let indice = index">
             <tr>
-              <td>{{indice+1}}</td>
+              <td>{{item.dni}}</td>
               <td>{{item.nombres}}</td>
               <td>{{item.apellidos}}</td>
               <td>{{item.email}}</td>
