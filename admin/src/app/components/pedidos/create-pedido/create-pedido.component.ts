@@ -126,10 +126,35 @@ export class CreatePedidoComponent implements OnInit {
 
   // PRODUCTO
   filtrarProducto() {
+    if (this.filtro) {
+      this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
+        response => {
+          // console.log(response);
+          this.productos = response.data;
+          this.load_data = false;
+        },
+        error => {
+          console.log(error);
+
+        }
+      )
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Ingrese un filtro para buscar'
+      });
+    }
 
   }
 
-  resetar() { }
+  resetar() {
+    this.filtro = '';
+    this.init_Data();
+  }
 
   eliminar(id) { }
 
