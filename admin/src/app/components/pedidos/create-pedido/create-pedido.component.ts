@@ -35,6 +35,7 @@ export class CreatePedidoComponent implements OnInit {
   public page = 1;
   public pageSize = 4;
   public url;
+
   public producto: any = {};
   public productos: Array<any> = [];
   public arr_productos: Array<any> = [];
@@ -52,6 +53,8 @@ export class CreatePedidoComponent implements OnInit {
         this.config_global = response.data;
       }
     );
+    // Variedades
+
   }
 
   ngOnInit(): void {
@@ -59,27 +62,18 @@ export class CreatePedidoComponent implements OnInit {
   }
 
   init_Data() {
-    //Cargamos los clientes en BD
-    // this._clienteService.listar_clientes_filtro_admin(null, null, this.token).subscribe(
-    //   response => {
-    //     this.clientes = response.data;
-    //     this.load_data = false;
-    //   },
-    //   error => {
-    //     console.log(error);
-    //   }
-    // );
-    // Cargamos los productos
     this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
       response => {
         this.productos = response.data;
         this.productos.forEach(element => {
           this.arr_productos.push({
             titulo: element.titulo,
+            _id: element._id,
             stock: element.stock,
             precio: element.precio,
             categoria: element.categoria,
-            nventas: element.nventas
+            nventas: element.nventas,
+            variedades: element.variedades,
           });
         });
         this.load_data = false;
@@ -104,11 +98,12 @@ export class CreatePedidoComponent implements OnInit {
     if (this.filtroCliente) {
       this._clienteService.obtener_cliente(this.filtroCliente, this.token).subscribe(
         response => {
-          if (response.data == undefined) {
+          if (response.data == "") {
             this.clientes = undefined;
           } else {
             this.clientes = response.data;
           }
+          console.log(response.data[0]._id);//ID CLIENTE
         }
       )
     } else {

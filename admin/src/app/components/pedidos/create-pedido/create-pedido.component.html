@@ -25,31 +25,39 @@
                 </div>
             </div>
             <br>
-            <div *ngIf="clientes != undefined">
-                <div class="row" *ngFor="let item of clientes">
-                    <div class="col-md-3 form-group">
-                        <label for="validationCustom01" class="form-label">Nombres</label>
-                        <input disabled class="form-control" type="text" placeholder="Nombres" required name="nombres"
-                            [value]="item.nombres">
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="validationCustom01" class="form-label">Apellidos</label>
-                        <input disabled class="form-control" type="text" placeholder="Apellidos" required
-                            name="apellidos" [value]="item.apellidos">
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label for="validationCustom01" class="form-label">Correo electrónico</label>
-                        <input disabled class="form-control" type="email" placeholder="Correo electrónico" required
-                            name="email" [value]="item.email">
-                    </div>
+            <ng-container *ngIf="clientes == undefined">
+                <div style="width: 100%; text-align: center;">
+                    <p>Cliente No encontrado</p>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="clientes != undefined">
+                <div>
+                    <div class="row" *ngFor="let item of clientes">
+                        <div class="col-md-3 form-group">
+                            <label for="validationCustom01" class="form-label">Nombres</label>
+                            <input disabled class="form-control" type="text" placeholder="Nombres" required
+                                name="nombres" [value]="item.nombres">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="validationCustom01" class="form-label">Apellidos</label>
+                            <input disabled class="form-control" type="text" placeholder="Apellidos" required
+                                name="apellidos" [value]="item.apellidos">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="validationCustom01" class="form-label">Correo electrónico</label>
+                            <input disabled class="form-control" type="email" placeholder="Correo electrónico" required
+                                name="email" [value]="item.email">
+                        </div>
 
-                    <div class="col-md-3 form-group">
-                        <label for="validationCustom01" class="form-label">Telefono</label>
-                        <input disabled class="form-control" type="text" placeholder="Telefono" required name="telefono"
-                            [value]="item.telefono">
+                        <div class="col-md-3 form-group">
+                            <label for="validationCustom01" class="form-label">Telefono</label>
+                            <input disabled class="form-control" type="text" placeholder="Telefono" required
+                                name="telefono" [value]="item.telefono">
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
+
         </div>
     </div>
 
@@ -57,8 +65,83 @@
     <div class="card box-shadow-sm">
         <div class="card box-shadow-sm">
             <div class="card-header">
-                <h5 style="margin-bottom: 0px;">Filtro de productos</h5>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 style="margin-bottom: 0px;">Filtro de productos</h5>
+                    </div>
+                    <div class="col-md-4" style="text-align: right;">
+                        <a class="btn btn-warning" data-toggle="modal" [attr.data-target]="'#select-stock'">Agregar
+                            Produco sin Stock</a>
+                    </div>
+                </div>
             </div>
+            <!-- MODAL SIN STOCK -->
+            <div class="modal fade" id="select-stock" tabindex="-1" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Producto sin Stock</h4>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">×</span></button>
+                        </div>
+                        <!-- FORMULARIO SELECCION -->
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="row">
+                                        <div class="col-lg-4 form-group">
+                                            <label for="">Precio</label>
+                                            <input type="number" class="form-control" placeholder="$ 00.00" required
+                                                name="precio" id="precio" [(ngModel)]="producto.precio">
+                                        </div>
+                                        <div class="col-lg-4 form-group">
+                                            <label for="">Cantidad</label>
+                                            <input type="number" class="form-control" placeholder="0" required
+                                                name="cantidad"
+                                                (change)="calcularTotal(producto.precio,producto.cantidad)"
+                                                [(ngModel)]="producto.cantidad">
+                                        </div>
+                                        <div class="col-lg-4 form-group">
+                                            <label for="">Total</label>
+                                            <input type="number" class="form-control" placeholder="0" required
+                                                name="total" [(ngModel)]="producto.total">
+                                        </div>
+                                        <div class="col-lg-4 form-group mb-3">
+                                            <label for="size">Talla</label>
+                                            <select class="form-control custom-select" id="talla"
+                                                [(ngModel)]="producto.talla">
+                                                <option value="XS">XS</option>
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="2XL">2XL</option>
+                                                <option value="3XL">3XL</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-12 form-group">
+                                            <label for="">Observaciones</label>
+                                            <textarea class="form-control" placeholder="Observaciones" required rows="5"
+                                                name="descripcion" [(ngModel)]="producto.descripcion"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary btn-sm" type="button"
+                                data-dismiss="modal">Cancelar</button>
+                            <button *ngIf="!load_btn" class="btn btn-primary btn-shadow btn-sm" type="button">Agregar
+                                Producto</button>
+                            <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
+                                <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                                Agregando...
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MODAL SIN STOCK -->
             <div class="card-header">
                 <div class="row">
                     <div class="col-6">
@@ -120,11 +203,11 @@
                                                 aria-expanded="false">OPCIONES</button>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
-                                                    [attr.data-target]="'#delete-'+item._id">Seleccionar Producto</a>
+                                                    [attr.data-target]="'#select-'+item._id">Seleccionar Producto</a>
                                             </div>
                                         </div>
-
-                                        <div class="modal fade" id="delete-{{item._id}}" tabindex="-1"
+                                        <!-- MODAL INIT -->
+                                        <div class="modal fade" id="select-{{item._id}}" tabindex="-1"
                                             style="display: none;" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
                                                 <div class="modal-content">
@@ -134,8 +217,8 @@
                                                             aria-label="Close"><span
                                                                 aria-hidden="true">×</span></button>
                                                     </div>
+                                                    <!-- FORMULARIO SELECCION -->
                                                     <div class="modal-body">
-                                                        <!-- FORMULARIO SELECCION -->
                                                         <div class="row">
                                                             <div class="col-lg-12">
                                                                 <div class="row">
@@ -159,6 +242,18 @@
                                                                             required name="total"
                                                                             [(ngModel)]="producto.total">
                                                                     </div>
+                                                                    <div class="col-lg-4 form-group mb-3">
+                                                                        <label
+                                                                            for="size">{{item.titulo_variedad}}</label>
+                                                                        <select class="form-control custom-select"
+                                                                            id="size" name="variedad">
+                                                                            <option value="" selected disabled>
+                                                                                Seleccionar</option>
+                                                                            <option value="{{item.titulo}}"
+                                                                                *ngFor="let opt of item.variedades">
+                                                                                {{opt.titulo}}</option>
+                                                                        </select>
+                                                                    </div>
                                                                     <div class="col-lg-12 form-group">
                                                                         <label for="">Observaciones</label>
                                                                         <textarea class="form-control"
@@ -175,8 +270,8 @@
                                                             data-dismiss="modal">Cancelar</button>
                                                         <button *ngIf="!load_btn"
                                                             class="btn btn-primary btn-shadow btn-sm"
-                                                            (click)="eliminar(item._id)"
-                                                            type="button">Confirmar</button>
+                                                            (click)="eliminar(item._id)" type="button">Agregar
+                                                            Producto</button>
                                                         <button *ngIf="load_btn" type="button" class="btn btn-secondary"
                                                             disabled>
                                                             <span class="spinner-grow spinner-grow-sm mr-2"
@@ -187,12 +282,11 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- MODAL FINISH -->
                                     </td>
                                 </tr>
                             </tbody>
                         </ng-container>
-
-
                     </table>
                 </div>
             </div>
@@ -203,12 +297,12 @@
         </div>
         <!-- NO USAR HASTA AQUI -->
         <div class="card-footer">
-            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Agregar Producto</button>
+            <button *ngIf="!load_btn" class="btn btn-primary mr-3" type="submit">Guardar Pedido</button>
             <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
                 <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
                 Agregando...
             </button>
-            <a [routerLink]="['/panel/pedidos']" class="btn btn-warning">Visualizar Orden</a>
+            <a class="btn btn-warning">Visualizar Orden</a>
         </div>
     </div>
 </form>

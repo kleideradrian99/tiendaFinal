@@ -12,23 +12,23 @@ export class DetalleVentasComponent implements OnInit {
 
   public url;
   public token;
-  public orden : any = {};
-  public detalles : Array<any> = [];
+  public orden: any = {};
+  public detalles: Array<any> = [];
   public load_data = true;
   public id;
 
   public totalstar = 5;
 
-  public review : any = {};
+  public review: any = {};
 
   constructor(
-    private _route:ActivatedRoute,
-    private _adminService:AdminService
-    ) { 
+    private _route: ActivatedRoute,
+    private _adminService: AdminService
+  ) {
     this.token = localStorage.getItem('token');
     this.url = GLOBAL.url;
     this._route.params.subscribe(
-      params=>{
+      params => {
         this.id = params['id'];
 
         this.init_data();
@@ -39,21 +39,21 @@ export class DetalleVentasComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  init_data(){
-    this._adminService.obtener_detalles_ordenes_cliente(this.id,this.token).subscribe(
-      response=>{
-        if(response.data != undefined){
+  init_data() {
+    this._adminService.obtener_detalles_ordenes_cliente(this.id, this.token).subscribe(
+      response => {
+        if (response.data != undefined) {
           this.orden = response.data;
-      
+
           this.detalles = response.detalles;
           this.load_data = false;
-        }else{
+        } else {
           this.orden = undefined;
         }
-       
+
         console.log(this.detalles);
-        
-        
+
+
 
       }
     );

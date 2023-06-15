@@ -17,19 +17,19 @@ export class ShowProductoComponent implements OnInit {
 
   public token;
   public slug;
-  public producto : any = {};
+  public producto: any = {};
   public url;
-  public productos_rec : Array<any> = [];
+  public productos_rec: Array<any> = [];
 
-  public carrito_data : any = {
+  public carrito_data: any = {
     variedad: '',
     cantidad: 1
   };
   public btn_cart = false;
   public socket = io('http://localhost:4201');
 
-  public descuento_activo : any = undefined;
-  public reviews :Array<any> = [];
+  public descuento_activo: any = undefined;
+  public reviews: Array<any> = [];
   public page = 1;
   public pageSize = 15;
 
@@ -51,87 +51,87 @@ export class ShowProductoComponent implements OnInit {
   public uno_porcent = 0;
 
   constructor(
-    private _route : ActivatedRoute,
-    private _guestService : GuestService,
-    private _clienteService : ClienteService
-  ) { 
+    private _route: ActivatedRoute,
+    private _guestService: GuestService,
+    private _clienteService: ClienteService
+  ) {
     this.token = localStorage.getItem('token');
     this.url = GLOBAL.url;
     this._route.params.subscribe(
-      params=>{
+      params => {
         this.slug = params['slug'];
-        
         this._guestService.obtener_productos_slug_publico(this.slug).subscribe(
-          response=>{
+          response => {
             this.producto = response.data;
+            console.log("Slug", this.producto);
 
             this._guestService.obtener_reviews_producto_publico(this.producto._id).subscribe(
-              response=>{
+              response => {
                 response.data.forEach(element => {
-                    if(element.estrellas == 5){
-                      this.count_five_start = this.count_five_start +1;
-                    }else if(element.estrellas == 4){
-                      this.count_four_start = this.count_four_start +1;
-                    }else if(element.estrellas == 3){
-                      this.count_three_start = this.count_three_start +1;
-                    }else if(element.estrellas == 2){
-                      this.count_two_start = this.count_two_start +1;
-                    }else if(element.estrellas == 1){
-                      this.count_one_start = this.count_one_start +1;
-                    }
+                  if (element.estrellas == 5) {
+                    this.count_five_start = this.count_five_start + 1;
+                  } else if (element.estrellas == 4) {
+                    this.count_four_start = this.count_four_start + 1;
+                  } else if (element.estrellas == 3) {
+                    this.count_three_start = this.count_three_start + 1;
+                  } else if (element.estrellas == 2) {
+                    this.count_two_start = this.count_two_start + 1;
+                  } else if (element.estrellas == 1) {
+                    this.count_one_start = this.count_one_start + 1;
+                  }
 
-                    this.cinco_porcent = (this.count_five_start*100)/response.data.length;
-                    this.cuatro_porcent = (this.count_four_start*100)/response.data.length;
-                    this.tres_porcent = (this.count_three_start*100)/response.data.length;
-                    this.dos_porcent = (this.count_two_start*100)/response.data.length;
-                    this.uno_porcent = (this.count_one_start*100)/response.data.length;
+                  this.cinco_porcent = (this.count_five_start * 100) / response.data.length;
+                  this.cuatro_porcent = (this.count_four_start * 100) / response.data.length;
+                  this.tres_porcent = (this.count_three_start * 100) / response.data.length;
+                  this.dos_porcent = (this.count_two_start * 100) / response.data.length;
+                  this.uno_porcent = (this.count_one_start * 100) / response.data.length;
 
 
-                    let puntos_cinco = 0;
-                    let puntos_cuatro = 0;
-                    let puntos_tres = 0;
-                    let puntos_dos = 0;
-                    let punto_uno = 0;
+                  let puntos_cinco = 0;
+                  let puntos_cuatro = 0;
+                  let puntos_tres = 0;
+                  let puntos_dos = 0;
+                  let punto_uno = 0;
 
-                    puntos_cinco = this.count_five_start * 5;
-                    puntos_cuatro = this.count_four_start * 4;
-                    puntos_tres = this.count_three_start * 3;
-                    puntos_dos = this.count_two_start * 2;
-                    punto_uno = this.count_one_start * 1;
+                  puntos_cinco = this.count_five_start * 5;
+                  puntos_cuatro = this.count_four_start * 4;
+                  puntos_tres = this.count_three_start * 3;
+                  puntos_dos = this.count_two_start * 2;
+                  punto_uno = this.count_one_start * 1;
 
-                    this.total_puntos = puntos_cinco + puntos_cuatro + puntos_tres + puntos_dos + punto_uno;
-                    this.max_puntos = response.data.length * 5;
+                  this.total_puntos = puntos_cinco + puntos_cuatro + puntos_tres + puntos_dos + punto_uno;
+                  this.max_puntos = response.data.length * 5;
 
-                    
 
-                    this.porcent_raiting = (this.total_puntos*100)/this.max_puntos;
-                    this.puntos_raiting = (this.porcent_raiting*5)/100;
-                    console.log(this.puntos_raiting);
+
+                  this.porcent_raiting = (this.total_puntos * 100) / this.max_puntos;
+                  this.puntos_raiting = (this.porcent_raiting * 5) / 100;
+                  console.log(this.puntos_raiting);
                 });
-              
+
                 this.reviews = response.data;
               }
             );
-            
+
             this._guestService.listar_productos_recomendados_publico(this.producto.categoria).subscribe(
-              response=>{
+              response => {
                 this.productos_rec = response.data;
 
               }
             );
           }
         );
-        
+
       }
     );
-    
+
   }
 
-  
+
 
   ngOnInit(): void {
 
-    setTimeout(()=>{
+    setTimeout(() => {
       tns({
         container: '.cs-carousel-inner',
         controlsText: ['<i class="cxi-arrow-left"></i>', '<i class="cxi-arrow-right"></i>'],
@@ -147,8 +147,8 @@ export class ShowProductoComponent implements OnInit {
       });
 
       var e = document.querySelectorAll(".cs-gallery");
-      if (e.length){
-        for (var t = 0; t < e.length; t++){
+      if (e.length) {
+        for (var t = 0; t < e.length; t++) {
           lightGallery(e[t], { selector: ".cs-gallery-item", download: !1, videojs: !0, youtubePlayerParams: { modestbranding: 1, showinfo: 0, rel: 0 }, vimeoPlayerParams: { byline: 0, portrait: 0 } });
         }
       }
@@ -183,77 +183,77 @@ export class ShowProductoComponent implements OnInit {
           }
         }
       });
-    },500)
+    }, 500)
 
     this._guestService.obtener_descuento_activo().subscribe(
-      response=>{
-        
-        if(response.data != undefined){
+      response => {
+
+        if (response.data != undefined) {
           this.descuento_activo = response.data[0];
-        }else{
+        } else {
           this.descuento_activo = undefined;
         }
 
-        
+
       }
     );
   }
 
-  agregar_producto(){
-     if(this.carrito_data.variedad){
-        if(this.carrito_data.cantidad <= this.producto.stock){
-          let data = {
-            producto: this.producto._id,
-            cliente: localStorage.getItem('_id'),
-            cantidad: this.carrito_data.cantidad,
-            variedad: this.carrito_data.variedad,
-          }
-          this.btn_cart =true;
-          this._clienteService.agregar_carrito_cliente(data,this.token).subscribe(
-            response=>{
-              if(response.data == undefined){
-                iziToast.show({
-                    title: 'ERROR',
-                    titleColor: '#FF0000',
-                    color: '#FFF',
-                    class: 'text-danger',
-                    position: 'topRight',
-                    message: 'El producto ya existe en el carrito'
-                });
-                this.btn_cart =false;
-              }else{
-                console.log(response);
-                iziToast.show({
-                    title: 'SUCCESS',
-                    titleColor: '#1DC74C',
-                    color: '#FFF',
-                    class: 'text-success',
-                    position: 'topRight',
-                    message: 'Se agregó el producto al carrito.'
-                });
-                this.socket.emit('add-carrito-add',{data:true});
-                this.btn_cart =false;
-              }
-            }
-          );
-        }else{
-          iziToast.show({
-            title: 'ERROR',
-            titleColor: '#FF0000',
-            color: '#FFF',
-            class: 'text-danger',
-            position: 'topRight',
-            message: 'La maxima cantidad disponible es: ' + this.producto.stock
-        });
+  agregar_producto() {
+    if (this.carrito_data.variedad) {
+      if (this.carrito_data.cantidad <= this.producto.stock) {
+        let data = {
+          producto: this.producto._id,
+          cliente: localStorage.getItem('_id'),
+          cantidad: this.carrito_data.cantidad,
+          variedad: this.carrito_data.variedad,
         }
-     }else{
-      iziToast.show({
+        this.btn_cart = true;
+        this._clienteService.agregar_carrito_cliente(data, this.token).subscribe(
+          response => {
+            if (response.data == undefined) {
+              iziToast.show({
+                title: 'ERROR',
+                titleColor: '#FF0000',
+                color: '#FFF',
+                class: 'text-danger',
+                position: 'topRight',
+                message: 'El producto ya existe en el carrito'
+              });
+              this.btn_cart = false;
+            } else {
+              console.log(response);
+              iziToast.show({
+                title: 'SUCCESS',
+                titleColor: '#1DC74C',
+                color: '#FFF',
+                class: 'text-success',
+                position: 'topRight',
+                message: 'Se agregó el producto al carrito.'
+              });
+              this.socket.emit('add-carrito-add', { data: true });
+              this.btn_cart = false;
+            }
+          }
+        );
+      } else {
+        iziToast.show({
           title: 'ERROR',
           titleColor: '#FF0000',
           color: '#FFF',
           class: 'text-danger',
           position: 'topRight',
-          message: 'Seleccione una variedad de producto'
+          message: 'La maxima cantidad disponible es: ' + this.producto.stock
+        });
+      }
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Seleccione una variedad de producto'
       });
     }
   }
