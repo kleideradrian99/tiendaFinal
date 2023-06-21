@@ -16,10 +16,16 @@ declare var $: any;
 })
 export class CreatePedidoComponent implements OnInit {
 
+  public carrito_data: any = {
+    variedad: '',
+    cantidad: 0
+  };
+
   // CLIENTE
   public clientes: Array<any> = [];
   public cliente: any = {};
   public filtroCliente = '';
+  public _idCliente = '';
 
   public load_data = true;
   public token;
@@ -35,7 +41,7 @@ export class CreatePedidoComponent implements OnInit {
   public page = 1;
   public pageSize = 4;
   public url;
-
+  public btn_cart = false;
   public producto: any = {};
   public productos: Array<any> = [];
   public arr_productos: Array<any> = [];
@@ -102,8 +108,9 @@ export class CreatePedidoComponent implements OnInit {
             this.clientes = undefined;
           } else {
             this.clientes = response.data;
+            this._idCliente = response.data[0]._id;
           }
-          console.log(response.data[0]._id);//ID CLIENTE
+
         }
       )
     } else {
@@ -116,6 +123,70 @@ export class CreatePedidoComponent implements OnInit {
         message: 'Ingrese un filtro para buscar'
       });
       this.clientes = undefined;
+    }
+  }
+
+  //AGREGAR AL CARRITO
+  agregar_producto(producto, id) {
+    if (this._idCliente != '') {
+      if (this.carrito_data.variedad) {
+        let data = {
+          producto: producto._id,
+          cliente: this._idCliente,
+          cantidad: this.carrito_data.cantidad,
+          variedad: this.carrito_data.variedad,
+        }
+        this.btn_cart = true;
+        setTimeout(() => {
+          this._clienteService.agregar_carrito_cliente(data, this.token).subscribe(
+            response => {
+              if (response.data == undefined) {
+                iziToast.show({
+                  title: 'ERROR',
+                  titleColor: '#FF0000',
+                  color: '#FFF',
+                  class: 'text-danger',
+                  position: 'topRight',
+                  message: 'El producto ya existe en el Pedido'
+                });
+                this.btn_cart = false;
+              } else {
+                console.log(response);
+                iziToast.show({
+                  title: 'SUCCESS',
+                  titleColor: '#1DC74C',
+                  color: '#FFF',
+                  class: 'text-success',
+                  position: 'topRight',
+                  message: 'Se agregó el producto al Pedido.'
+                });
+                this.btn_cart = false;
+                $('#select-' + id).modal('hide');
+                $('.modal-backdrop').removeClass('show');
+                //this.init_Data();
+              }
+            }
+          );
+        }, 2000);
+      } else {
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Seleccione una variedad de producto'
+        });
+      }
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Debe ingresar un cliente para continuar'
+      });
     }
   }
 

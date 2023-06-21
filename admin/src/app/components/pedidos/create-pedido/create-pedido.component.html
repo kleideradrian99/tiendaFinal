@@ -232,8 +232,8 @@
                                                                         <label for="">Cantidad</label>
                                                                         <input type="number" class="form-control"
                                                                             placeholder="0" required name="cantidad"
-                                                                            (change)="calcularTotal(item.precio,producto.cantidad)"
-                                                                            [(ngModel)]="producto.cantidad">
+                                                                            (change)="calcularTotal(item.precio,carrito_data.cantidad)"
+                                                                            [(ngModel)]="carrito_data.cantidad">
                                                                     </div>
                                                                     <div class="col-lg-4 form-group">
                                                                         <label for="">Total</label>
@@ -246,10 +246,11 @@
                                                                         <label
                                                                             for="size">{{item.titulo_variedad}}</label>
                                                                         <select class="form-control custom-select"
-                                                                            id="size" name="variedad">
+                                                                            id="size" name="variedad"
+                                                                            [(ngModel)]="carrito_data.variedad">
                                                                             <option value="" selected disabled>
                                                                                 Seleccionar</option>
-                                                                            <option value="{{item.titulo}}"
+                                                                            <option value="{{opt.titulo}}"
                                                                                 *ngFor="let opt of item.variedades">
                                                                                 {{opt.titulo}}</option>
                                                                         </select>
@@ -268,11 +269,11 @@
                                                     <div class="modal-footer">
                                                         <button class="btn btn-secondary btn-sm" type="button"
                                                             data-dismiss="modal">Cancelar</button>
-                                                        <button *ngIf="!load_btn"
+                                                        <button *ngIf="!btn_cart"
                                                             class="btn btn-primary btn-shadow btn-sm"
-                                                            (click)="eliminar(item._id)" type="button">Agregar
+                                                            (click)="agregar_producto(item, item._id)" type="button">Agregar
                                                             Producto</button>
-                                                        <button *ngIf="load_btn" type="button" class="btn btn-secondary"
+                                                        <button *ngIf="btn_cart" type="button" class="btn btn-secondary"
                                                             disabled>
                                                             <span class="spinner-grow spinner-grow-sm mr-2"
                                                                 role="status" aria-hidden="true"></span>
