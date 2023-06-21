@@ -36,6 +36,12 @@ export class CreatePedidoComponent implements OnInit {
   public imgSelect: any | ArrayBuffer = 'assets/img/01.jpg';
   public config_global: any = {};
 
+  //CARRITO PEDIDO
+  public carrito_arr: Array<any> = [];
+  public venta: any = {};
+  public dventa: Array<any> = [];
+  public page2 = 1;
+  public pageSize2 = 4;
 
   // PRODUCTO
   public page = 1;
@@ -126,8 +132,39 @@ export class CreatePedidoComponent implements OnInit {
     }
   }
 
-  //AGREGAR AL CARRITO
+  //CARRITO
+  obtenerPedidoCliente() {
+    if (this._idCliente != '') {
+      this._clienteService.obtener_carrito_cliente(this._idCliente, this.token).subscribe(
+        response => {
+          this.carrito_arr = response.data;
+          console.log(this.carrito_arr);
+          this.carrito_arr.forEach(element => {
+            this.dventa.push({
+              producto: element.producto._id,
+              subtotal: element.producto.precio,
+              variedad: element.variedad,
+              cantidad: element.cantidad,
+              cliente: this._idCliente
+            });
+          });
+        }
+      );
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Aun no ha seleccionado un cliente'
+      });
+    }
+  }
+
+
   agregar_producto(producto, id) {
+    //PENDIENTE SABER STOCK SHOW-PRODUCTO
     if (this._idCliente != '') {
       if (this.carrito_data.variedad) {
         let data = {
