@@ -228,6 +228,7 @@ export class CreatePedidoComponent implements OnInit {
   }
 
   // PRODUCTO
+
   filtrarProducto() {
     if (this.filtro) {
       this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
@@ -259,6 +260,21 @@ export class CreatePedidoComponent implements OnInit {
     this.init_Data();
   }
 
-  eliminar(id) { }
+  eliminar_item(id) {
+    this._clienteService.eliminar_carrito_cliente(id, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'SUCCESS',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Se eliminó el producto correctamente.'
+        });
+        this.obtenerPedidoCliente();
+      }
+    );
+
+  }
 
 }
