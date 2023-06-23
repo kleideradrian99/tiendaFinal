@@ -89,14 +89,11 @@ export class NavComponent implements OnInit {
 
     this._guestService.obtener_descuento_activo().subscribe(
       response => {
-
         if (response.data != undefined) {
           this.descuento_activo = response.data[0];
         } else {
           this.descuento_activo = undefined;
         }
-
-
       }
     );
 
