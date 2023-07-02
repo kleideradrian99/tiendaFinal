@@ -34,6 +34,7 @@ import { ReviewsProductoComponent } from './components/productos/reviews-product
 import { IndexPedidosComponent } from './components/pedidos/index-pedidos/index-pedidos.component';
 import { CreatePedidoComponent } from './components/pedidos/create-pedido/create-pedido.component';
 import { EditPedidoComponent } from './components/pedidos/edit-pedido/edit-pedido.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { EditPedidoComponent } from './components/pedidos/edit-pedido/edit-pedid
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    NgSelectModule,
     HttpClientModule,
     routing,
     NgbPaginationModule,

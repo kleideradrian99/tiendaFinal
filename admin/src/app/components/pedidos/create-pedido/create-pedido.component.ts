@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { element } from 'protractor';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
@@ -18,7 +17,6 @@ export class CreatePedidoComponent implements OnInit {
 
   public carrito_data: any = {
     variedad: '',
-    cantidad: 0
   };
 
   // CLIENTE
@@ -45,6 +43,12 @@ export class CreatePedidoComponent implements OnInit {
 
   // PRODUCTO
   public page = 1;
+  public talla: Array<any> = [
+    { name: 'S' },
+    { name: 'M' },
+    { name: 'L' },
+    { name: 'XL' },
+  ];
   public pageSize = 4;
   public url;
   public btn_cart = false;
@@ -66,7 +70,6 @@ export class CreatePedidoComponent implements OnInit {
       }
     );
     // Variedades
-
   }
 
   ngOnInit(): void {
@@ -105,6 +108,7 @@ export class CreatePedidoComponent implements OnInit {
   registro(registroForm) {
 
   }
+  // ***************************************************************************************************
   // Cliente
   filtrarCliente() {
     if (this.filtroCliente) {
@@ -131,8 +135,9 @@ export class CreatePedidoComponent implements OnInit {
       this.clientes = undefined;
     }
   }
-
+  // ***************************************************************************************************
   //CARRITO
+  //Obtener Carrito Con Stock
   obtenerPedidoCliente() {
     if (this._idCliente != '') {
       this._clienteService.obtener_carrito_cliente(this._idCliente, this.token).subscribe(
@@ -161,49 +166,50 @@ export class CreatePedidoComponent implements OnInit {
       });
     }
   }
-
-
+  //Agregar Producto Al carrito (Con Stock)
   agregar_producto(producto, id) {
     //PENDIENTE SABER STOCK SHOW-PRODUCTO
-    if (this._idCliente != '') {
+    if (this._idCliente == '') {
       if (this.carrito_data.variedad) {
         let data = {
           producto: producto._id,
           cliente: this._idCliente,
-          cantidad: this.carrito_data.cantidad,
           variedad: this.carrito_data.variedad,
+          total: this.producto.total,
+          observacion: this.producto.observacion
         }
         this.btn_cart = true;
         setTimeout(() => {
-          this._clienteService.agregar_carrito_cliente(data, this.token).subscribe(
-            response => {
-              if (response.data == undefined) {
-                iziToast.show({
-                  title: 'ERROR',
-                  titleColor: '#FF0000',
-                  color: '#FFF',
-                  class: 'text-danger',
-                  position: 'topRight',
-                  message: 'El producto ya existe en el Pedido'
-                });
-                this.btn_cart = false;
-              } else {
-                console.log(response);
-                iziToast.show({
-                  title: 'SUCCESS',
-                  titleColor: '#1DC74C',
-                  color: '#FFF',
-                  class: 'text-success',
-                  position: 'topRight',
-                  message: 'Se agregó el producto al Pedido.'
-                });
-                this.btn_cart = false;
-                $('#select-' + id).modal('hide');
-                $('.modal-backdrop').removeClass('show');
-                //this.init_Data();
-              }
-            }
-          );
+          console.log(data);
+          // this._clienteService.agregar_carrito_cliente(data, this.token).subscribe(
+          //   response => {
+          //     if (response.data == undefined) {
+          //       iziToast.show({
+          //         title: 'ERROR',
+          //         titleColor: '#FF0000',
+          //         color: '#FFF',
+          //         class: 'text-danger',
+          //         position: 'topRight',
+          //         message: 'El producto ya existe en el Pedido'
+          //       });
+          //       this.btn_cart = false;
+          //     } else {
+          //       console.log(response);
+          //       iziToast.show({
+          //         title: 'SUCCESS',
+          //         titleColor: '#1DC74C',
+          //         color: '#FFF',
+          //         class: 'text-success',
+          //         position: 'topRight',
+          //         message: 'Se agregó el producto al Pedido.'
+          //       });
+          //       this.btn_cart = false;
+          //       $('#select-' + id).modal('hide');
+          //       $('.modal-backdrop').removeClass('show');
+          //       this.init_Data();
+          //     }
+          //   }
+          // );
         }, 2000);
       } else {
         iziToast.show({
@@ -226,9 +232,49 @@ export class CreatePedidoComponent implements OnInit {
       });
     }
   }
+  // Agregar Producto Al carrito (Sin Stock)
+  agregar_producto_sin_stock() {
+    if (this._idCliente == '') {
+      let data = {
+        producto: "senciilo",
+        precio: this.producto.precio,
+        cliente: this._idCliente,
+        tallas: this.producto.variedad,
+        total: this.producto.total,
+        observacion: this.producto.observacion
+      }
+      console.log(data);
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Debe ingresar un cliente para continuar'
+      });
+    }
+  }
+  //Eliminar del Carrito con stock
+  eliminar_item(id) {
+    this._clienteService.eliminar_carrito_cliente(id, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'SUCCESS',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Se eliminó el producto correctamente.'
+        });
+        this.obtenerPedidoCliente();
+      }
+    );
 
+  }
+
+  // ***************************************************************************************************
   // PRODUCTO
-
   filtrarProducto() {
     if (this.filtro) {
       this._productoService.listar_productos_admin(this.filtro, this.token).subscribe(
@@ -260,21 +306,28 @@ export class CreatePedidoComponent implements OnInit {
     this.init_Data();
   }
 
-  eliminar_item(id) {
-    this._clienteService.eliminar_carrito_cliente(id, this.token).subscribe(
-      response => {
-        iziToast.show({
-          title: 'SUCCESS',
-          titleColor: '#1DC74C',
-          color: '#FFF',
-          class: 'text-success',
-          position: 'topRight',
-          message: 'Se eliminó el producto correctamente.'
-        });
-        this.obtenerPedidoCliente();
-      }
-    );
+  total_sin_stock() {
+    if (this.producto.variedad) {
+      let cantidades = this.producto.variedad.reduce((acum, talla) => {
+        if (talla.cantidad) {
+          return acum + talla.cantidad
+        }
+        return acum;
+      }, 0);
+      this.producto.total = cantidades * this.producto.precio;
+    }
+  }
 
+  total_con_stock(precio) {
+    if (this.carrito_data.variedad) {
+      let cantidades = this.carrito_data.variedad.reduce((acum, talla) => {
+        if (talla.cantidad) {
+          return acum + talla.cantidad
+        }
+        return acum;
+      }, 0);
+      this.producto.total = cantidades * precio;
+    }
   }
 
 }
