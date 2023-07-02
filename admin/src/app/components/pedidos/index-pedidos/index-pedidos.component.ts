@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AdminService } from 'src/app/services/admin.service';
+import { ClienteService } from 'src/app/services/cliente.service';
 
 @Component({
   selector: 'app-index-pedidos',
@@ -14,18 +16,24 @@ export class IndexPedidosComponent implements OnInit {
   public filtro = '';
   public token;
 
-  constructor() { }
+  constructor(
+    private _clienteService: ClienteService,
+    private _adminService: AdminService,
+  ) { 
+    this.token = this._adminService.getToken();
 
-  ngOnInit(): void {
   }
 
-  filtrar(){
-    // this._cuponService.listar_cupones_admin(this.filtro,this.token).subscribe(
-    //   response=>{
-    //     this.cupones = response.data;
-    //     this.load_data = false;
-    //   }
-    // )
+  ngOnInit(): void {
+    this._clienteService.obtener_ordenes(this.token).subscribe(
+      response=>{
+        console.log(response);
+      }
+    );
+  }
+
+  filtrar() {
+
   }
 
 }
