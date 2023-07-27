@@ -1,16 +1,33 @@
 var CarritoAdmin = require('../models/carritoAdmin');
 
 const agregar_al_carrito = async function (req, res) {
-    if (req.user) {
-        let data = req.body;
-        let carrito_admin = await CarritoAdmin.find({ cliente: data.cliente });
-        if (carrito_admin == 0) {
-            let reg = await CarritoAdmin.create(data);
-            res.status(200).send({ data: reg });
+    try {
+        if (req.user) {
+            let data = req.body;
+            // Validar por cliente producto y orden
+            let clienteId = await CarritoAdmin.find({
+                cliente: data.cliente,
+                producto: data.producto
+            });
+
+            if (clienteId.length == 0) {
+                let reg = await CarritoAdmin.create(
+                    {
+                        variedad: data.variedad,
+                        producto: data.producto,
+                        cliente: data.cliente,
+                        total: data.total,
+                        observacion: data.observacion
+                    });
+                res.status(200).send({ data: reg });
+            } else {
+                res.status(200).send({ data: undefined });
+            }
         } else {
-            res.status(200).send({ data: undefined });
+            res.status(500).send({ message: 'NoAccess' });
         }
-    } else {
+    } catch (error) {
+        console.log(error);
         res.status(500).send({ message: 'NoAccess' });
     }
 }
@@ -45,7 +62,7 @@ const eliminar_carrito_admin = async function (req, res) {
     }
 }
 
-module.exports={
+module.exports = {
     agregar_al_carrito,
     obtener_carrito_admin,
     eliminar_carrito_admin,

@@ -22,15 +22,10 @@ const actualiza_config_admin = async function (req, res) {
         if (req.user.role == 'admin') {
 
             let data = req.body;
-
             if (req.files) {
-                console.log('Si hay img');
                 var img_path = req.files.logo.path;
                 var name = img_path.split('\\');
                 var logo_name = name[2];
-
-
-
 
                 let reg = await Config.findByIdAndUpdate({ _id: "6308f0f03f3dba885123aca9" }, {
                     categorias: JSON.parse(data.categorias),
@@ -49,7 +44,7 @@ const actualiza_config_admin = async function (req, res) {
                 })
                 res.status(200).send({ data: reg });
             } else {
-                console.log('No hay img');
+                // console.log('No hay img');
                 let reg = await Config.findByIdAndUpdate({ _id: "6308f0f03f3dba885123aca9" }, {
                     categorias: data.categorias,
                     titulo: data.titulo,
@@ -58,9 +53,6 @@ const actualiza_config_admin = async function (req, res) {
                 });
                 res.status(200).send({ data: reg });
             }
-
-
-
         } else {
             res.status(500).send({ message: 'NoAccess' });
         }

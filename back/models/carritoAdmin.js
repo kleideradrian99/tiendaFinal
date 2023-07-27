@@ -4,12 +4,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var CarritoAdminSchema = Schema({
-    producto: { type: Schema.ObjectId, required: true },
-    precio: {type: Number, required: true},
-    cantidad: { type: Number, require: true },
-    tallas: [{type: Object, require:false}],
+    producto: { type: Schema.ObjectId, required: false },
+    variedad: [{ type: Schema.Types.Mixed, require: false }],
     cliente: { type: Schema.ObjectId, ref: 'cliente', required: true },
-    observaciones: {type: String, required: true},
+    observacion: { type: String, required: false },
     createdAt: { type: Date, default: Date.now, require: true }
 });
 

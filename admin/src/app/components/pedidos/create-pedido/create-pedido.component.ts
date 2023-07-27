@@ -169,7 +169,7 @@ export class CreatePedidoComponent implements OnInit {
   //Agregar Producto Al carrito (Con Stock)
   agregar_producto(producto, id) {
     //PENDIENTE SABER STOCK SHOW-PRODUCTO
-    if (this._idCliente == '') {
+    if (this._idCliente != '') {
       if (this.carrito_data.variedad) {
         let data = {
           producto: producto._id,
@@ -181,35 +181,35 @@ export class CreatePedidoComponent implements OnInit {
         this.btn_cart = true;
         setTimeout(() => {
           console.log(data);
-          // this._clienteService.agregar_carrito_cliente(data, this.token).subscribe(
-          //   response => {
-          //     if (response.data == undefined) {
-          //       iziToast.show({
-          //         title: 'ERROR',
-          //         titleColor: '#FF0000',
-          //         color: '#FFF',
-          //         class: 'text-danger',
-          //         position: 'topRight',
-          //         message: 'El producto ya existe en el Pedido'
-          //       });
-          //       this.btn_cart = false;
-          //     } else {
-          //       console.log(response);
-          //       iziToast.show({
-          //         title: 'SUCCESS',
-          //         titleColor: '#1DC74C',
-          //         color: '#FFF',
-          //         class: 'text-success',
-          //         position: 'topRight',
-          //         message: 'Se agregó el producto al Pedido.'
-          //       });
-          //       this.btn_cart = false;
-          //       $('#select-' + id).modal('hide');
-          //       $('.modal-backdrop').removeClass('show');
-          //       this.init_Data();
-          //     }
-          //   }
-          // );
+          this._clienteService.agregar_al_carrito(data, this.token).subscribe(
+            response => {
+              if (response.data == undefined) {
+                iziToast.show({
+                  title: 'ERROR',
+                  titleColor: '#FF0000',
+                  color: '#FFF',
+                  class: 'text-danger',
+                  position: 'topRight',
+                  message: 'El producto ya existe en el Pedido'
+                });
+                this.btn_cart = false;
+              } else {
+                console.log(response);
+                iziToast.show({
+                  title: 'SUCCESS',
+                  titleColor: '#1DC74C',
+                  color: '#FFF',
+                  class: 'text-success',
+                  position: 'topRight',
+                  message: 'Se agregó el producto al Pedido.'
+                });
+                this.btn_cart = false;
+                $('#select-' + id).modal('hide');
+                $('.modal-backdrop').removeClass('show');
+                this.init_Data();
+              }
+            }
+          );
         }, 2000);
       } else {
         iziToast.show({
