@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { strict } from 'assert';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
@@ -40,6 +41,7 @@ export class CreatePedidoComponent implements OnInit {
   public dventa: Array<any> = [];
   public page2 = 1;
   public pageSize2 = 4;
+  public variedadDetails: Array<any> = [];
 
   // PRODUCTO
   public page = 1;
@@ -100,11 +102,6 @@ export class CreatePedidoComponent implements OnInit {
     )
   }
 
-  calcularTotal(precio, cantidad) {
-    this.cal_total = precio * cantidad;
-    this.producto.total = this.cal_total;
-  }
-
   registro(registroForm) {
 
   }
@@ -140,11 +137,11 @@ export class CreatePedidoComponent implements OnInit {
   //Obtener Carrito Con Stock
   obtenerPedidoCliente() {
     if (this._idCliente != '') {
-      this._clienteService.obtener_carrito_cliente(this._idCliente, this.token).subscribe(
+      this._clienteService.obtener_carrito_admin(this._idCliente, this.token).subscribe(
         response => {
           this.carrito_arr = response.data;
-          console.log(this.carrito_arr);
           this.carrito_arr.forEach(element => {
+            // Esto para los detalles
             this.dventa.push({
               producto: element.producto._id,
               subtotal: element.producto.precio,
@@ -152,6 +149,8 @@ export class CreatePedidoComponent implements OnInit {
               cantidad: element.cantidad,
               cliente: this._idCliente
             });
+            console.log(this.carrito_arr)
+
           });
         }
       );
@@ -255,9 +254,9 @@ export class CreatePedidoComponent implements OnInit {
       });
     }
   }
-  //Eliminar del Carrito con stock
+  //Eliminar del Carrito
   eliminar_item(id) {
-    this._clienteService.eliminar_carrito_cliente(id, this.token).subscribe(
+    this._clienteService.eliminar_carrito_admin(id, this.token).subscribe(
       response => {
         iziToast.show({
           title: 'SUCCESS',

@@ -5,12 +5,11 @@ const agregar_al_carrito = async function (req, res) {
         if (req.user) {
             let data = req.body;
             // Validar por cliente producto y orden
-            let clienteId = await CarritoAdmin.find({
+            let carritoClienteAdmin = await CarritoAdmin.find({
                 cliente: data.cliente,
                 producto: data.producto
             });
-
-            if (clienteId.length == 0) {
+            if (carritoClienteAdmin.length == 0) {
                 let reg = await CarritoAdmin.create(
                     {
                         variedad: data.variedad,
@@ -35,7 +34,7 @@ const agregar_al_carrito = async function (req, res) {
 const obtener_carrito_admin = async function (req, res) {
     if (req.user) {
         let id = req.params['id'];
-        let carrito_admin = await CarritoAdmin.find({ cliente: id });
+        let carrito_admin = await CarritoAdmin.find({ cliente: id }).populate('producto');
         res.status(200).send({ data: carrito_admin });
     } else {
         res.status(500).send({ message: 'NoAccess' });

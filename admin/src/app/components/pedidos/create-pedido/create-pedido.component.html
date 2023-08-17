@@ -325,7 +325,7 @@
                                                     <th>Titulo</th>
                                                     <th>Cantidad</th>
                                                     <th>Precio</th>
-                                                    <th>Variedad</th>
+                                                    <th>Variedades</th>
                                                     <th>Total</th>
                                                     <th>Opt</th>
                                                 </tr>
@@ -346,17 +346,21 @@
                                                 <tbody *ngFor="let item of carrito_arr">
                                                     <tr>
                                                         <td>
+                                                            <img style="width:50px"
+                                                                [src]="url +'obtener_portada/'+item.producto.portada"
+                                                                class="img-thumbnail rounded-0" alt="Square image">
                                                             <h6 style="padding-bottom: 0;margin-bottom: 0;">
-                                                                <img style="width:50px"
-                                                                    [src]="url +'obtener_portada/'+item.producto.portada"
-                                                                    class="img-thumbnail rounded-0" alt="Square image">
                                                                 {{item.producto.titulo}}
                                                             </h6>
 
                                                         </td>
                                                         <td>{{item.cantidad}}</td>
                                                         <td>${{item.producto.precio}}</td>
-                                                        <td>{{item.variedad}}</td>
+                                                        <td>
+                                                            <span *ngFor="let data of item.variedad">
+                                                                > {{data.titulo}}-{{data.cantidad}}<br>
+                                                            </span>
+                                                        </td>
                                                         <td>0.00</td>
                                                         <div class="btn-group dropdown d-inline-block mb-3 mr-2">
                                                             <button class="btn btn-outline-danger btn-sm mt-2 ml-2"

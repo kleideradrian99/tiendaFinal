@@ -48,11 +48,10 @@ export class ClienteService {
     return this._http.delete(this.url + 'eliminar_cliente_admin/' + id, { headers: headers });
   }
 
-  //Carrito de Pedido Productos con Stock
-  agregar_carrito_cliente(data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
-    return this._http.post(this.url + 'agregar_carrito_cliente', data, { headers: headers });
-  }
+  // agregar_carrito_cliente(data, token): Observable<any> {
+  //   let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+  //   return this._http.post(this.url + 'agregar_carrito_cliente', data, { headers: headers });
+  // }
 
   eliminar_carrito_cliente(id, token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
@@ -64,26 +63,26 @@ export class ClienteService {
     return this._http.get(this.url + 'obtener_carrito_cliente/' + id, { headers: headers });
   }
 
-  //Carrito de Pedido Productos sin Stock
+  //Carrito Admin
+
+  obtener_carrito_admin(id, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'obtener_carrito_admin/' + id, { headers: headers });
+  }
 
   agregar_al_carrito(data, token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.post(this.url + 'agregar_al_carrito', data, { headers: headers });
   }
 
-  obtener_carrito_admin(id, token): Observable<any> {
+  eliminar_carrito_admin(id, token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
-    return this._http.delete(this.url + 'obtener_carrito_admin/' + id, { headers: headers });
+    return this._http.delete(this.url + 'eliminar_carrito_admin/' + id, { headers: headers });
   }
 
   obtener_ordenes(token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.get(this.url + 'obtener_ordenes/', { headers: headers });
-  }
-
-  eliminar_carrito_admin(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
-    return this._http.get(this.url + 'eliminar_carrito_admin/' + id, { headers: headers });
   }
 
 
