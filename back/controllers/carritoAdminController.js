@@ -18,6 +18,7 @@ const agregar_al_carrito = async function (req, res) {
                         total: data.total,
                         observacion: data.observacion
                     });
+                    console.log(reg);
                 res.status(200).send({ data: reg });
             } else {
                 res.status(200).send({ data: undefined });

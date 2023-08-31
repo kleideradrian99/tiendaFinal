@@ -323,7 +323,7 @@
                                             <thead class="thead-dark">
                                                 <tr>
                                                     <th>Titulo</th>
-                                                    <th>Cantidad</th>
+                                                    <!-- <th>Cantidad</th> -->
                                                     <th>Precio</th>
                                                     <th>Variedades</th>
                                                     <th>Total</th>
@@ -354,14 +354,13 @@
                                                             </h6>
 
                                                         </td>
-                                                        <td>{{item.cantidad}}</td>
                                                         <td>${{item.producto.precio}}</td>
                                                         <td>
                                                             <span *ngFor="let data of item.variedad">
                                                                 > {{data.titulo}}-{{data.cantidad}}<br>
                                                             </span>
                                                         </td>
-                                                        <td>0.00</td>
+                                                        <td>{{item.total}}</td>
                                                         <div class="btn-group dropdown d-inline-block mb-3 mr-2">
                                                             <button class="btn btn-outline-danger btn-sm mt-2 ml-2"
                                                                 type="button" aria-haspopup="true" aria-expanded="false"

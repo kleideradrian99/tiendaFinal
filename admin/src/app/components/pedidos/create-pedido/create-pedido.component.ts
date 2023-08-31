@@ -1,3 +1,4 @@
+import { createAttribute } from '@angular/compiler/src/core';
 import { Component, OnInit } from '@angular/core';
 import { strict } from 'assert';
 import { GLOBAL } from 'src/app/services/GLOBAL';
@@ -135,13 +136,32 @@ export class CreatePedidoComponent implements OnInit {
   // ***************************************************************************************************
   //CARRITO
   //Obtener Carrito Con Stock
+  public totalPago: any;
   obtenerPedidoCliente() {
+    //GUARDAR DESDE MONGODB
     if (this._idCliente != '') {
+      this.totalPago = 0;
       this._clienteService.obtener_carrito_admin(this._idCliente, this.token).subscribe(
         response => {
           this.carrito_arr = response.data;
+          this.carrito_arr.forEach(e => {
+            let prices= [];
+            let cantidad = e.variedad.reduce((acum, talla) => {
+              if (talla.cantidad) {
+                return acum + talla.cantidad
+              }
+              return acum;
+            }, 0);            
+            this.totalPago = cantidad * e.producto.precio;
+            prices = [
+              this.totalPago
+            ];
+            this.carrito_arr.concat(prices);
+            console.log(this.carrito_arr)
+          });
+          
+          // Esto para los detalles
           this.carrito_arr.forEach(element => {
-            // Esto para los detalles
             this.dventa.push({
               producto: element.producto._id,
               subtotal: element.producto.precio,
@@ -149,8 +169,6 @@ export class CreatePedidoComponent implements OnInit {
               cantidad: element.cantidad,
               cliente: this._idCliente
             });
-            console.log(this.carrito_arr)
-
           });
         }
       );
@@ -314,6 +332,20 @@ export class CreatePedidoComponent implements OnInit {
         return acum;
       }, 0);
       this.producto.total = cantidades * this.producto.precio;
+    }
+  }
+  total_pago(precio) {
+    if (this.carrito_arr) {
+      this.carrito_arr.forEach(e => {
+        let cantidad = e.variedad.reduce((acum, talla) => {
+          if (talla.cantidad) {
+            return acum + talla.cantidad
+          }
+          return acum;
+        }, 0);
+        console.log(cantidad);
+        this.totalPago = cantidad * precio;
+      })
     }
   }
 

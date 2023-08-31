@@ -8,6 +8,7 @@ var CarritoAdminSchema = Schema({
     variedad: [{ type: Schema.Types.Mixed, require: false }],
     cliente: { type: Schema.ObjectId, ref: 'cliente', required: true },
     observacion: { type: String, required: false },
+    total: { type: Number, require: true },
     createdAt: { type: Date, default: Date.now, require: true }
 });
 
