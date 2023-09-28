@@ -77,7 +77,7 @@
             </div>
             <!-- MODAL SIN STOCK -->
             <div class="modal fade" id="select-stock" tabindex="-1" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h4 class="modal-title">Producto sin Stock</h4>
@@ -89,7 +89,7 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="row">
-                                        <div class="col-lg-8 form-group">
+                                        <div class="col-lg-4 form-group">
                                             <label for="">Nombre del Producto</label>
                                             <input type="text" class="form-control" placeholder="Nombre del producto"
                                                 required name="nombre" id="nombre" [(ngModel)]="producto.nombre">
@@ -115,6 +115,24 @@
                                             <label for="">Total</label>
                                             <input type="number" class="form-control" placeholder="0" required
                                                 name="total" [(ngModel)]="producto.total">
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="row">
+                                                <div class="col-lg-10 form-group">
+                                                    <label for="">Portada</label>
+                                                    <div class="custom-file">
+                                                        <input class="custom-file-input" type="file" id="file-input"
+                                                        (change)="fileChangeEvent($event)" >
+                                                        <label class="custom-file-label" id="input-portada"
+                                                            for="file-input"
+                                                            style="white-space:nowrap;overflow:hidden">Seleccionar
+                                                            imagen</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <img [src]="imgSelect" class="img-thumbnail" alt="Rounded image">
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-lg-12 form-group">
                                             <label for="">Observaciones</label>
@@ -298,7 +316,7 @@
 
         <div class="card-footer">
             <button *ngIf="!load_btn" [routerLink]="['/panel/pedidos']" class="btn btn-primary mr-3"
-                type="submit">Guardar Pedido</button>
+                type="submit">Terminar Pedido</button>
             <button *ngIf="load_btn" type="button" class="btn btn-secondary" disabled>
                 <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
                 Agregando...

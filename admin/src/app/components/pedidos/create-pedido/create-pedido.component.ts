@@ -55,10 +55,11 @@ export class CreatePedidoComponent implements OnInit {
   public pageSize = 4;
   public url;
   public btn_cart = false;
-  public producto: any = {};
+  public producto: any = {
+    categoria: ''
+  };
   public productos: Array<any> = [];
   public arr_productos: Array<any> = [];
-  public cal_total;
 
   constructor(
     private _adminService: AdminService,
@@ -136,30 +137,12 @@ export class CreatePedidoComponent implements OnInit {
   // ***************************************************************************************************
   //CARRITO
   //Obtener Carrito Con Stock
-  public totalPago: any;
   obtenerPedidoCliente() {
     //GUARDAR DESDE MONGODB
     if (this._idCliente != '') {
-      this.totalPago = 0;
       this._clienteService.obtener_carrito_admin(this._idCliente, this.token).subscribe(
         response => {
           this.carrito_arr = response.data;
-          this.carrito_arr.forEach(e => {
-            let prices= [];
-            let cantidad = e.variedad.reduce((acum, talla) => {
-              if (talla.cantidad) {
-                return acum + talla.cantidad
-              }
-              return acum;
-            }, 0);            
-            this.totalPago = cantidad * e.producto.precio;
-            prices = [
-              this.totalPago
-            ];
-            this.carrito_arr.concat(prices);
-            console.log(this.carrito_arr)
-          });
-          
           // Esto para los detalles
           this.carrito_arr.forEach(element => {
             this.dventa.push({
@@ -197,7 +180,6 @@ export class CreatePedidoComponent implements OnInit {
         }
         this.btn_cart = true;
         setTimeout(() => {
-          console.log(data);
           this._clienteService.agregar_al_carrito(data, this.token).subscribe(
             response => {
               if (response.data == undefined) {
@@ -211,7 +193,6 @@ export class CreatePedidoComponent implements OnInit {
                 });
                 this.btn_cart = false;
               } else {
-                console.log(response);
                 iziToast.show({
                   title: 'SUCCESS',
                   titleColor: '#1DC74C',
@@ -256,11 +237,43 @@ export class CreatePedidoComponent implements OnInit {
         producto: "senciilo",
         precio: this.producto.precio,
         cliente: this._idCliente,
-        tallas: this.producto.variedad,
+        variedades: this.producto.variedad,
         total: this.producto.total,
         observacion: this.producto.observacion
       }
       console.log(data);
+      //CREAMOS EL PRODUCTO
+      this.load_btn = true;
+      // this._productoService.registro_producto_admin(data, this.file, this.token).subscribe(
+      //   response => {
+      //     iziToast.show({
+      //       title: 'SUCCESS',
+      //       titleColor: '#1DC74C',
+      //       color: '#FFF',
+      //       class: 'text-success',
+      //       position: 'topRight',
+      //       message: 'El producto se creo, recuerde completar sus datos mas adelante'
+      //   }); 
+      //   this.load_btn = false;
+      //   },error=>{
+      //     console.log('Errorr:', error);
+      //     this.load_btn = false;
+      //   }
+      // );
+      //CREAMOS LA VARIEDAD DEL PRODUCTO
+      // if (data.variedades.length >= 1) {
+      //   this._productoService.actualizar_producto_variedades_admin({
+      //     titulo_variedad: 'Talla',
+      //     variedades: data.variedades
+      //   }, 'id',this.token).subscribe(
+      //     response=>{
+      //       console.log(response);
+
+      //     },error=>{
+      //       console.log('ErrVariedad:',error);
+      //     }
+      //   );
+      // } 
     } else {
       iziToast.show({
         title: 'ERROR',
@@ -334,20 +347,6 @@ export class CreatePedidoComponent implements OnInit {
       this.producto.total = cantidades * this.producto.precio;
     }
   }
-  total_pago(precio) {
-    if (this.carrito_arr) {
-      this.carrito_arr.forEach(e => {
-        let cantidad = e.variedad.reduce((acum, talla) => {
-          if (talla.cantidad) {
-            return acum + talla.cantidad
-          }
-          return acum;
-        }, 0);
-        console.log(cantidad);
-        this.totalPago = cantidad * precio;
-      })
-    }
-  }
 
   total_con_stock(precio) {
     if (this.carrito_data.variedad) {
@@ -361,4 +360,58 @@ export class CreatePedidoComponent implements OnInit {
     }
   }
 
+  
+  fileChangeEvent(event:any):void{
+    var file;
+    if(event.target.files && event.target.files[0]){
+      file = <File>event.target.files[0];
+    }else{
+      iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'No hay un imagen de envio'
+      });
+    }
+
+    if(file.size <= 4000000){
+      if(file.type == 'image/png' || file.type == 'image/webp' || file.type == 'image/jpg' || file.type == 'image/gif' || file.type == 'image/jpeg'){
+        const reader = new FileReader();
+        reader.onload = e => this.imgSelect = reader.result;
+        // console.log(this.imgSelect);
+        reader.readAsDataURL(file);
+        $('#input-portada').text(file.name);
+        this.file = file;
+      }else{
+        iziToast.show({
+            title: 'ERROR',
+            titleColor: '#FF0000',
+            color: '#FFF',
+            class: 'text-danger',
+            position: 'topRight',
+            message: 'El archivo debe ser una imagen'
+        });
+        $('#input-portada').text('Seleccionar imagen');
+        this.imgSelect = 'assets/img/01.jpg';
+        this.file = undefined;
+      }
+    }else{
+      iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'La imagen no puede superar los 4MB'
+      });
+      $('#input-portada').text('Seleccionar imagen');
+      this.imgSelect = 'assets/img/01.jpg';
+      this.file = undefined;
+    }
+    
+    console.log(this.file);
+    
+  }
 }
