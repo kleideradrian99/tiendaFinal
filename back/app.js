@@ -36,16 +36,25 @@ var venta_route = require('./routes/venta');
 var descuento_route = require('./routes/descuento');
 var carrito_admin = require('./routes/carritoAdmin');
 
-mongoose.connect('mongodb://127.0.0.1:27017/tienda', { useUnifiedTopology: true, useNewUrlParser: true }, (err, res) => {
+mongoose.connect('mongodb+srv://kleidermachado:GjrxtBf7hSrkSZcs@cluster0.qowwswz.mongodb.net/tienda', { useUnifiedTopology: true, useNewUrlParser: true }, (err, res) => {
     if (err) {
         console.log(err);
     } else {
-
         server.listen(port, function () {
             console.log('Servidor corriendo en el puerto ' + port);
         });
     }
 });
+
+// mongoose.connect('mongodb://127.0.0.1:27017/tienda', { useUnifiedTopology: true, useNewUrlParser: true }, (err, res) => {
+//     if (err) {
+//         console.log(err);
+//     } else {
+//         server.listen(port, function () {
+//             console.log('Servidor corriendo en el puerto ' + port);
+//         });
+//     }
+// });
 
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json({ limit: '50mb', extended: true }));
