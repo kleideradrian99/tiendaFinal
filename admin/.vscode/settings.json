@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/b07c4d52-ae59-4904-8408-c5072fe61377/resourceGroups/backenMb/providers/Microsoft.Web/sites/adminWebMb",
+    "appService.deploySubpath": "dist/admin"
+}
