@@ -17,7 +17,7 @@ var ProductoSchema = Schema({
     categoria: { type: String,default:'Moda', required: true },
     titulo_variedad: { type: String, default: 'Talla', required: false },
     estado: { type: String, default: 'Edicion', required: true },
-    typeProducto: { type: String, required: true },
+    typeProducto: { type: String, required: false },
     createdAt: { type: Date, default: Date.now, require: true }
 });
 

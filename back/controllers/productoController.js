@@ -6,15 +6,13 @@ var Review = require('../models/review');
 var fs = require('fs');
 var path = require('path');
 
-const registro_producto_admin = async function(req, res) {
+const registro_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             let data = req.body;
-
             var img_path = req.files.portada.path;
-            var name = img_path.split('\\');
-            var portada_name = name[2];
-
+            var name = img_path.split(path.sep);
+            var portada_name = name[name.length - 1];
             data.slug = data.titulo.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
             data.portada = portada_name;
             let reg = await Producto.create(data);
@@ -36,7 +34,7 @@ const registro_producto_admin = async function(req, res) {
     }
 }
 
-const listar_productos_admin = async function(req, res) {
+const listar_productos_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             var filtro = req.params['filtro'];
@@ -51,11 +49,11 @@ const listar_productos_admin = async function(req, res) {
     }
 }
 
-const obtener_portada = async function(req, res) {
+const obtener_portada = async function (req, res) {
     var img = req.params['img'];
 
 
-    fs.stat('./uploads/productos/' + img, function(err) {
+    fs.stat('./uploads/productos/' + img, function (err) {
         if (!err) {
             let path_img = './uploads/productos/' + img;
             res.status(200).sendFile(path.resolve(path_img));
@@ -66,7 +64,7 @@ const obtener_portada = async function(req, res) {
     })
 }
 
-const obtener_producto_admin = async function(req, res) {
+const obtener_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -88,7 +86,7 @@ const obtener_producto_admin = async function(req, res) {
     }
 }
 
-const actualizar_producto_admin = async function(req, res) {
+const actualizar_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             let id = req.params['id'];
@@ -111,7 +109,7 @@ const actualizar_producto_admin = async function(req, res) {
                     portada: portada_name
                 });
 
-                fs.stat('./uploads/productos/' + reg.portada, function(err) {
+                fs.stat('./uploads/productos/' + reg.portada, function (err) {
                     if (!err) {
                         fs.unlink('./uploads/productos/' + reg.portada, (err) => {
                             if (err) throw err;
@@ -141,7 +139,7 @@ const actualizar_producto_admin = async function(req, res) {
     }
 }
 
-const eliminar_producto_admin = async function(req, res) {
+const eliminar_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -158,7 +156,7 @@ const eliminar_producto_admin = async function(req, res) {
     }
 }
 
-const listar_inventario_producto_admin = async function(req, res) {
+const listar_inventario_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -175,7 +173,7 @@ const listar_inventario_producto_admin = async function(req, res) {
     }
 }
 
-const eliminar_inventario_producto_admin = async function(req, res) {
+const eliminar_inventario_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             //OBTENER ID DEL INVENTARIO
@@ -205,7 +203,7 @@ const eliminar_inventario_producto_admin = async function(req, res) {
     }
 }
 
-const registro_inventario_producto_admin = async function(req, res) {
+const registro_inventario_producto_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -235,7 +233,7 @@ const registro_inventario_producto_admin = async function(req, res) {
     }
 }
 
-const actualizar_producto_variedades_admin = async function(req, res) {
+const actualizar_producto_variedades_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             let id = req.params['id'];
@@ -256,7 +254,7 @@ const actualizar_producto_variedades_admin = async function(req, res) {
 }
 
 
-const agregar_imagen_galeria_admin = async function(req, res) {
+const agregar_imagen_galeria_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             let id = req.params['id'];
@@ -286,7 +284,7 @@ const agregar_imagen_galeria_admin = async function(req, res) {
 }
 
 
-const eliminar_imagen_galeria_admin = async function(req, res) {
+const eliminar_imagen_galeria_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             let id = req.params['id'];
@@ -308,38 +306,38 @@ const eliminar_imagen_galeria_admin = async function(req, res) {
 
 //---METODOS PUBLICOS----------------------------------------------------
 
-const listar_productos_publico = async function(req, res) {
+const listar_productos_publico = async function (req, res) {
     var filtro = req.params['filtro'];
 
     let reg = await Producto.find({ titulo: new RegExp(filtro, 'i') }).sort({ createdAt: -1 });
     res.status(200).send({ data: reg });
 }
 
-const obtener_productos_slug_publico = async function(req, res) {
+const obtener_productos_slug_publico = async function (req, res) {
     var slug = req.params['slug'];
 
     let reg = await Producto.findOne({ slug: slug });
     res.status(200).send({ data: reg });
 }
 
-const listar_productos_recomendados_publico = async function(req, res) {
+const listar_productos_recomendados_publico = async function (req, res) {
     var categoria = req.params['categoria'];
 
     let reg = await Producto.find({ categoria: categoria }).sort({ createdAt: -1 }).limit(8);
     res.status(200).send({ data: reg });
 }
 
-const listar_productos_nuevos_publico = async function(req, res) {
+const listar_productos_nuevos_publico = async function (req, res) {
     let reg = await Producto.find().sort({ createdAt: -1 }).limit(8);
     res.status(200).send({ data: reg });
 }
 
-const listar_productos_masvendidos_publico = async function(req, res) {
+const listar_productos_masvendidos_publico = async function (req, res) {
     let reg = await Producto.find().sort({ nventas: -1 }).limit(8);
     res.status(200).send({ data: reg });
 }
 
-const obtener_reviews_producto_publico = async function(req, res) {
+const obtener_reviews_producto_publico = async function (req, res) {
     let id = req.params['id'];
 
     let reviews = await Review.find({ producto: id }).populate('cliente').sort({ createdAt: -1 });
