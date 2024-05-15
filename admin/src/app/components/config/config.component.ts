@@ -30,8 +30,6 @@ export class ConfigComponent implements OnInit{
         response=>{
           this.config = response.data;
           this.imgSelect = this.url+'obtener_logo/'+this.config.logo;
-          console.log(this.config);
-          
         },
         error=>{
           console.log(error);
@@ -45,8 +43,6 @@ export class ConfigComponent implements OnInit{
 
   agregar_cat(){
       if(this.titulo_cat && this.icono_cat){
-        console.log(uuidv4());
-        
           this.config.categorias.push({
             titulo: this.titulo_cat,
             icono: this.icono_cat,
@@ -77,10 +73,7 @@ export class ConfigComponent implements OnInit{
         categorias: this.config.categorias,
         logo: this.file
       }
-
-      console.log(data);
-
-      this._adminService.actualiza_config_admin("6308f0f03f3dba885123aca9",data,this.token).subscribe(
+      this._adminService.actualiza_config_admin("664526b432ea5f7527aeef3a",data,this.token).subscribe(
         response=>{
           iziToast.show({
               title: 'SUCCESS',
@@ -159,8 +152,6 @@ export class ConfigComponent implements OnInit{
       this.imgSelect = 'assets/img/01.jpg';
       this.file = undefined;
     }
-    
-    console.log(this.file);
   }
 
   ngDoCheck(): void {

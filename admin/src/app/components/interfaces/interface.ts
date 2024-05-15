@@ -13,7 +13,29 @@ export interface IProducto {
     contenido: string;
     slug: string;
     portada: string;
-    variedades: { titulo: string }[]; 
+    variedades: { titulo: string }[];
     createdAt: string;
     __v: number;
 }
+
+export interface IConfig {
+
+    _id: {
+        $oid: string;
+    };
+    categorias: Categoria[];
+    titulo: string;
+    logo: string;
+    serie: string;
+    correlativo: string;
+    __v: {
+        $numberInt: string;
+    };
+}
+
+interface Categoria {
+    titulo: string;
+    icono: string;
+    _id: string;
+}
+

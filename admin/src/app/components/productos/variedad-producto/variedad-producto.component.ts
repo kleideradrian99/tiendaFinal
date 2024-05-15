@@ -35,13 +35,11 @@ export class VariedadProductoComponent implements OnInit {
           response => {
             if (response.data) {
               this.producto = response.data;
-              console.log('Producto después de asignar datos:', this.producto); // Agrega este console.log
             } else {
               this.producto.variedades = [];
             }
           }
         );
-
       }
     );
   }

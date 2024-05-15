@@ -6,7 +6,7 @@ const obtener_config_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
-            let reg = await Config.findById({ _id: "6308f0f03f3dba885123aca9" });
+            let reg = await Config.findById({ _id: "664526b432ea5f7527aeef3a" });
             res.status(200).send({ data: reg });
 
         } else {
@@ -27,7 +27,7 @@ const actualiza_config_admin = async function (req, res) {
                 var name = img_path.split('\\');
                 var logo_name = name[2];
 
-                let reg = await Config.findByIdAndUpdate({ _id: "6308f0f03f3dba885123aca9" }, {
+                let reg = await Config.findByIdAndUpdate({ _id: "664526b432ea5f7527aeef3a" }, {
                     categorias: JSON.parse(data.categorias),
                     titulo: data.titulo,
                     serie: data.serie,
@@ -45,7 +45,7 @@ const actualiza_config_admin = async function (req, res) {
                 res.status(200).send({ data: reg });
             } else {
                 // console.log('No hay img');
-                let reg = await Config.findByIdAndUpdate({ _id: "6308f0f03f3dba885123aca9" }, {
+                let reg = await Config.findByIdAndUpdate({ _id: "664526b432ea5f7527aeef3a" }, {
                     categorias: data.categorias,
                     titulo: data.titulo,
                     serie: data.serie,
@@ -77,7 +77,7 @@ const obtener_logo = async function (req, res) {
 }
 
 const obtener_config_publico = async function (req, res) {
-    let reg = await Config.findById({ _id: "6308f0f03f3dba885123aca9" });
+    let reg = await Config.findById({ _id: "664526b432ea5f7527aeef3a" });
     res.status(200).send({ data: reg });
 }
 
