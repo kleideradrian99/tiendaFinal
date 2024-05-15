@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { ProductoService } from 'src/app/services/producto.service';
+import { IProducto } from '../../interfaces/interface';
 declare var iziToast;
 
 @Component({
@@ -10,11 +11,9 @@ declare var iziToast;
   styleUrls: ['./variedad-producto.component.css']
 })
 export class VariedadProductoComponent implements OnInit {
-
-  public producto: any = {};
+  public producto: IProducto;
   public id;
   public token;
-
   public nueva_variedad = '';
   public load_btn = false;
   public url;
@@ -23,27 +22,23 @@ export class VariedadProductoComponent implements OnInit {
     private _route: ActivatedRoute,
     private _productoService: ProductoService
   ) {
+
+  }
+
+  ngOnInit(): void {
     this.token = localStorage.getItem('token');
     this.url = GLOBAL.url;
     this._route.params.subscribe(
       params => {
         this.id = params['id'];
-
-
         this._productoService.obtener_producto_admin(this.id, this.token).subscribe(
           response => {
-            if (response.data == undefined) {
-              this.producto = undefined;
-            } else {
+            if (response.data) {
               this.producto = response.data;
-
+              console.log('Producto después de asignar datos:', this.producto); // Agrega este console.log
+            } else {
+              this.producto.variedades = [];
             }
-            console.log(this.producto);
-
-
-          },
-          error => {
-
           }
         );
 
@@ -51,12 +46,12 @@ export class VariedadProductoComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-  }
-
 
   agregar_variedad() {
     if (this.nueva_variedad) {
+      if (!this.producto.variedades) {
+        this.producto.variedades = [];
+      }
       this.producto.variedades.push({ titulo: this.nueva_variedad });
       this.nueva_variedad = '';
     } else {
@@ -68,7 +63,6 @@ export class VariedadProductoComponent implements OnInit {
         position: 'topRight',
         message: 'El campo de la variedad debe ser completada'
       });
-
     }
   }
 
@@ -86,8 +80,6 @@ export class VariedadProductoComponent implements OnInit {
           variedades: this.producto.variedades
         }, this.id, this.token).subscribe(
           response => {
-            console.log(response);
-
             iziToast.show({
               title: 'SUCCESS',
               titleColor: '#1DC74C',

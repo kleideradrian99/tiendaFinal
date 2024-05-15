@@ -119,7 +119,6 @@ export class CreateProductoComponent implements OnInit {
 
         const reader = new FileReader();
         reader.onload = e => this.imgSelect = reader.result;
-        console.log(this.imgSelect);
 
         reader.readAsDataURL(file);
 
@@ -152,9 +151,6 @@ export class CreateProductoComponent implements OnInit {
       this.imgSelect = 'assets/img/01.jpg';
       this.file = undefined;
     }
-
-    console.log(this.file);
-
   }
 
 }
