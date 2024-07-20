@@ -261,8 +261,8 @@ const agregar_imagen_galeria_admin = async function (req, res) {
             let data = req.body;
 
             var img_path = req.files.imagen.path;
-            var name = img_path.split('\\');
-            var imagen_name = name[2];
+            var name = img_path.split(path.sep);
+            var imagen_name = name[name.length - 1];
 
             let reg = await Producto.findByIdAndUpdate({ _id: id }, {
                 $push: {

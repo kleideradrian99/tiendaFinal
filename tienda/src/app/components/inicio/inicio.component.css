@@ -1,0 +1,14 @@
+.cs-page-wrapper {
+
+    h1,
+    h2,
+    h3 {
+        color: #efefef;
+    }
+
+    .btn-outline-secondary{
+        box-shadow: 0px 4px 12px 0px rgba(255,255,255,1);
+        color: #fff;
+        border: #fff solid 1px;
+    }
+}
