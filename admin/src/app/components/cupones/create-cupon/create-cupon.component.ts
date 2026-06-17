@@ -1,13 +1,16 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CuponService } from 'src/app/services/cupon.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 declare var iziToast;
 
 @Component({
-  selector: 'app-create-cupon',
-  templateUrl: './create-cupon.component.html',
-  styleUrls: ['./create-cupon.component.css']
+    selector: 'app-create-cupon',
+    templateUrl: './create-cupon.component.html',
+    styleUrls: ['./create-cupon.component.css'],
+    imports: [SidebarComponent, FormsModule, NgIf, RouterLink]
 })
 export class CreateCuponComponent implements OnInit {
 

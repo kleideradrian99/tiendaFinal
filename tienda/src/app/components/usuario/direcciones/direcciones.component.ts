@@ -12,7 +12,7 @@ declare var iziToast;
 export class DireccionesComponent implements OnInit {
 
   public token;
-  public direccion : any = {
+  public direccion: any = {
     pais: '',
     region: '',
     provincia: '',
@@ -20,62 +20,61 @@ export class DireccionesComponent implements OnInit {
     principal: false
   };
 
-  public direcciones :Array<any> = [];
+  public direcciones: Array<any> = [];
 
-  public regiones:Array<any> = [];
-  public provincias:Array<any> = [];
-  public distritos:Array<any> = [];
+  public regiones: Array<any> = [];
+  public provincias: Array<any> = [];
+  public distritos: Array<any> = [];
 
-  public regiones_arr:Array<any> = [];
-  public provincias_arr:Array<any> = [];
-  public distritos_arr:Array<any> = [];
+  public regiones_arr: Array<any> = [];
+  public provincias_arr: Array<any> = [];
+  public distritos_arr: Array<any> = [];
 
   public load_data = true;
 
   constructor(
-    private _guestService:GuestService,
-    private _clienteService:ClienteService
+    private _guestService: GuestService,
+    private _clienteService: ClienteService
   ) {
     this.token = localStorage.getItem('token');
 
     this._guestService.get_Regiones().subscribe(
-      response=>{
+      response => {
         this.regiones_arr = response;
       }
     );
 
     this._guestService.get_Procincias().subscribe(
-      response=>{
+      response => {
         this.provincias_arr = response;
       }
     );
 
     this._guestService.get_Distritos().subscribe(
-      response=>{
+      response => {
         this.distritos_arr = response;
       }
     );
-   }
+  }
 
   ngOnInit(): void {
     this.obtener_direccion();
   }
 
-  obtener_direccion(){
-    this._clienteService.obtener_direccion_todos_cliente(localStorage.getItem('_id'),this.token).subscribe(
-      response=>{
+  obtener_direccion() {
+    this._clienteService.obtener_direccion_todos_cliente(localStorage.getItem('_id'), this.token).subscribe(
+      response => {
         this.direcciones = response.data;
         this.load_data = false;
       }
     );
   }
 
-  select_pais(){
-    if(this.direccion.pais == 'Perú'){
+  select_pais() {
+    if (this.direccion.pais == 'Perú') {
       $('#sl-region').prop('disabled', false);
       this._guestService.get_Regiones().subscribe(
-        response=>{
-          console.log(response);
+        response => {
           response.forEach(element => {
             this.regiones.push({
               id: element.id,
@@ -85,7 +84,7 @@ export class DireccionesComponent implements OnInit {
 
         }
       );
-    }else{
+    } else {
       $('#sl-region').prop('disabled', true);
       $('#sl-provincia').prop('disabled', true);
       $('#sl-distrito').prop('disabled', true);
@@ -99,65 +98,65 @@ export class DireccionesComponent implements OnInit {
     }
   }
 
-  select_region(){
+  select_region() {
     this.provincias = [];
     $('#sl-provincia').prop('disabled', false);
     $('#sl-distrito').prop('disabled', true);
     this.direccion.provincia = '';
     this.direccion.distrito = '';
     this._guestService.get_Procincias().subscribe(
-      response=>{
+      response => {
         response.forEach(element => {
-            if(element.department_id == this.direccion.region){
-              this.provincias.push(
-                element
-              );
-            }
+          if (element.department_id == this.direccion.region) {
+            this.provincias.push(
+              element
+            );
+          }
         });
         console.log(this.provincias);
-        
-        
+
+
       }
     );
   }
 
-  select_provincia(){
+  select_provincia() {
     this.distritos = [];
     $('#sl-distrito').prop('disabled', false);
-    this.direccion.distrito= '';
+    this.direccion.distrito = '';
     this._guestService.get_Distritos().subscribe(
-      response=>{
+      response => {
         response.forEach(element => {
-          if(element.province_id == this.direccion.provincia){
+          if (element.province_id == this.direccion.provincia) {
             this.distritos.push(
               element
             );
           }
-      });
-      console.log(this.distritos);
-        
+        });
+        console.log(this.distritos);
+
       }
     );
   }
 
 
-  registrar(registroForm){
-    if(registroForm.valid){
-      
+  registrar(registroForm) {
+    if (registroForm.valid) {
+
       this.regiones_arr.forEach(element => {
-        if(parseInt(element.id) == parseInt(this.direccion.region)){
+        if (parseInt(element.id) == parseInt(this.direccion.region)) {
           this.direccion.region = element.name;
         }
       });
 
       this.provincias_arr.forEach(element => {
-        if(parseInt(element.id) == parseInt(this.direccion.provincia)){
+        if (parseInt(element.id) == parseInt(this.direccion.provincia)) {
           this.direccion.provincia = element.name;
         }
       });
 
       this.distritos_arr.forEach(element => {
-        if(parseInt(element.id) == parseInt(this.direccion.distrito)){
+        if (parseInt(element.id) == parseInt(this.direccion.distrito)) {
           this.direccion.distrito = element.name;
         }
       });
@@ -178,8 +177,8 @@ export class DireccionesComponent implements OnInit {
         cliente: localStorage.getItem('_id')
       }
 
-      this._clienteService.registro_direccion_cliente(data,this.token).subscribe(
-        response=>{
+      this._clienteService.registro_direccion_cliente(data, this.token).subscribe(
+        response => {
           this.direccion = {
             pais: '',
             region: '',
@@ -192,17 +191,17 @@ export class DireccionesComponent implements OnInit {
           $('#sl-distrito').prop('disabled', true);
           this.obtener_direccion();
           iziToast.show({
-              title: 'SUCCESS',
-              titleColor: '#1DC74C',
-              color: '#FFF',
-              class: 'text-success',
-              position: 'topRight',
-              message: 'Se agregó la nueva direccion correctamente.'
+            title: 'SUCCESS',
+            titleColor: '#1DC74C',
+            color: '#FFF',
+            class: 'text-success',
+            position: 'topRight',
+            message: 'Se agregó la nueva direccion correctamente.'
           });
         }
       );
 
-    }else{
+    } else {
       iziToast.show({
         title: 'ERROR',
         titleColor: '#FF0000',
@@ -210,13 +209,13 @@ export class DireccionesComponent implements OnInit {
         class: 'text-danger',
         position: 'topRight',
         message: 'Los datos del formulario no son validos'
-    });
+      });
     }
   }
 
-  establecer_principal(id){
-    this._clienteService.cambiar_direccion_principal_cliente(id,localStorage.getItem('_id'),this.token).subscribe(
-      response=>{
+  establecer_principal(id) {
+    this._clienteService.cambiar_direccion_principal_cliente(id, localStorage.getItem('_id'), this.token).subscribe(
+      response => {
         iziToast.show({
           title: 'SUCCESS',
           titleColor: '#1DC74C',
@@ -224,7 +223,7 @@ export class DireccionesComponent implements OnInit {
           class: 'text-success',
           position: 'topRight',
           message: 'Se actualizó la direccion principal.'
-      });
+        });
         this.obtener_direccion();
       }
     );

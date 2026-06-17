@@ -143,8 +143,6 @@ export class NavComponent implements OnInit {
           message: 'Se eliminó el producto correctamente.'
         });
         this.socket.emit('delete-carrito', { data: response.data });
-        console.log(response);
-
       }
     );
   }

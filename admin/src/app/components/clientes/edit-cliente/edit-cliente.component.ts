@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 
 declare var iziToast;
 
 @Component({
-  selector: 'app-edit-cliente',
-  templateUrl: './edit-cliente.component.html',
-  styleUrls: ['./edit-cliente.component.css']
+    selector: 'app-edit-cliente',
+    templateUrl: './edit-cliente.component.html',
+    styleUrls: ['./edit-cliente.component.css'],
+    imports: [SidebarComponent, FormsModule, NgIf, RouterLink]
 })
 export class EditClienteComponent implements OnInit {
 
@@ -33,7 +37,6 @@ export class EditClienteComponent implements OnInit {
         this.id = params['id'];
         this._clienteService.obtener_cliente_admin(this.id, this.token).subscribe(
           response => {
-            console.log(response);
             if (response.data == undefined) {
               this.cliente = undefined;
               this.load_data = false;

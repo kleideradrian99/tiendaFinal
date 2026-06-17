@@ -3,15 +3,21 @@ import { GLOBAL } from 'src/app/services/GLOBAL';
 import { ProductoService } from 'src/app/services/producto.service';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgIf, NgFor, SlicePipe } from '@angular/common';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 declare var iziToast;
 declare var jQuery: any;
 declare var $: any;
 
 @Component({
-  selector: 'app-index-producto',
-  templateUrl: './index-producto.component.html',
-  styleUrls: ['./index-producto.component.css']
+    selector: 'app-index-producto',
+    templateUrl: './index-producto.component.html',
+    styleUrls: ['./index-producto.component.css'],
+    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe]
 })
 export class IndexProductoComponent implements OnInit {
 

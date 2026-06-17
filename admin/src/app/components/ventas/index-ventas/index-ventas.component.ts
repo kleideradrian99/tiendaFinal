@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgFor, SlicePipe, DatePipe } from '@angular/common';
+import { RouterLinkActive, RouterLink } from '@angular/router';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-index-ventas',
-  templateUrl: './index-ventas.component.html',
-  styleUrls: ['./index-ventas.component.css']
+    selector: 'app-index-ventas',
+    templateUrl: './index-ventas.component.html',
+    styleUrls: ['./index-ventas.component.css'],
+    imports: [SidebarComponent, FormsModule, NgFor, RouterLinkActive, RouterLink, NgbPagination, SlicePipe, DatePipe]
 })
 export class IndexVentasComponent implements OnInit {
 

@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { NgIf, NgFor, SlicePipe, DatePipe } from '@angular/common';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 declare var iziToast;
 declare var $;
 
 @Component({
-  selector: 'app-index-contacto',
-  templateUrl: './index-contacto.component.html',
-  styleUrls: ['./index-contacto.component.css']
+    selector: 'app-index-contacto',
+    templateUrl: './index-contacto.component.html',
+    styleUrls: ['./index-contacto.component.css'],
+    imports: [SidebarComponent, NgIf, NgFor, NgbPagination, SlicePipe, DatePipe]
 })
 export class IndexContactoComponent implements OnInit {
 

@@ -5,7 +5,7 @@ var Venta = require('../models/venta');
 var Dventa = require('../models/dventa');
 var Contacto = require('../models/contacto');
 var Review = require('../models/review');
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcryptjs');
 var jwt = require('../helpers/jwt');
 
 var Direccion = require('../models/direccion');
@@ -21,7 +21,7 @@ const registro_cliente = async function(req, res) {
         /*  */
 
         if (data.password) {
-            bcrypt.hash(data.password, null, null, async function(err, hash) {
+            bcrypt.hash(data.password, 10, async function(err, hash) {
                 if (hash) {
                     data.password = hash;
                     var reg = await Cliente.create(data);
@@ -118,7 +118,7 @@ const registro_cliente_admin = async function(req, res) {
         if (req.user.role == 'admin') {
             var data = req.body;
 
-            bcrypt.hash('123456789', null, null, async function(err, hash) {
+            bcrypt.hash('123456789', 10, async function(err, hash) {
                 if (hash) {
                     data.password = hash;
                     let reg = await Cliente.create(data);
@@ -202,7 +202,7 @@ const eliminar_cliente_admin = async function(req, res) {
 
             var id = req.params['id'];
 
-            let reg = await Cliente.findByIdAndRemove({ _id: id });
+            let reg = await Cliente.findByIdAndDelete(id);
             res.status(200).send({ data: reg });
 
         } else {
@@ -238,7 +238,7 @@ const actualizar_perfil_cliente_guest = async function(req, res) {
 
         if (data.password) {
             console.log('Con contraseña');
-            bcrypt.hash(data.password, null, null, async function(err, hash) {
+            bcrypt.hash(data.password, 10, async function(err, hash) {
                 console.log(hash);
                 var reg = await Cliente.findByIdAndUpdate({ _id: id }, {
                     nombres: data.nombres,

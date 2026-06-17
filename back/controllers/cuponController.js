@@ -86,7 +86,7 @@ const eliminar_cupon_admin = async function(req,res){
             
             var id = req.params['id'];
 
-            let reg = await Cupon.findByIdAndRemove({_id:id});
+            let reg = await Cupon.findByIdAndDelete(id);
             res.status(200).send({data:reg});
             
         }else{

@@ -11,29 +11,28 @@ export class IndexReviewComponent implements OnInit {
 
   public token;
   public url;
-  public reviews : Array<any>=[];
+  public reviews: Array<any> = [];
   public load_data = true;
 
   public page = 1;
   public pageSize = 15;
 
-  
+
 
   constructor(
-    private _clienteService:ClienteService
-  ) { 
+    private _clienteService: ClienteService
+  ) {
     this.token = localStorage.getItem('token');
   }
 
   ngOnInit(): void {
-    this._clienteService.obtener_reviews_cliente(localStorage.getItem('_id'),this.token).subscribe(
-      response=>{
-        console.log(response);
+    this._clienteService.obtener_reviews_cliente(localStorage.getItem('_id'), this.token).subscribe(
+      response => {
         this.reviews = response.data;
         this.load_data = false;
       }
     );;
   }
 
-  
+
 }

@@ -54,7 +54,7 @@ const obtener_ordenes = async function (req, res) {
 const eliminar_carrito_admin = async function (req, res) {
     if (req.user) {
         let id = req.params['id'];
-        let reg = await CarritoAdmin.findByIdAndRemove({ _id: id });
+        let reg = await CarritoAdmin.findByIdAndDelete(id);
         res.status(200).send({ data: reg });
     } else {
         res.status(500).send({ message: 'NoAccess' });

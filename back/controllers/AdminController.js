@@ -5,7 +5,7 @@ var Venta = require('../models/venta');
 var Dventa = require('../models/dventa');
 
 var Contacto = require('../models/contacto');
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcryptjs');
 var jwt = require('../helpers/jwt');
 const venta = require('../models/venta');
 
@@ -20,7 +20,7 @@ const registro_admin = async function(req,res){
         /*  */
 
         if(data.password){
-            bcrypt.hash(data.password,null,null, async function(err,hash){
+            bcrypt.hash(data.password, 10, async function(err,hash){
                 if(hash){
                     data.password = hash;
                     var reg = await Admin.create(data);

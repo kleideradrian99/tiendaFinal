@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-detalle-ventas',
-  templateUrl: './detalle-ventas.component.html',
-  styleUrls: ['./detalle-ventas.component.css']
+    selector: 'app-detalle-ventas',
+    templateUrl: './detalle-ventas.component.html',
+    styleUrls: ['./detalle-ventas.component.css'],
+    imports: [SidebarComponent, NgIf, NgFor, DatePipe]
 })
 export class DetalleVentasComponent implements OnInit {
 
@@ -50,10 +53,6 @@ export class DetalleVentasComponent implements OnInit {
         } else {
           this.orden = undefined;
         }
-
-        console.log(this.detalles);
-
-
 
       }
     );

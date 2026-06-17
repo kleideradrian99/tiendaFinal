@@ -1,19 +1,25 @@
-import { createAttribute } from '@angular/compiler/src/core';
 import { Component, OnInit } from '@angular/core';
 import { strict } from 'assert';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { ProductoService } from 'src/app/services/producto.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgIf, NgFor, SlicePipe } from '@angular/common';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLink } from '@angular/router';
 
 declare var iziToast;
 declare var jQuery: any;
 declare var $: any;
 
 @Component({
-  selector: 'app-create-pedido',
-  templateUrl: './create-pedido.component.html',
-  styleUrls: ['./create-pedido.component.css']
+    selector: 'app-create-pedido',
+    templateUrl: './create-pedido.component.html',
+    styleUrls: ['./create-pedido.component.css'],
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, RouterLink, SlicePipe]
 })
 export class CreatePedidoComponent implements OnInit {
 
@@ -241,7 +247,6 @@ export class CreatePedidoComponent implements OnInit {
         total: this.producto.total,
         observacion: this.producto.observacion
       }
-      console.log(data);
       //CREAMOS EL PRODUCTO
       this.load_btn = true;
       // this._productoService.registro_producto_admin(data, this.file, this.token).subscribe(
@@ -360,58 +365,56 @@ export class CreatePedidoComponent implements OnInit {
     }
   }
 
-  
-  fileChangeEvent(event:any):void{
+
+  fileChangeEvent(event: any): void {
     var file;
-    if(event.target.files && event.target.files[0]){
+    if (event.target.files && event.target.files[0]) {
       file = <File>event.target.files[0];
-    }else{
+    } else {
       iziToast.show({
-          title: 'ERROR',
-          titleColor: '#FF0000',
-          color: '#FFF',
-          class: 'text-danger',
-          position: 'topRight',
-          message: 'No hay un imagen de envio'
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'No hay un imagen de envio'
       });
     }
 
-    if(file.size <= 4000000){
-      if(file.type == 'image/png' || file.type == 'image/webp' || file.type == 'image/jpg' || file.type == 'image/gif' || file.type == 'image/jpeg'){
+    if (file.size <= 4000000) {
+      if (file.type == 'image/png' || file.type == 'image/webp' || file.type == 'image/jpg' || file.type == 'image/gif' || file.type == 'image/jpeg') {
         const reader = new FileReader();
         reader.onload = e => this.imgSelect = reader.result;
         // console.log(this.imgSelect);
         reader.readAsDataURL(file);
         $('#input-portada').text(file.name);
         this.file = file;
-      }else{
+      } else {
         iziToast.show({
-            title: 'ERROR',
-            titleColor: '#FF0000',
-            color: '#FFF',
-            class: 'text-danger',
-            position: 'topRight',
-            message: 'El archivo debe ser una imagen'
-        });
-        $('#input-portada').text('Seleccionar imagen');
-        this.imgSelect = 'assets/img/01.jpg';
-        this.file = undefined;
-      }
-    }else{
-      iziToast.show({
           title: 'ERROR',
           titleColor: '#FF0000',
           color: '#FFF',
           class: 'text-danger',
           position: 'topRight',
-          message: 'La imagen no puede superar los 4MB'
+          message: 'El archivo debe ser una imagen'
+        });
+        $('#input-portada').text('Seleccionar imagen');
+        this.imgSelect = 'assets/img/01.jpg';
+        this.file = undefined;
+      }
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'La imagen no puede superar los 4MB'
       });
       $('#input-portada').text('Seleccionar imagen');
       this.imgSelect = 'assets/img/01.jpg';
       this.file = undefined;
     }
-    
-    console.log(this.file);
-    
+
   }
 }

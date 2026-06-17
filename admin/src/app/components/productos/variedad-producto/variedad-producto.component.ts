@@ -3,12 +3,16 @@ import { ActivatedRoute } from '@angular/router';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { ProductoService } from 'src/app/services/producto.service';
 import { IProducto } from '../../interfaces/interface';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 declare var iziToast;
 
 @Component({
-  selector: 'app-variedad-producto',
-  templateUrl: './variedad-producto.component.html',
-  styleUrls: ['./variedad-producto.component.css']
+    selector: 'app-variedad-producto',
+    templateUrl: './variedad-producto.component.html',
+    styleUrls: ['./variedad-producto.component.css'],
+    imports: [SidebarComponent, NgIf, FormsModule, NgFor]
 })
 export class VariedadProductoComponent implements OnInit {
   public producto: IProducto;

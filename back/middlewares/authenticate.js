@@ -1,7 +1,6 @@
 'use strict'
 
-var jwt = require('jwt-simple');
-var moment = require('moment');
+var jwt = require('jsonwebtoken');
 var secret = 'diegoararca';
 
 exports.auth = function(req,res,next){
@@ -18,13 +17,11 @@ exports.auth = function(req,res,next){
         return res.status(403).send({message: 'InvalidToken'});
     }else{
         try {
-            var payload = jwt.decode(token,secret);
-            
-            if(payload.exp <= moment().unix()){
+            var payload = jwt.verify(token, secret);
+        } catch (error) {
+            if(error.name == 'TokenExpiredError'){
                 return res.status(403).send({message: 'TokenExpirado'});
             }
-
-        } catch (error) {
             return res.status(403).send({message: 'InvalidToken'});
         }
     }

@@ -2,11 +2,26 @@ var Config = require('../models/config');
 var fs = require('fs');
 var path = require('path');
 
+const getOrCreateConfig = async function () {
+    let reg = await Config.findById("664526b432ea5f7527aeef3a");
+    if (!reg) {
+        reg = await Config.create({
+            _id: "664526b432ea5f7527aeef3a",
+            categorias: [],
+            titulo: "Mi Tienda",
+            logo: "default.jpg",
+            serie: "001",
+            correlativo: "000001"
+        });
+    }
+    return reg;
+}
+
 const obtener_config_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
-            let reg = await Config.findById({ _id: "664526b432ea5f7527aeef3a" });
+            let reg = await getOrCreateConfig();
             res.status(200).send({ data: reg });
 
         } else {
@@ -77,7 +92,7 @@ const obtener_logo = async function (req, res) {
 }
 
 const obtener_config_publico = async function (req, res) {
-    let reg = await Config.findById({ _id: "664526b432ea5f7527aeef3a" });
+    let reg = await getOrCreateConfig();
     res.status(200).send({ data: reg });
 }
 

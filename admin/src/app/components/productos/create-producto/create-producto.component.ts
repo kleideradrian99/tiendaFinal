@@ -1,17 +1,21 @@
-import { Route } from '@angular/compiler/src/core';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { ProductoService } from 'src/app/services/producto.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgFor, NgIf } from '@angular/common';
+import { TinymceComponent } from 'ngx-tinymce';
 
 declare var iziToast;
 declare var jQuery: any;
 declare var $: any;
 
 @Component({
-  selector: 'app-create-producto',
-  templateUrl: './create-producto.component.html',
-  styleUrls: ['./create-producto.component.css']
+    selector: 'app-create-producto',
+    templateUrl: './create-producto.component.html',
+    styleUrls: ['./create-producto.component.css'],
+    imports: [SidebarComponent, FormsModule, NgFor, TinymceComponent, NgIf, RouterLinkActive, RouterLink]
 })
 export class CreateProductoComponent implements OnInit {
 
@@ -37,7 +41,6 @@ export class CreateProductoComponent implements OnInit {
     this._adminService.obtener_config_publico().subscribe(
       response => {
         this.config_global = response.data;
-        console.log(this.config_global);
       }
     );
   }

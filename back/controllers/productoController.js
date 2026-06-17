@@ -95,8 +95,8 @@ const actualizar_producto_admin = async function (req, res) {
             if (req.files) {
                 //SI HAY IMAGEN
                 var img_path = req.files.portada.path;
-                var name = img_path.split('\\');
-                var portada_name = name[2];
+                var name = img_path.split(path.sep);
+                var portada_name = name[name.length - 1];
 
 
                 let reg = await Producto.findByIdAndUpdate({ _id: id }, {
@@ -145,7 +145,7 @@ const eliminar_producto_admin = async function (req, res) {
 
             var id = req.params['id'];
 
-            let reg = await Producto.findByIdAndRemove({ _id: id });
+            let reg = await Producto.findByIdAndDelete(id);
             res.status(200).send({ data: reg });
 
         } else {
@@ -180,7 +180,7 @@ const eliminar_inventario_producto_admin = async function (req, res) {
             var id = req.params['id'];
 
             //ELIMINAR INVENTARIO
-            let reg = await Inventario.findByIdAndRemove({ _id: id });
+            let reg = await Inventario.findByIdAndDelete(id);
 
             //OBTENER EL REGISTRO DE PRODUCTO
             let prod = await Producto.findById({ _id: reg.producto });

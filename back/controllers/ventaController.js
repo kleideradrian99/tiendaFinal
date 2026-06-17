@@ -8,7 +8,6 @@ var fs = require('fs');
 var handlebars = require('handlebars');
 var ejs = require('ejs');
 var nodemailer = require('nodemailer');
-var smtpTransport = require('nodemailer-smtp-transport');
 var path = require('path');
 
 
@@ -61,7 +60,7 @@ const registro_compra_cliente = async function (req, res) {
             });
 
             //limpiar carrito
-            await Carrito.remove({ cliente: data.cliente });
+            await Carrito.deleteMany({ cliente: data.cliente });
         });
 
         res.status(200).send({ venta: venta });
@@ -105,14 +104,14 @@ const enviar_correo_compra_cliente = async function (req, res) {
         });
     };
 
-    var transporter = nodemailer.createTransport(smtpTransport({
+    var transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
             user: 'diegoalonssoac@gmail.com',
             pass: 'dcmplvjviofjojgf'
         }
-    }));
+    });
 
     //cliente _id fecha data subtotal
 

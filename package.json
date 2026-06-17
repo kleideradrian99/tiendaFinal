@@ -1,0 +1,11 @@
+{
+  "name": "tienda-final",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "back": "npm --prefix back start",
+    "admin": "npm --prefix admin start -- --port 4200",
+    "tienda": "npm --prefix tienda start -- --port 4202",
+    "dev": "npm run back & npm run admin & npm run tienda & wait"
+  }
+}

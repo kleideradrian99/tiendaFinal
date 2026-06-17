@@ -1,15 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgIf, NgFor, SlicePipe } from '@angular/common';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 declare var iziToast;
 declare var jQuery:any;
 declare var $:any;
 
 @Component({
-  selector: 'app-index-cliente',
-  templateUrl: './index-cliente.component.html',
-  styleUrls: ['./index-cliente.component.css']
+    selector: 'app-index-cliente',
+    templateUrl: './index-cliente.component.html',
+    styleUrls: ['./index-cliente.component.css'],
+    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe]
 })
 export class IndexClienteComponent implements OnInit {
 

@@ -1,84 +1,85 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
+import { FormsModule } from '@angular/forms';
 
-declare var jQuery:any;
-declare var $:any;
+declare var jQuery: any;
+declare var $: any;
 declare var iziToast;
 //////////
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css'],
+    imports: [FormsModule]
 })
 //////////
 export class LoginComponent implements OnInit {
 
-  public user : any = {};
-  public usuario : any = {};
-  public token : any = '';
+  public user: any = {};
+  public usuario: any = {};
+  public token: any = '';
 
   constructor(
-    private _adminService:AdminService,
+    private _adminService: AdminService,
     private _router: Router
-  ) { 
+  ) {
     this.token = this._adminService.getToken();
   }
 
   ngOnInit(): void {
-  
 
-    if(this.token){
+
+    if (this.token) {
       this._router.navigate(['/']);
-    }else{
+    } else {
       //MANTENER EN EL COMPONENTE
     }
-    
+
   }
 
-  login(loginForm){
-    if(loginForm.valid){
-      console.log(this.user);
+  login(loginForm) {
+    if (loginForm.valid) {
 
       let data = {
         email: this.user.email,
         password: this.user.password
       }
-      
+
       this._adminService.login_admin(data).subscribe(
-        response=>{
-          if(response.data == undefined){
+        response => {
+          if (response.data == undefined) {
             iziToast.show({
-                title: 'ERROR',
-                titleColor: '#FF0000',
-                color: '#FFF',
-                class: 'text-danger',
-                position: 'topRight',
-                message: response.message
+              title: 'ERROR',
+              titleColor: '#FF0000',
+              color: '#FFF',
+              class: 'text-danger',
+              position: 'topRight',
+              message: response.message
             });
-          }else{
+          } else {
             this.usuario = response.data;
-            localStorage.setItem('token',response.token);
-            localStorage.setItem('_id',response.data._id);
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('_id', response.data._id);
 
             this._router.navigate(['/']);
 
           }
-         
+
         },
-        error=>{
+        error => {
           console.log(error);
-          
+
         }
       );
-    }else{
+    } else {
       iziToast.show({
-          title: 'ERROR',
-          titleColor: '#FF0000',
-          color: '#FFF',
-          class: 'text-danger',
-          position: 'topRight',
-          message: 'Los datos del formulario no son validos'
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Los datos del formulario no son validos'
       });
     }
   }

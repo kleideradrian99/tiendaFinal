@@ -3,12 +3,16 @@ import { AdminService } from 'src/app/services/admin.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 declare var iziToast;
 import { v4 as uuidv4 } from 'uuid';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { FormsModule } from '@angular/forms';
+import { NgIf, NgFor } from '@angular/common';
 declare var jQuery:any;
 declare var $:any;
 @Component({
-  selector: 'app-config',
-  templateUrl: './config.component.html',
-  styleUrls: ['./config.component.css']
+    selector: 'app-config',
+    templateUrl: './config.component.html',
+    styleUrls: ['./config.component.css'],
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor]
 })
 export class ConfigComponent implements OnInit{
 
@@ -28,8 +32,12 @@ export class ConfigComponent implements OnInit{
       this.url = GLOBAL.url;
       this._adminService.obtener_config_admin(this.token).subscribe(
         response=>{
-          this.config = response.data;
-          this.imgSelect = this.url+'obtener_logo/'+this.config.logo;
+          if (response.data) {
+            this.config = response.data;
+            this.imgSelect = this.url+'obtener_logo/'+this.config.logo;
+          } else {
+            this.config = {};
+          }
         },
         error=>{
           console.log(error);
@@ -154,10 +162,6 @@ export class ConfigComponent implements OnInit{
     }
   }
 
-  ngDoCheck(): void {
-    $('.cs-file-drop-preview').html("<img src="+this.imgSelect+">");
-  }
-  
   eliminar_catergoria(idx){
     this.config.categorias.splice(idx,1);
   }

@@ -1,3 +1,39 @@
+# Dependency directories
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-back/node_modules/.package-lock.json
-back/package-lock.json
+# Angular build and cache directories
+.angular/
+**/.angular/
+dist/
+**/dist/
+
+# OS generated files
+.DS_Store
+**/.DS_Store
+.DS_Store?
+**/.DS_Store?
+._*
+**/._*
+Thumbs.db
+ehthumbs.db
+
+# IDEs and editors
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local environment and uploads
+.env
+**/.env
+back/uploads/
+**/uploads/

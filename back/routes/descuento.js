@@ -5,8 +5,8 @@ var descuentoController = require('../controllers/descuentoController');
 
 var api = express.Router();
 var auth = require('../middlewares/authenticate');
-var multiparty = require('connect-multiparty');
-var path = multiparty({uploadDir: './uploads/descuentos'});
+var upload = require('../middlewares/upload');
+var path = upload.createUpload('./uploads/descuentos');
 
 api.post('/registro_descuento_admin',[auth.auth,path],descuentoController.registro_descuento_admin);
 api.get('/listar_descuentos_admin/:filtro?',auth.auth,descuentoController.listar_descuentos_admin);

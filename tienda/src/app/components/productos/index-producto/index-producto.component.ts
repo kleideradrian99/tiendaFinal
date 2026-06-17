@@ -306,7 +306,7 @@ export class IndexProductoComponent implements OnInit {
           });
           this.btn_cart = false;
         } else {
-          console.log(response);
+          ;
           iziToast.show({
             title: 'SUCCESS',
             titleColor: '#1DC74C',

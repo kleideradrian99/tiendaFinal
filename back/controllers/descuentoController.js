@@ -133,7 +133,7 @@ const eliminar_descuento_admin = async function(req,res){
             
             var id = req.params['id'];
 
-            let reg = await Descuento.findByIdAndRemove({_id:id});
+            let reg = await Descuento.findByIdAndDelete(id);
             res.status(200).send({data:reg});
             
         }else{
