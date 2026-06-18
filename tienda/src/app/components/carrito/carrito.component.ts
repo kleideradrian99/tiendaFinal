@@ -3,7 +3,12 @@ import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { io } from "socket.io-client";
 import { GuestService } from 'src/app/services/guest.service';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive, RouterLink } from '@angular/router';
+import { NavComponent } from '../nav/nav.component';
+import { NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from '../footer/footer.component';
+import { DescuentoPipe } from '../../pipes/descuento.pipe';
 declare var iziToast;
 declare var Cleave;
 declare var StickySidebar;
@@ -14,9 +19,10 @@ interface HtmlInputEvent extends Event {
 }
 
 @Component({
-  selector: 'app-carrito',
-  templateUrl: './carrito.component.html',
-  styleUrls: ['./carrito.component.css']
+    selector: 'app-carrito',
+    templateUrl: './carrito.component.html',
+    styleUrls: ['./carrito.component.css'],
+    imports: [NavComponent, RouterLinkActive, RouterLink, NgIf, NgFor, FormsModule, FooterComponent, DescuentoPipe]
 })
 export class CarritoComponent implements OnInit {
   @ViewChild('paypalButton', { static: true }) paypalElement: ElementRef;

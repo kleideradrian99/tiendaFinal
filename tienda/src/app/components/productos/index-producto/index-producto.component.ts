@@ -1,17 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 declare var noUiSlider;
 declare var $: any;
 import { io } from "socket.io-client";
 import { GuestService } from 'src/app/services/guest.service';
+import { NavComponent } from '../../nav/nav.component';
+import { NgIf, NgFor, SlicePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FooterComponent } from '../../footer/footer.component';
+import { DescuentoPipe } from '../../../pipes/descuento.pipe';
 declare var iziToast;
 
 @Component({
-  selector: 'app-index-producto',
-  templateUrl: './index-producto.component.html',
-  styleUrls: ['./index-producto.component.css']
+    selector: 'app-index-producto',
+    templateUrl: './index-producto.component.html',
+    styleUrls: ['./index-producto.component.css'],
+    imports: [NavComponent, RouterLink, NgIf, FormsModule, NgbPagination, NgFor, RouterLinkActive, FooterComponent, SlicePipe, DescuentoPipe]
 })
 export class IndexProductoComponent implements OnInit {
 

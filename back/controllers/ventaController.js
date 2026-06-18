@@ -108,8 +108,8 @@ const enviar_correo_compra_cliente = async function (req, res) {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: 'diegoalonssoac@gmail.com',
-            pass: 'dcmplvjviofjojgf'
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
     });
 
@@ -133,7 +133,7 @@ const enviar_correo_compra_cliente = async function (req, res) {
         var htmlToSend = template({ op: true });
 
         var mailOptions = {
-            from: 'diegoalonssoac@gmail.com',
+            from: process.env.EMAIL_USER,
             to: venta.cliente.email,
             subject: 'Gracias por tu compra, Mi Tienda',
             html: htmlToSend

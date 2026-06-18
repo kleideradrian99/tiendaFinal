@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 declare var $;
 import { io } from "socket.io-client";
 import { GuestService } from 'src/app/services/guest.service';
+import { NgIf, NgFor } from '@angular/common';
+import { DescuentoPipe } from '../../pipes/descuento.pipe';
 declare var iziToast;
 
 @Component({
-  selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+    selector: 'app-nav',
+    templateUrl: './nav.component.html',
+    styleUrls: ['./nav.component.css'],
+    imports: [NgIf, RouterLink, RouterLinkActive, NgFor, DescuentoPipe]
 })
 export class NavComponent implements OnInit {
 

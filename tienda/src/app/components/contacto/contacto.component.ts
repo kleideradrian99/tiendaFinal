@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { GuestService } from 'src/app/services/guest.service';
+import { NavComponent } from '../nav/nav.component';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { FooterComponent } from '../footer/footer.component';
 declare var iziToast;
 
 @Component({
-  selector: 'app-contacto',
-  templateUrl: './contacto.component.html',
-  styleUrls: ['./contacto.component.css']
+    selector: 'app-contacto',
+    templateUrl: './contacto.component.html',
+    styleUrls: ['./contacto.component.css'],
+    imports: [NavComponent, RouterLink, FormsModule, NgIf, FooterComponent]
 })
 export class ContactoComponent implements OnInit {
 

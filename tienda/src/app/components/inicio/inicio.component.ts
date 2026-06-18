@@ -2,12 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { GuestService } from 'src/app/services/guest.service';
+import { NavComponent } from '../nav/nav.component';
+import { NgIf, NgFor } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { FooterComponent } from '../footer/footer.component';
+import { DescuentoPipe } from '../../pipes/descuento.pipe';
 declare var tns;
 
 @Component({
-  selector: 'app-inicio',
-  templateUrl: './inicio.component.html',
-  styleUrls: ['./inicio.component.css']
+    selector: 'app-inicio',
+    templateUrl: './inicio.component.html',
+    styleUrls: ['./inicio.component.css'],
+    imports: [NavComponent, NgIf, RouterLink, NgFor, RouterLinkActive, FooterComponent, DescuentoPipe]
 })
 export class InicioComponent implements OnInit {
 

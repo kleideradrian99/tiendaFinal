@@ -1,13 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { NavComponent } from '../../nav/nav.component';
+import { RouterLink } from '@angular/router';
+import { SiderbarComponent } from '../siderbar/siderbar.component';
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from '../../footer/footer.component';
 declare var iziToast;
 declare var $:any;
 declare var iziToast;
 
 @Component({
-  selector: 'app-perfil',
-  templateUrl: './perfil.component.html',
-  styleUrls: ['./perfil.component.css']
+    selector: 'app-perfil',
+    templateUrl: './perfil.component.html',
+    styleUrls: ['./perfil.component.css'],
+    imports: [NavComponent, RouterLink, SiderbarComponent, FormsModule, FooterComponent]
 })
 export class PerfilComponent implements OnInit {
 

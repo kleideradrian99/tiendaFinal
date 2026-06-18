@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-siderbar',
-  templateUrl: './siderbar.component.html',
-  styleUrls: ['./siderbar.component.css']
+    selector: 'app-siderbar',
+    templateUrl: './siderbar.component.html',
+    styleUrls: ['./siderbar.component.css'],
+    imports: [NgIf, RouterLinkActive, RouterLink]
 })
 export class SiderbarComponent implements OnInit {
 

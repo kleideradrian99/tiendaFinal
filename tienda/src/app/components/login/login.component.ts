@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { NavComponent } from '../nav/nav.component';
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from '../footer/footer.component';
 declare var iziToast;
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css'],
+    imports: [NavComponent, FormsModule, FooterComponent]
 })
 export class LoginComponent implements OnInit {
 

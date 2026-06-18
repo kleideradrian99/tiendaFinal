@@ -1,0 +1,32 @@
+Workspace extension with invalid name (defaultProject) found.
+One or more browsers which are configured in the project's Browserslist configuration will be ignored as ES5 output is not supported by the Angular CLI.
+Ignored browsers:
+kaios 2.5, op_mini all
+One or more browsers which are configured in the project's Browserslist configuration fall outside Angular's browser support for this version.
+Unsupported browsers:
+and_qq 14.9, and_uc 15.5, android 149, ios_saf 26.5, kaios 3.0-3.1, op_mob 80, opera 131, opera 127, samsung 30, samsung 29
+- Generating browser application bundles (phase: setup)...
+    TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and "false" respectively by the Angular CLI. To control ECMA version and features use the Browserslist configuration. For more information, see https://angular.dev/tools/cli/build#configuring-browser-compatibility
+    NOTE: You can set the "target" to "ES2022" in the project's tsconfig to remove this warning.
+✔ Browser application bundle generation complete.
+✔ Browser application bundle generation complete.
+- Copying assets...
+✔ Copying assets complete.
+- Generating index html...
+✔ Index html generation complete.
+
+Initial chunk files | Names         |  Raw size
+vendor.js           | vendor        |   4.47 MB | 
+main.js             | main          | 529.29 kB | 
+polyfills.js        | polyfills     | 138.04 kB | 
+runtime.js          | runtime       |   6.76 kB | 
+styles.css          | styles        | 778 bytes | 
+
+                    | Initial total |   5.15 MB
+
+Build at: 2026-06-17T23:29:09.181Z - Hash: d4870c00e6b02841 - Time: 3211ms
+
+Warning: /Users/kleidermachado/Documents/MbLatina/tiendaFinal/tienda/node_modules/socket.io-parser/build/esm-debug/index.js depends on 'debug'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+

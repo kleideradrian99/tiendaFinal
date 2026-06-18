@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { GuestService } from 'src/app/services/guest.service';
@@ -7,11 +7,18 @@ declare var tns;
 declare var lightGallery;
 declare var iziToast;
 import { io } from "socket.io-client";
+import { NavComponent } from '../../nav/nav.component';
+import { NgIf, NgFor, NgClass, NgStyle, SlicePipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FooterComponent } from '../../footer/footer.component';
+import { DescuentoPipe } from '../../../pipes/descuento.pipe';
 
 @Component({
-  selector: 'app-show-producto',
-  templateUrl: './show-producto.component.html',
-  styleUrls: ['./show-producto.component.css']
+    selector: 'app-show-producto',
+    templateUrl: './show-producto.component.html',
+    styleUrls: ['./show-producto.component.css'],
+    imports: [NavComponent, RouterLink, NgIf, RouterLinkActive, NgFor, FormsModule, NgClass, NgStyle, NgbPagination, FooterComponent, SlicePipe, DatePipe, DescuentoPipe]
 })
 export class ShowProductoComponent implements OnInit {
 

@@ -1,13 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GuestService } from 'src/app/services/guest.service';
+import { NavComponent } from '../../nav/nav.component';
+import { RouterLink } from '@angular/router';
+import { SiderbarComponent } from '../siderbar/siderbar.component';
+import { FormsModule } from '@angular/forms';
+import { NgFor, NgIf } from '@angular/common';
+import { FooterComponent } from '../../footer/footer.component';
 declare var $;
 declare var iziToast;
 
 @Component({
-  selector: 'app-direcciones',
-  templateUrl: './direcciones.component.html',
-  styleUrls: ['./direcciones.component.css']
+    selector: 'app-direcciones',
+    templateUrl: './direcciones.component.html',
+    styleUrls: ['./direcciones.component.css'],
+    imports: [NavComponent, RouterLink, SiderbarComponent, FormsModule, NgFor, NgIf, FooterComponent]
 })
 export class DireccionesComponent implements OnInit {
 

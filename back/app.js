@@ -1,5 +1,7 @@
 'use strict'
 
+require('dotenv').config();
+
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
@@ -35,7 +37,7 @@ var venta_route = require('./routes/venta');
 var descuento_route = require('./routes/descuento');
 var carrito_admin = require('./routes/carritoAdmin');
 
-mongoose.connect('mongodb+srv://kleidermachado:GjrxtBf7hSrkSZcs@cluster0.qowwswz.mongodb.net/tienda')
+mongoose.connect(process.env.MONGODB_URI)
     .then(function () {
         server.listen(port, function () {
             console.log('Servidor corriendo en el puerto ' + port);

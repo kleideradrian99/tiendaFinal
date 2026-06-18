@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { NavComponent } from '../../../nav/nav.component';
+import { SiderbarComponent } from '../../siderbar/siderbar.component';
+import { NgIf, NgFor, NgClass, SlicePipe, DatePipe } from '@angular/common';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FooterComponent } from '../../../footer/footer.component';
 
 @Component({
-  selector: 'app-index-review',
-  templateUrl: './index-review.component.html',
-  styleUrls: ['./index-review.component.css']
+    selector: 'app-index-review',
+    templateUrl: './index-review.component.html',
+    styleUrls: ['./index-review.component.css'],
+    imports: [NavComponent, RouterLink, SiderbarComponent, NgIf, NgFor, NgClass, NgbPagination, FooterComponent, SlicePipe, DatePipe]
 })
 export class IndexReviewComponent implements OnInit {
 

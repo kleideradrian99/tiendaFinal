@@ -1,15 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { StarRatingComponent } from 'ng-starrating';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { StarRatingComponent } from '../../../star-rating/star-rating.component';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
+import { NavComponent } from '../../../nav/nav.component';
+import { SiderbarComponent } from '../../siderbar/siderbar.component';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FooterComponent } from '../../../footer/footer.component';
 declare var iziToast;
 declare var $;
 
 @Component({
-  selector: 'app-detalle-orden',
-  templateUrl: './detalle-orden.component.html',
-  styleUrls: ['./detalle-orden.component.css']
+    selector: 'app-detalle-orden',
+    templateUrl: './detalle-orden.component.html',
+    styleUrls: ['./detalle-orden.component.css'],
+    imports: [NavComponent, RouterLink, SiderbarComponent, NgIf, NgFor, FormsModule, StarRatingComponent, FooterComponent, DatePipe]
 })
 export class DetalleOrdenComponent implements OnInit {
 
@@ -82,9 +88,9 @@ export class DetalleOrdenComponent implements OnInit {
   }
 
 
-  onRate($event:{oldValue:number, newValue:number, starRating:StarRatingComponent}){
+  onRate($event:{newValue:number}){
     console.log($event.newValue);
-    
+    this.totalstar = $event.newValue;
   }
 
   emitir(id){
