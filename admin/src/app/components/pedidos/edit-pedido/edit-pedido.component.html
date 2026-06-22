@@ -1,0 +1,553 @@
+<app-sidebar></app-sidebar>
+
+<div class="border-bottom pt-4 mt-2 mb-4 d-flex justify-content-between align-items-end">
+    <h1 class="mt-2 mt-md-4 pt-4 mb-2">Editar Orden (POS)</h1>
+    <a class="btn btn-secondary mb-2" [routerLink]="['/panel/pedidos']">Volver a Pedidos</a>
+</div>
+
+<div class="row">
+    <!-- COLUMNA IZQUIERDA: Clientes y Productos -->
+    <div class="col-lg-8 col-md-12">
+        
+        <!-- CARD CLIENTE -->
+        <div class="card box-shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="cxi-profile mr-2 text-primary"></i>1. Cliente</h5>
+                <button *ngIf="!cliente_seleccionado" class="btn btn-outline-success btn-sm" type="button" data-toggle="modal" data-target="#create-cliente-modal">
+                    <i class="cxi-plus mr-1"></i>Nuevo Cliente
+                </button>
+            </div>
+            
+            <div class="card-body">
+                <!-- Buscador si no hay cliente seleccionado -->
+                <div *ngIf="!cliente_seleccionado">
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Buscar cliente por Nombre, Apellido, DNI o Correo..." name="filtroCliente" [(ngModel)]="filtroCliente" (keyup.enter)="filtrarCliente()">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" (click)="filtrarCliente()" type="button"><i class="cxi-search mr-1"></i>Buscar</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Resultados de Búsqueda -->
+                    <div *ngIf="clientes && clientes.length > 0" class="table-responsive mt-3 border rounded">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>DNI</th>
+                                    <th>Correo</th>
+                                    <th>Teléfono</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of clientes">
+                                    <td><strong>{{item.nombres}} {{item.apellidos}}</strong></td>
+                                    <td><span class="badge badge-secondary">{{item.dni || 'N/A'}}</span></td>
+                                    <td>{{item.email}}</td>
+                                    <td>{{item.telefono || 'N/A'}}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-sm px-3" type="button" (click)="seleccionar_cliente(item)">
+                                            Seleccionar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div *ngIf="clientes === undefined" class="alert alert-warning mt-3 mb-0" role="alert">
+                        <i class="cxi-warning mr-2"></i> Cliente no encontrado. ¿Deseas registrar uno nuevo?
+                    </div>
+                </div>
+
+                <!-- Info si hay cliente seleccionado -->
+                <div *ngIf="cliente_seleccionado" class="p-2">
+                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                        <div>
+                            <h4 class="mb-1 text-primary">{{cliente_seleccionado.nombres}} {{cliente_seleccionado.apellidos}}</h4>
+                            <div class="text-muted font-size-sm">
+                                <span class="mr-3"><i class="cxi-mail mr-1"></i>{{cliente_seleccionado.email}}</span>
+                                <span class="mr-3"><i class="cxi-phone mr-1"></i>{{cliente_seleccionado.telefono || 'Sin teléfono'}}</span>
+                                <span><i class="cxi-card mr-1"></i>DNI: {{cliente_seleccionado.dni || 'N/A'}}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm" type="button" (click)="deseleccionar_cliente()">
+                            <i class="cxi-delete mr-1"></i>Cambiar Cliente
+                        </button>
+                    </div>
+
+                    <!-- SECCIÓN DIRECCIONES -->
+                    <div class="mt-2">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-dark" style="font-weight: 600;"><i class="cxi-map-pin mr-2 text-primary"></i>Dirección de Envío (Obligatorio)</h6>
+                            <button class="btn btn-outline-primary btn-sm py-1" type="button" data-toggle="modal" data-target="#create-direccion-modal">
+                                <i class="cxi-plus mr-1"></i>Añadir Dirección
+                            </button>
+                        </div>
+
+                        <div *ngIf="direcciones.length == 0" class="alert alert-info py-2" role="alert">
+                            <i class="cxi-info mr-2"></i> El cliente no tiene direcciones registradas. Por favor, añada una para proceder con el envío.
+                        </div>
+
+                        <div class="row" *ngIf="direcciones.length > 0">
+                            <div class="col-md-6 mb-3" *ngFor="let dir of direcciones">
+                                <div class="card h-100 border-2" [ngClass]="{'border-primary bg-light': direccion_seleccionada?._id === dir._id, 'border-gray': direccion_seleccionada?._id !== dir._id}" style="cursor: pointer;" (click)="seleccionar_direccion(dir)">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="card-title mb-0 font-size-sm text-truncate" style="font-weight: 600; max-width: 150px;">{{dir.destinatario}}</h6>
+                                            <span class="badge px-2 py-1" [ngClass]="{'badge-primary': direccion_seleccionada?._id === dir._id, 'badge-secondary': direccion_seleccionada?._id !== dir._id}">
+                                                {{direccion_seleccionada?._id === dir._id ? 'Seleccionada' : 'Usar esta'}}
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted font-size-xs mb-1">{{dir.direccion}}</p>
+                                        <p class="card-text text-muted font-size-xs mb-0">
+                                            {{dir.pais}} - {{dir.region}} - {{dir.provincia}}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTRO DE PRODUCTOS -->
+        <div class="card box-shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="cxi-folder mr-2 text-primary"></i>2. Filtro de productos</h5>
+                <button class="btn btn-warning btn-sm" type="button" data-toggle="modal" data-target="#select-stock">
+                    <i class="cxi-plus-circle mr-1"></i>Agregar Producto sin Stock
+                </button>
+            </div>
+            
+            <div class="card-header bg-white border-0 py-3">
+                <div class="input-group col-lg-8 px-0">
+                    <input class="form-control" type="text" placeholder="Buscar producto por título..." name="filtro" [(ngModel)]="filtro" (keyup.enter)="filtrarProducto()">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" (click)="filtrarProducto()">Filtrar</button>
+                        <button class="btn btn-info" type="button" (click)="resetar()">Resetear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="table-responsive border rounded">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Categoría</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="load_data">
+                            <tr>
+                                <td class="text-center py-5" colspan="5">
+                                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                                        <span class="sr-only">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <ng-container *ngIf="!load_data">
+                            <tbody *ngFor="let item of productos | slice: (page-1)*pageSize : (page-1) * pageSize + pageSize">
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img [src]="url +'obtener_portada/'+item.portada" class="img-thumbnail rounded mr-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                            <span style="font-weight: 600;">{{item.titulo}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" [ngClass]="{'badge-success': item.stock > 10, 'badge-warning': item.stock <= 10 && item.stock > 0, 'badge-danger': item.stock == 0}">
+                                            {{item.stock}} unidades
+                                        </span>
+                                    </td>
+                                    <td><strong>${{item.precio}}</strong></td>
+                                    <td><span class="text-muted">{{item.categoria}}</span></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-outline-primary btn-sm" type="button" data-toggle="modal" [attr.data-target]="'#select-'+item._id">
+                                            Seleccionar
+                                        </button>
+                                        
+                                        <!-- MODAL SELECCIONAR PRODUCTO CON STOCK -->
+                                        <div class="modal fade" id="select-{{item._id}}" tabindex="-1" style="display: none;" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title font-weight-bold">Producto: {{item.titulo}}</h5>
+                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body text-left">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group mb-3">
+                                                                    <label class="form-label" style="font-weight: 600;">Precio Unitario</label>
+                                                                    <input type="number" class="form-control" disabled [value]="item.precio">
+                                                                </div>
+                                                                <div class="form-group mb-3">
+                                                                    <label class="form-label" style="font-weight: 600;">Seleccionar Variedad ({{item.titulo_variedad}})</label>
+                                                                    <ng-select [multiple]="true" class="" id="size" name="variedad" [(ngModel)]="carrito_data.variedad" [items]="item.variedades" bindLabel="titulo">
+                                                                    </ng-select>
+                                                                </div>
+                                                                <div class="row" *ngIf="carrito_data.variedad && carrito_data.variedad.length > 0">
+                                                                    <div class="col-6 mb-3" *ngFor="let can of carrito_data.variedad">
+                                                                        <label class="form-label font-size-xs" style="font-weight: 600;">Cantidad para {{can.titulo}}</label>
+                                                                        <input type="number" (change)="total_con_stock(item.precio)" class="form-control" placeholder="0" required [name]="'cantidad'+ can.titulo" [(ngModel)]="can.cantidad">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group mb-3">
+                                                                    <label class="form-label" style="font-weight: 600;">Total Estimado</label>
+                                                                    <input disabled type="number" class="form-control font-weight-bold text-primary" placeholder="0" name="total" [(ngModel)]="producto.total">
+                                                                </div>
+                                                                <div class="form-group mb-0">
+                                                                    <label class="form-label" style="font-weight: 600;">Observaciones</label>
+                                                                    <textarea class="form-control" placeholder="Instrucciones especiales para el producto..." rows="3" name="observacion" [(ngModel)]="producto.observacion"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                                                        <button *ngIf="!btn_cart" class="btn btn-primary btn-sm px-4" (click)="agregar_producto(item, item._id)" type="button">Agregar al Pedido</button>
+                                                        <button *ngIf="btn_cart" type="button" class="btn btn-secondary btn-sm" disabled>
+                                                            <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                                                            Agregando...
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </ng-container>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="productos.length"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Resumen de Pedido -->
+    <div class="col-lg-4 col-md-12">
+        <div class="card box-shadow-sm mb-4 sticky-top" style="top: 20px; z-index: 10;">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0 text-white" style="font-weight: 600;"><i class="cxi-cart mr-2 text-warning"></i>Resumen de Pedido</h5>
+            </div>
+            
+            <div class="card-body">
+                <div *ngIf="!cliente_seleccionado" class="text-center py-5">
+                    <i class="cxi-profile font-size-xl text-muted mb-3 d-block"></i>
+                    <p class="text-muted mb-0">Seleccione un cliente para ver y gestionar la orden.</p>
+                </div>
+                
+                <div *ngIf="cliente_seleccionado">
+                    <div class="border-bottom pb-3 mb-3">
+                        <p class="text-muted font-size-xs uppercase tracking-wider mb-1" style="font-weight: 700;">Cliente:</p>
+                        <h6 class="mb-0 text-primary">{{cliente_seleccionado.nombres}} {{cliente_seleccionado.apellidos}}</h6>
+                        
+                        <div class="mt-2" *ngIf="direccion_seleccionada">
+                            <p class="text-muted font-size-xs uppercase tracking-wider mb-1" style="font-weight: 700;">Envío a:</p>
+                            <div class="font-size-xs text-dark bg-secondary p-2 rounded">
+                                <strong>{{direccion_seleccionada.destinatario}}</strong><br>
+                                {{direccion_seleccionada.direccion}}<br>
+                                {{direccion_seleccionada.region}}, {{direccion_seleccionada.provincia}}
+                            </div>
+                        </div>
+                        <div class="mt-2" *ngIf="!direccion_seleccionada">
+                            <span class="text-danger font-size-xs"><i class="cxi-warning mr-1"></i>Dirección requerida</span>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Productos en Carrito -->
+                    <p class="text-muted font-size-xs uppercase tracking-wider mb-2" style="font-weight: 700;">Productos Seleccionados:</p>
+                    <div *ngIf="carrito_arr.length == 0" class="text-center py-4 bg-light rounded border mb-3">
+                        <p class="text-muted mb-0 font-size-sm">No hay productos en el carrito</p>
+                    </div>
+
+                    <div *ngIf="carrito_arr.length > 0" class="mb-3" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                        <div class="media align-items-center mb-3 pb-3 border-bottom" *ngFor="let item of carrito_arr">
+                            <img [src]="url +'obtener_portada/'+item.producto.portada" class="rounded mr-2" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="media-body">
+                                <h6 class="mb-1 font-size-sm text-truncate" style="font-weight: 600; max-width: 140px;">{{item.producto.titulo}}</h6>
+                                <div class="font-size-xs text-muted">
+                                    <div *ngFor="let varData of item.variedad">
+                                        Talla: {{varData.titulo}} x {{varData.cantidad}}
+                                    </div>
+                                    <strong class="text-dark">${{item.total}}</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-link text-danger p-1" type="button" (click)="eliminar_item(item._id)" title="Eliminar">
+                                <i class="cxi-delete"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de Pago y Envío -->
+                    <div class="border-top pt-3 mt-3 mb-3">
+                        <p class="text-muted font-size-xs uppercase tracking-wider mb-2" style="font-weight: 700;">Pago y Despacho:</p>
+                        
+                        <div class="form-group mb-2">
+                            <label class="form-label font-size-xs mb-1" style="font-weight: 600;">Método de Pago</label>
+                            <select class="form-control form-control-sm custom-select" name="transaccion" [(ngModel)]="transaccion">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                                <option value="Yape / Plin">Yape / Plin</option>
+                                <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                                <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-2">
+                            <label class="form-label font-size-xs mb-1" style="font-weight: 600;">Tipo de Envío</label>
+                            <select class="form-control form-control-sm custom-select" name="envio_tipo" [(ngModel)]="envio_titulo" (change)="envio_titulo === 'Recogida en Tienda' ? envio_precio = 0 : null">
+                                <option value="Recogida en Tienda">Recogida en Tienda</option>
+                                <option value="Envío a Domicilio">Envío a Domicilio (Courier/Agencia)</option>
+                            </select>
+                        </div>
+
+                        <!-- Si es Envío a Domicilio, se habilita ingresar Courier y Costo -->
+                        <div class="row" *ngIf="envio_titulo !== 'Recogida en Tienda'">
+                            <div class="col-7 form-group mb-2 pr-1">
+                                <label class="form-label font-size-xs mb-1" style="font-weight: 600;">Agencia / Courier</label>
+                                <input type="text" class="form-control form-control-sm" placeholder="Ej: Olva Courier" name="envio_titulo_courier" [(ngModel)]="envio_titulo">
+                            </div>
+                            <div class="col-5 form-group mb-2 pl-1">
+                                <label class="form-label font-size-xs mb-1" style="font-weight: 600;">Costo Envío</label>
+                                <input type="number" class="form-control form-control-sm" placeholder="0.00" name="envio_precio" [(ngModel)]="envio_precio">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Totales -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted font-size-sm">Subtotal:</span>
+                            <strong class="font-size-sm">${{calcular_subtotal()}}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted font-size-sm">Envío:</span>
+                            <span *ngIf="envio_precio == 0" class="text-success font-size-sm font-weight-bold">Gratis</span>
+                            <strong *ngIf="envio_precio > 0" class="font-size-sm">${{envio_precio}}</strong>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-dark font-weight-bold">Total Venta:</span>
+                            <h4 class="text-primary font-weight-bold mb-0">${{calcular_subtotal() + (envio_precio * 1)}}</h4>
+                        </div>
+                    </div>
+
+                    <!-- Observación general del pedido -->
+                    <div class="form-group mb-3">
+                        <label class="form-label font-size-xs" style="font-weight: 600;">Notas del Pedido</label>
+                        <textarea class="form-control" placeholder="Notas internas para la orden..." rows="2" name="observacion" [(ngModel)]="producto.observacion"></textarea>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <button *ngIf="!load_btn" class="btn btn-primary btn-block btn-lg" type="button" (click)="guardar_cambios()" [disabled]="carrito_arr.length == 0 || !direccion_seleccionada">
+                        <i class="cxi-checkmark-circle mr-2"></i>Guardar Cambios
+                    </button>
+                    <button *ngIf="load_btn" type="button" class="btn btn-secondary btn-block btn-lg" disabled>
+                        <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                        Guardando Cambios...
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR NUEVO CLIENTE -->
+<div class="modal fade" id="create-cliente-modal" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold">Registrar Nuevo Cliente</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form #clienteForm="ngForm" (ngSubmit)="registrar_cliente_modal(clienteForm)">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Nombres *</label>
+                            <input class="form-control" type="text" placeholder="Nombres" required name="nombres" [(ngModel)]="nuevo_cliente.nombres">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Apellidos *</label>
+                            <input class="form-control" type="text" placeholder="Apellidos" required name="apellidos" [(ngModel)]="nuevo_cliente.apellidos">
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Correo electrónico *</label>
+                            <input class="form-control" type="email" placeholder="correo@ejemplo.com" required name="email" [(ngModel)]="nuevo_cliente.email">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">DNI (Opcional)</label>
+                            <input class="form-control" type="text" placeholder="Número de DNI" name="dni" [(ngModel)]="nuevo_cliente.dni">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Teléfono</label>
+                            <input class="form-control" type="text" placeholder="Número telefónico" name="telefono" [(ngModel)]="nuevo_cliente.telefono">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Género</label>
+                            <select class="form-control custom-select" name="genero" [(ngModel)]="nuevo_cliente.genero">
+                                <option value="" disabled>Seleccionar género</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Fecha de Nacimiento</label>
+                            <input class="form-control" type="date" name="f_nacimiento" [(ngModel)]="nuevo_cliente.f_nacimiento">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                    <button *ngIf="!load_btn_cliente" class="btn btn-success btn-sm px-4" type="submit">Registrar y Seleccionar</button>
+                    <button *ngIf="load_btn_cliente" type="button" class="btn btn-secondary btn-sm" disabled>
+                        <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                        Registrando...
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR NUEVA DIRECCIÓN -->
+<div class="modal fade" id="create-direccion-modal" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold">Añadir Dirección de Envío</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form #direccionForm="ngForm" (ngSubmit)="registrar_direccion_modal(direccionForm)">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Destinatario *</label>
+                            <input class="form-control" type="text" placeholder="Nombre de quien recibe" required name="destinatario" [(ngModel)]="nueva_direccion.destinatario">
+                        </div>
+                        <div class="col-md-12 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Dirección de Envío *</label>
+                            <input class="form-control" type="text" placeholder="Av. Principal Nro 123..." required name="direccion" [(ngModel)]="nueva_direccion.direccion">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Zip/Código Postal</label>
+                            <input class="form-control" type="text" placeholder="00000" name="zip" [(ngModel)]="nueva_direccion.zip">
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Teléfono de Contacto *</label>
+                            <input class="form-control" type="text" placeholder="Contacto de entrega" required name="telefono" [(ngModel)]="nueva_direccion.telefono">
+                        </div>
+                        <div class="col-md-4 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">País *</label>
+                            <input class="form-control" type="text" required name="pais" [(ngModel)]="nueva_direccion.pais">
+                        </div>
+                        <div class="col-md-4 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Región/Estado *</label>
+                            <input class="form-control" type="text" placeholder="Lima, Antioquia..." required name="region" [(ngModel)]="nueva_direccion.region">
+                        </div>
+                        <div class="col-md-4 form-group mb-3">
+                            <label class="form-label" style="font-weight: 600;">Provincia/Ciudad *</label>
+                            <input class="form-control" type="text" placeholder="Cercado, Medellín..." required name="provincia" [(ngModel)]="nueva_direccion.provincia">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                    <button *ngIf="!load_btn_direccion" class="btn btn-primary btn-sm px-4" type="submit">Guardar Dirección</button>
+                    <button *ngIf="load_btn_direccion" type="button" class="btn btn-secondary btn-sm" disabled>
+                        <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                        Guardando...
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL AGREGAR PRODUCTO SIN STOCK -->
+<div class="modal fade" id="select-stock" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold">Producto sin Stock</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-left">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-4 form-group mb-3">
+                                <label class="form-label" style="font-weight: 600;">Nombre del Producto *</label>
+                                <input type="text" class="form-control" placeholder="Ej: Camisa Slim Fit" required name="nombre" id="nombre" [(ngModel)]="producto.nombre">
+                            </div>
+                            <div class="col-lg-4 form-group mb-3">
+                                <label class="form-label" style="font-weight: 600;">Precio Unitario *</label>
+                                <input type="number" class="form-control" placeholder="$ 0.00" required name="precio" id="precio" [(ngModel)]="producto.precio" (change)="total_sin_stock()">
+                            </div>
+                            <div class="col-lg-4 form-group mb-3">
+                                <label class="form-label" style="font-weight: 600;">Tallas Disponibles</label>
+                                <ng-select [multiple]="true" class="" name="variedad" id="variedad" [(ngModel)]="producto.variedad" [items]="talla" bindLabel="name">
+                                </ng-select>
+                            </div>
+                            <div class="col-lg-4 form-group mb-3" *ngFor="let can of producto.variedad">
+                                <label class="form-label font-size-xs" style="font-weight: 600;">Cantidad {{can.name}} *</label>
+                                <input type="number" (change)="total_sin_stock()" class="form-control" placeholder="0" required [name]="'cantidad'+ can.name" [(ngModel)]="can.cantidad">
+                            </div>
+                            <div class="col-lg-4 form-group mb-3">
+                                <label class="form-label font-weight-bold" style="font-weight: 600;">Total Estimado</label>
+                                <input type="number" class="form-control text-primary font-weight-bold" placeholder="0" required name="total" [(ngModel)]="producto.total">
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-8 form-group">
+                                        <label class="form-label" style="font-weight: 600;">Foto de Portada</label>
+                                        <div class="custom-file">
+                                            <input class="custom-file-input" type="file" id="file-input" (change)="fileChangeEvent($event)">
+                                            <label class="custom-file-label" id="input-portada" style="white-space:nowrap;overflow:hidden">Seleccionar imagen</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 text-center">
+                                        <img [src]="imgSelect" class="img-thumbnail rounded" style="max-height: 100px; object-fit: cover;" alt="Preview">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 form-group mb-0">
+                                <label class="form-label" style="font-weight: 600;">Observaciones</label>
+                                <textarea class="form-control" placeholder="Instrucciones o especificaciones..." rows="3" name="observacion" [(ngModel)]="producto.observacion"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                <button *ngIf="!load_btn" class="btn btn-primary btn-sm px-4" type="button" (click)="agregar_producto_sin_stock()">Agregar Producto</button>
+                <button *ngIf="load_btn" type="button" class="btn btn-secondary btn-sm" disabled>
+                    <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                    Agregando...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

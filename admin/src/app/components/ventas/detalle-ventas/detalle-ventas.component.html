@@ -95,11 +95,21 @@
                           </p>
                         </div>
                       </div>
+            </div>
+            </div>
+
+            <!-- Notas del Pedido -->
+            <div class="col-12 mb-4" *ngIf="orden.nota">
+                <div class="card bg-secondary border-0">
+                    <div class="card-header bg-dark py-2">
+                        <strong class="text-white"><i class="cxi-comment mr-2"></i>Notas / Observaciones del Pedido</strong>
+                    </div>
+                    <div class="card-body py-3">
+                        <p class="mb-0 font-size-sm text-dark font-weight-medium" style="white-space: pre-line;">{{orden.nota}}</p>
+                    </div>
                 </div>
             </div>
-            </div>
         </div>
-
 
         <div class="card border-bottom">
           

@@ -18,7 +18,7 @@ export class ClienteService {
   }
 
   obtener_direccion_principal_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_direccion_principal_cliente/' + id, { headers: headers });
   }
 
@@ -27,13 +27,18 @@ export class ClienteService {
     return this._http.post(this.url + 'login_cliente', data, { headers: headers });
   }
 
+  registro_cliente(data): Observable<any> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._http.post(this.url + 'registro_cliente', data, { headers: headers });
+  }
+
   obtener_cliente_guest(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_cliente_guest/' + id, { headers: headers });
   }
 
   actualizar_perfil_cliente_guest(id, data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.put(this.url + 'actualizar_perfil_cliente_guest/' + id, data, { headers: headers });
   }
 
@@ -82,111 +87,81 @@ export class ClienteService {
   }
 
   agregar_carrito_cliente(data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.post(this.url + 'agregar_carrito_cliente', data, { headers: headers });
   }
 
   obtener_carrito_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_carrito_cliente/' + id, { headers: headers });
   }
 
   eliminar_carrito_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.delete(this.url + 'eliminar_carrito_cliente/' + id, { headers: headers });
   }
 
   registro_direccion_cliente(data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.post(this.url + 'registro_direccion_cliente', data, { headers: headers });
   }
 
   obtener_direccion_todos_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_direccion_todos_cliente/' + id, { headers: headers });
   }
 
   cambiar_direccion_principal_cliente(id, cliente, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.put(this.url + 'cambiar_direccion_principal_cliente/' + id + '/' + cliente, { data: true }, { headers: headers });
   }
 
   registro_compra_cliente(data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.post(this.url + 'registro_compra_cliente', data, { headers: headers });
   }
 
+  obtener_culqi_public_key(): Observable<any> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._http.get(this.url + 'obtener_culqi_public_key', { headers: headers });
+  }
 
-
-
-
-
-
-
-
-  get_token_culqi(data): Observable<any> {
+  get_token_culqi(data, publicKey): Observable<any> {
     let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer pk_test_0b07aceaa3de8c43');
+      .set('Authorization', 'Bearer ' + publicKey);
     return this._http.post('https://secure.culqi.com/v2/tokens', data, { headers: headers });
   }
 
-  get_charge_culqi(data): Observable<any> {
-    let headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer sk_test_56683314fd8a5328');
-    return this._http.post('https://api.culqi.com/v2/charges', data, { headers: headers });
+  get_charge_culqi(data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
+    return this._http.post(this.url + 'crear_cargo_culqi', data, { headers: headers });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
   enviar_correo_compra_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'enviar_correo_compra_cliente/' + id, { headers: headers });
   }
 
   validar_cupon_admin(cupon, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'validar_cupon_admin/' + cupon, { headers: headers });
   }
 
 
   obtener_ordenes_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_ordenes_cliente/' + id, { headers: headers });
   }
   obtener_detalles_ordenes_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_detalles_ordenes_cliente/' + id, { headers: headers });
   }
 
   emitir_review_producto_cliente(data, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.post(this.url + 'emitir_review_producto_cliente', data, { headers: headers });
   }
 
@@ -196,7 +171,22 @@ export class ClienteService {
   }
 
   obtener_reviews_cliente(id, token): Observable<any> {
-    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.get(this.url + 'obtener_reviews_cliente/' + id, { headers: headers });
+  }
+
+  obtener_paypal_client_id(): Observable<any> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._http.get(this.url + 'obtener_paypal_client_id', { headers: headers });
+  }
+
+  crear_orden_paypal(data: any, token: any): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
+    return this._http.post(this.url + 'crear_orden_paypal', data, { headers: headers });
+  }
+
+  capturar_orden_paypal(orderID: string, token: any): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
+    return this._http.post(this.url + 'capturar_orden_paypal', { orderID }, { headers: headers });
   }
 }

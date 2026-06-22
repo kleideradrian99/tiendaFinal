@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var DireccionSchema = Schema({
     cliente: {type: Schema.ObjectId, ref: 'cliente', required: true},
     destinatario: {type: String, required: true},
-    dni: {type: String, required: true},
+    dni: {type: String, required: false},
     zip: {type: String, required: true},
     direccion: {type: String, required: true},
     pais: {type: String, required: true},

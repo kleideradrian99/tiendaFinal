@@ -113,37 +113,134 @@
             
 
             <!-- Adresses -->
-            <h2 class="h4 mb-4">2. Dirección de envio</h2>
-            <div class="row pb-3">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h2 class="h4 mb-0">2. Dirección de envío</h2>
+              <!-- Mostrar botón de registrar nueva dirección si hay alguna guardada -->
+              <button type="button" class="btn btn-sm btn-outline-primary" *ngIf="direcciones.length > 0" (click)="op_nueva_direccion = !op_nueva_direccion">
+                {{ op_nueva_direccion ? 'Ver mis direcciones' : '+ Registrar nueva dirección' }}
+              </button>
+            </div>
+
+            <!-- Listado y detalle de dirección principal -->
+            <div class="row pb-3" *ngIf="!op_nueva_direccion">
               <div class="col-12">
-                <div class="card">
+                <div class="card border rounded box-shadow-sm">
                   <div class="card-body">
-                      <div class="row " *ngIf="direccion_principal == undefined">
-                        <div class="col-12 text-center">
-                          <h3 style="color: #565656;    margin-bottom: 0px;">No tiene una dirección principal</h3>
-                          <img src="assets/img/1652734.png" style="width: 80px;">
-                        </div>
-                        
+                      <!-- Dropdown para elegir dirección si hay más de una -->
+                      <div class="form-group border-bottom pb-3 mb-3" *ngIf="direcciones.length > 1">
+                        <label for="select-address" class="font-weight-bold">Seleccionar dirección guardada</label>
+                        <select id="select-address" class="custom-select custom-select-lg" (change)="seleccionar_direccion($any($event.target).value)">
+                          <option [value]="item._id" *ngFor="let item of direcciones" [selected]="item._id === direccion_principal?._id">
+                            {{item.destinatario}} — {{item.direccion}}, {{item.distrito || ''}} {{item.provincia || ''}} ({{item.pais}})
+                          </option>
+                        </select>
                       </div>
-                      <div class="row"  *ngIf="direccion_principal != undefined">
+
+                      <div class="row" *ngIf="direccion_principal == undefined">
+                        <div class="col-12 text-center py-4">
+                          <h3 style="color: #565656;" class="h5 mb-3">No tiene una dirección de envío registrada</h3>
+                          <img src="assets/img/1652734.png" style="width: 80px;" alt="Ubicación">
+                        </div>
+                      </div>
+
+                      <div class="row" *ngIf="direccion_principal != undefined">
                         <div class="col-lg-12">
-                          <dl>
-                            <dt>Destinatario</dt>
-                            <dd>{{direccion_principal.destinatario}}</dd>
-                            <dt>Dirección</dt>
-                            <dd>{{direccion_principal.direccion}}</dd>
-                            <dd>{{direccion_principal.pais}} -
-                              <span *ngIf="direccion_principal.region">{{direccion_principal.region}}</span> -
-                              <span *ngIf="direccion_principal.provincia">{{direccion_principal.provincia}}</span> -
-                              <span *ngIf="direccion_principal.distrito">{{direccion_principal.distrito}}</span>
-                            </dd>
-                            <dt>ZIP - Telefono</dt>
-                            <dd>{{direccion_principal.zip}} - {{direccion_principal.telefono}}</dd>
+                          <dl class="row mb-0">
+                            <div class="col-sm-6 mb-3">
+                              <dt class="text-muted font-size-sm mb-1">Destinatario</dt>
+                              <dd class="font-weight-bold mb-0">{{direccion_principal.destinatario}}</dd>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                              <dt class="text-muted font-size-sm mb-1">ZIP / Teléfono</dt>
+                              <dd class="mb-0">{{direccion_principal.zip}} — {{direccion_principal.telefono}}</dd>
+                            </div>
+                            <div class="col-12">
+                              <dt class="text-muted font-size-sm mb-1">Dirección de envío</dt>
+                              <dd class="mb-0 font-weight-bold text-primary">{{direccion_principal.direccion}}</dd>
+                              <dd class="mb-0 text-muted font-size-sm">
+                                {{direccion_principal.pais}} —
+                                <span *ngIf="direccion_principal.region">{{direccion_principal.region}}</span>
+                                <span *ngIf="direccion_principal.provincia"> — {{direccion_principal.provincia}}</span>
+                              </dd>
+                            </div>
                           </dl>
                         </div>
                       </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Formulario para registrar nueva dirección en caliente -->
+            <div class="card border rounded box-shadow-sm mb-4" *ngIf="op_nueva_direccion">
+              <div class="card-header bg-secondary py-3">
+                <h3 class="h5 mb-0">Nueva dirección de envío</h3>
+              </div>
+              <div class="card-body">
+                <form #nuevaDirForm="ngForm" (ngSubmit)="registrar_direccion(nuevaDirForm)">
+                  <div class="row">
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">Destinatario</label>
+                      <input type="text" required class="form-control" name="destinatario" [(ngModel)]="direccion_nuevo.destinatario" placeholder="Nombres completos">
+                    </div>
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">Teléfono</label>
+                      <input type="text" required class="form-control" name="telefono" [(ngModel)]="direccion_nuevo.telefono" placeholder="Número de teléfono">
+                    </div>
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">País</label>
+                      <select name="pais" required [(ngModel)]="direccion_nuevo.pais" class="custom-select">
+                        <option value="" disabled>Seleccionar</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Bolivia">Bolivia</option>
+                        <option value="Brasil">Brasil</option>
+                        <option value="Chile">Chile</option>
+                        <option value="Colombia">Colombia</option>
+                        <option value="Costa Rica">Costa Rica</option>
+                        <option value="Cuba">Cuba</option>
+                        <option value="Ecuador">Ecuador</option>
+                        <option value="El Salvador">El Salvador</option>
+                        <option value="España">España</option>
+                        <option value="Estados Unidos">Estados Unidos</option>
+                        <option value="Guatemala">Guatemala</option>
+                        <option value="Haití">Haití</option>
+                        <option value="Honduras">Honduras</option>
+                        <option value="México">México</option>
+                        <option value="Nicaragua">Nicaragua</option>
+                        <option value="Panamá">Panamá</option>
+                        <option value="Paraguay">Paraguay</option>
+                        <option value="Perú">Perú</option>
+                        <option value="República Dominicana">República Dominicana</option>
+                        <option value="Uruguay">Uruguay</option>
+                        <option value="Venezuela">Venezuela</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">Estado / Región</label>
+                      <input type="text" required class="form-control" name="region" [(ngModel)]="direccion_nuevo.region" placeholder="Ej. Florida o Antioquia">
+                    </div>
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">Ciudad</label>
+                      <input type="text" required class="form-control" name="provincia" [(ngModel)]="direccion_nuevo.provincia" placeholder="Ej. Miami o Medellín">
+                    </div>
+                    <div class="col-sm-6 form-group">
+                      <label class="font-weight-bold">ZIP (Código Postal)</label>
+                      <input type="text" required class="form-control" name="zip" [(ngModel)]="direccion_nuevo.zip" placeholder="Código postal">
+                    </div>
+                    <div class="col-12 form-group">
+                      <label class="font-weight-bold">Dirección</label>
+                      <textarea required class="form-control" name="direccion" [(ngModel)]="direccion_nuevo.direccion" placeholder="Calle, número, departamento..." rows="2"></textarea>
+                    </div>
+                    <div class="col-12 mt-2 d-flex justify-content-end">
+                      <button type="button" class="btn btn-outline-secondary mr-2" *ngIf="direcciones.length > 0" (click)="op_nueva_direccion = false">
+                        Cancelar
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        Guardar Dirección
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
 
@@ -174,8 +271,8 @@
                   <!-- Card: Credit card -->
                   <div class="card mb-3 px-4 py-3 border rounded box-shadow-sm">
                     <div class="card-header py-2">
-                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#cc-card">
-                        <input type="radio" class="custom-control-input" id="cc" name="payment" checked>
+                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#cc-card" (click)="metodo_pago = 'Tarjeta'">
+                        <input type="radio" class="custom-control-input" id="cc" name="payment" [(ngModel)]="metodo_pago" value="Tarjeta">
                         <label for="cc" class="custom-control-label d-flex align-items-center">
                           <strong class="d-block mr-3">Tarjeta de crédito</strong>
                           <img src="assets/img/cards.png" width="108" alt="Credit cards">
@@ -205,9 +302,9 @@
                   <!-- Card: PayPal -->
                   <div class="card mb-3 px-4 py-3 border rounded box-shadow-sm">
                     <div class="card-header py-2">
-                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#paypal-card">
-                        <input type="radio" class="custom-control-input" id="paypal" name="payment">
-                        <label for="paypal" class="custom-control-label d-flex align-items-center">
+                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#paypal-card" (click)="metodo_pago = 'PayPal'">
+                        <input type="radio" class="custom-control-input" id="paypal-radio" name="payment" [(ngModel)]="metodo_pago" value="PayPal">
+                        <label for="paypal-radio" class="custom-control-label d-flex align-items-center">
                           <strong class="d-block mr-3">PayPal</strong>
                           <img src="assets/img/paypal-badge.png" width="48" alt="PayPal">
                         </label>
@@ -223,8 +320,8 @@
                   <!-- Card: Cash -->
                   <div class="card mb-3 px-4 py-3 border rounded box-shadow-sm">
                     <div class="card-header py-2">
-                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#cash-card">
-                        <input type="radio" class="custom-control-input" id="cash" name="payment">
+                      <div class="accordion-heading custom-control custom-radio" data-toggle="collapse" data-target="#cash-card" (click)="metodo_pago = 'Efectivo'">
+                        <input type="radio" class="custom-control-input" id="cash" name="payment" [(ngModel)]="metodo_pago" value="Efectivo">
                         <label for="cash" class="custom-control-label">
                           <strong class="d-block mr-3">Cash on delivery</strong>
                         </label>
@@ -294,11 +391,13 @@
                   </div>
                 </div>
                 <ng-container *ngIf="carrito_arr.length >= 1">
-                  <button *ngIf="!btn_load" type="button" class="btn btn-primary btn-lg btn-block" (click)="get_token_culqi()">Completar orden</button>
-                  <button *ngIf="btn_load" type="button" class="btn btn-secondary btn-lg btn-block">
-                    <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
-                    Procesando...
-                  </button>
+                  <ng-container *ngIf="metodo_pago !== 'PayPal'">
+                    <button *ngIf="!btn_load" type="button" class="btn btn-primary btn-lg btn-block" (click)="completar_orden()">Completar orden</button>
+                    <button *ngIf="btn_load" type="button" class="btn btn-secondary btn-lg btn-block">
+                      <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                      Procesando...
+                    </button>
+                  </ng-container>
                 </ng-container>
                 
               </div>

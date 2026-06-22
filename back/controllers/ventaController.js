@@ -3,6 +3,8 @@ var Dventa = require('../models/dventa');
 var Producto = require('../models/producto');
 
 var Carrito = require('../models/carrito');
+var CarritoAdmin = require('../models/carritoAdmin');
+
 
 var fs = require('fs');
 var handlebars = require('handlebars');
@@ -43,6 +45,7 @@ const registro_compra_cliente = async function (req, res) {
 
         data.nventa = n_venta;
         data.estado = 'Procesando';
+        data.userid = req.user.sub;
 
         console.log(data);
 
@@ -61,6 +64,7 @@ const registro_compra_cliente = async function (req, res) {
 
             //limpiar carrito
             await Carrito.deleteMany({ cliente: data.cliente });
+            await CarritoAdmin.deleteMany({ cliente: data.cliente });
         });
 
         res.status(200).send({ venta: venta });
@@ -148,7 +152,85 @@ const enviar_correo_compra_cliente = async function (req, res) {
     });
 }
 
+const actualizar_estado_venta_admin = async function (req, res) {
+    if (req.user) {
+        if (req.user.role == 'admin') {
+            var id = req.params['id'];
+            var data = req.body;
+            
+            let reg = await Venta.findByIdAndUpdate({ _id: id }, {
+                estado: data.estado
+            });
+            res.status(200).send({ data: reg });
+        } else {
+            res.status(500).send({ message: 'NoAccess' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const actualizar_pedido_admin = async function (req, res) {
+    if (req.user) {
+        if (req.user.role == 'admin') {
+            var id = req.params['id'];
+            var data = req.body;
+            var detalles = data.detalles;
+
+            // 1. Obtener detalles antiguos
+            let old_details = await Dventa.find({ venta: id });
+
+            // 2. Devolver stock anterior
+            for (var item of old_details) {
+                let element_producto = await Producto.findById({ _id: item.producto });
+                if (element_producto) {
+                    let new_stock = parseInt(element_producto.stock) + parseInt(item.cantidad);
+                    await Producto.findByIdAndUpdate({ _id: item.producto }, {
+                        stock: new_stock
+                    });
+                }
+            }
+
+            // 3. Eliminar detalles antiguos
+            await Dventa.deleteMany({ venta: id });
+
+            // 4. Crear nuevos detalles y deducir stock
+            for (var element of detalles) {
+                element.venta = id;
+                await Dventa.create(element);
+
+                let element_producto = await Producto.findById({ _id: element.producto });
+                if (element_producto) {
+                    let new_stock = parseInt(element_producto.stock) - parseInt(element.cantidad);
+                    await Producto.findByIdAndUpdate({ _id: element.producto }, {
+                        stock: new_stock
+                    });
+                }
+            }
+
+            // 5. Actualizar la Venta principal
+            let updatedVenta = await Venta.findByIdAndUpdate({ _id: id }, {
+                subtotal: data.subtotal,
+                direccion: data.direccion,
+                nota: data.nota || '',
+                transaccion: data.transaccion,
+                envio_titulo: data.envio_titulo,
+                envio_precio: data.envio_precio,
+                userid: req.user.sub
+            }, { new: true });
+
+            res.status(200).send({ data: updatedVenta });
+        } else {
+            res.status(500).send({ message: 'NoAccess' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
 module.exports = {
     registro_compra_cliente,
-    enviar_correo_compra_cliente
+    enviar_correo_compra_cliente,
+    actualizar_estado_venta_admin,
+    actualizar_pedido_admin
 }

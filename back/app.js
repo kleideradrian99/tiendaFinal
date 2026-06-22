@@ -36,6 +36,8 @@ var carrito_route = require('./routes/carrito');
 var venta_route = require('./routes/venta');
 var descuento_route = require('./routes/descuento');
 var carrito_admin = require('./routes/carritoAdmin');
+var paypal_route = require('./routes/paypal');
+var culqi_route = require('./routes/culqi');
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(function () {
@@ -77,5 +79,7 @@ app.use('/api', carrito_route);
 app.use('/api', venta_route);
 app.use('/api', descuento_route);
 app.use('/api', carrito_admin);
+app.use('/api', paypal_route);
+app.use('/api', culqi_route);
 
 module.exports = app;

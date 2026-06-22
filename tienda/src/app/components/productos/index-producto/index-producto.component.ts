@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 declare var noUiSlider;
@@ -49,7 +49,8 @@ export class IndexProductoComponent implements OnInit {
   constructor(
     private _clienteService: ClienteService,
     private _route: ActivatedRoute,
-    private _guestService: GuestService
+    private _guestService: GuestService,
+    private _router: Router
   ) {
     this.token = localStorage.getItem('token');
     this.url = GLOBAL.url;
@@ -293,6 +294,18 @@ export class IndexProductoComponent implements OnInit {
 
 
   agregar_producto(producto) {
+    if (!this.token) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Debe iniciar sesión para agregar productos al carrito.'
+      });
+      this._router.navigate(['/login'], { queryParams: { returnUrl: this._router.url } });
+      return;
+    }
     let data = {
       producto: producto._id,
       cliente: localStorage.getItem('_id'),

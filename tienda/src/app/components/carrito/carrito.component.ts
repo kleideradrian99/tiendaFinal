@@ -52,6 +52,19 @@ export class CarritoComponent implements OnInit {
 
   public descuento_activo: any = undefined;
 
+  // Nuevas propiedades para direcciones y autocompletado por Geolocalización
+  public direcciones: Array<any> = [];
+  public direccion_nuevo: any = {
+    pais: '',
+    region: '', // Rellena el Estado
+    provincia: '', // Rellena la Ciudad
+    principal: true
+  };
+
+  public op_nueva_direccion = false;
+  public culqi_public_key = '';
+  public metodo_pago = 'Tarjeta';
+
   constructor(
     private _clienteService: ClienteService,
     private _guestService: GuestService,
@@ -105,49 +118,171 @@ export class CarritoComponent implements OnInit {
       new StickySidebar('.sidebar-sticky', { topSpacing: 20 });
     });
 
-    this.get_direccion_principal();
+    this.obtener_direcciones();
 
+    // Geolocalización del usuario por IP para precargar país, código postal, estado y ciudad
+    this._guestService.obtener_geolocalizacion().subscribe(
+      res => {
+        console.log("Geolocalización por IP:", res);
+        if (res) {
+          if (res.country_name) {
+            let detectedCountry = res.country_name;
+            if (detectedCountry === 'Peru') {
+              detectedCountry = 'Perú';
+            }
+            this.direccion_nuevo.pais = detectedCountry;
+          }
+          if (res.region) {
+            this.direccion_nuevo.region = res.region; // Estado
+          }
+          if (res.city) {
+            this.direccion_nuevo.provincia = res.city; // Ciudad
+          }
+          if (res.postal) {
+            this.direccion_nuevo.zip = res.postal;
+          }
+        }
+      },
+      err => {
+        console.error("Error al obtener la geolocalización por IP:", err);
+      }
+    );
+
+    this._clienteService.obtener_culqi_public_key().subscribe(
+      response => {
+        this.culqi_public_key = response.publicKey;
+      },
+      err => {
+        console.error("Error al obtener la clave pública de Culqi:", err);
+      }
+    );
+
+    this._clienteService.obtener_paypal_client_id().subscribe(
+      response => {
+        const script = document.createElement('script');
+        script.src = `https://www.paypal.com/sdk/js?client-id=${response.clientId}&currency=USD`;
+        script.onload = () => {
+          this.init_Paypal_Buttons();
+        };
+        document.body.appendChild(script);
+      }
+    );
+  }
+
+  init_Paypal_Buttons() {
     paypal.Buttons({
       style: {
         layout: 'horizontal'
       },
-      createOrder: (data, actions) => {
-
-        return actions.order.create({
-          purchase_units: [{
-            description: 'Pago en Mi Tienda',
-            amount: {
-              currency_code: 'USD',
-              value: this.subtotal
+      createOrder: (data: any, actions: any) => {
+        this.btn_load = true;
+        return new Promise((resolve, reject) => {
+          const orderPayload = {
+            cupon: this.venta.cupon,
+            envio_precio: this.precio_envio
+          };
+          this._clienteService.crear_orden_paypal(orderPayload, this.token).subscribe(
+            res => {
+              resolve(res.orderID);
             },
-          }]
+            err => {
+              console.error(err);
+              this.btn_load = false;
+              iziToast.show({
+                title: 'ERROR',
+                titleColor: '#FF0000',
+                color: '#FFF',
+                class: 'text-danger',
+                position: 'topRight',
+                message: 'No se pudo iniciar el pago con PayPal.'
+              });
+              reject(err);
+            }
+          );
         });
-
       },
-      onApprove: async (data, actions) => {
-        const order = await actions.order.capture();
-        console.log(order);
-
-        this.venta.transaccion = order.purchase_units[0].payments.captures[0].id;
-
-        this.venta.detalles = this.dventa;
-        this._clienteService.registro_compra_cliente(this.venta, this.token).subscribe(
-          response => {
-
-            this._clienteService.enviar_correo_compra_cliente(response.venta._id, this.token).subscribe(
-              response => {
-                this._router.navigate(['/']);
-              }
-            );
+      onApprove: async (data: any, actions: any) => {
+        this.btn_load = true;
+        this._clienteService.capturar_orden_paypal(data.orderID, this.token).subscribe(
+          res => {
+            const capture = res.captureData.purchase_units[0].payments.captures[0];
+            if (capture.status === 'COMPLETED') {
+              this.venta.transaccion = capture.id;
+              this.venta.detalles = this.dventa;
+              this._clienteService.registro_compra_cliente(this.venta, this.token).subscribe(
+                response => {
+                  this.btn_load = false;
+                  this._clienteService.enviar_correo_compra_cliente(response.venta._id, this.token).subscribe(
+                    response => {
+                      this._router.navigate(['/']);
+                    },
+                    err => {
+                      console.error("Error al enviar el correo:", err);
+                      this._router.navigate(['/']);
+                    }
+                  );
+                },
+                err => {
+                  console.error(err);
+                  this.btn_load = false;
+                  iziToast.show({
+                    title: 'ERROR',
+                    titleColor: '#FF0000',
+                    color: '#FFF',
+                    class: 'text-danger',
+                    position: 'topRight',
+                    message: 'Error al registrar la compra en el sistema.'
+                  });
+                }
+              );
+            } else {
+              this.btn_load = false;
+              iziToast.show({
+                title: 'ERROR',
+                titleColor: '#FF0000',
+                color: '#FFF',
+                class: 'text-danger',
+                position: 'topRight',
+                message: 'El pago no pudo ser capturado correctamente.'
+              });
+            }
+          },
+          err => {
+            console.error(err);
+            this.btn_load = false;
+            iziToast.show({
+              title: 'ERROR',
+              titleColor: '#FF0000',
+              color: '#FFF',
+              class: 'text-danger',
+              position: 'topRight',
+              message: 'Error al capturar el pago.'
+            });
           }
         );
-
       },
-      onError: err => {
-
+      onError: (err: any) => {
+        console.error(err);
+        this.btn_load = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Ocurrió un error con el procesador de pagos de PayPal.'
+        });
       },
-      onCancel: function (data, actions) {
-
+      onCancel: (data: any, actions: any) => {
+        this.btn_load = false;
+        iziToast.show({
+          title: 'CANCELADO',
+          titleColor: '#FFC107',
+          color: '#FFF',
+          class: 'text-warning',
+          position: 'topRight',
+          message: 'El pago con PayPal fue cancelado.'
+        });
       }
     }).render(this.paypalElement.nativeElement);
   }
@@ -173,19 +308,81 @@ export class CarritoComponent implements OnInit {
     );
   }
 
-  get_direccion_principal() {
-    this._clienteService.obtener_direccion_principal_cliente(localStorage.getItem('_id'), this.token).subscribe(
+  obtener_direcciones() {
+    this._clienteService.obtener_direccion_todos_cliente(this.idcliente, this.token).subscribe(
       response => {
-        if (response.data == undefined) {
+        this.direcciones = response.data || [];
+        if (this.direcciones.length == 0) {
+          this.op_nueva_direccion = true;
           this.direccion_principal = undefined;
         } else {
-          this.direccion_principal = response.data;
+          const principal = this.direcciones.find(item => item.principal);
+          if (principal) {
+            this.direccion_principal = principal;
+          } else {
+            this.direccion_principal = this.direcciones[0];
+          }
           this.venta.direccion = this.direccion_principal._id;
         }
-
-
       }
     );
+  }
+
+  seleccionar_direccion(id) {
+    const matched = this.direcciones.find(item => item._id == id);
+    if (matched) {
+      this.direccion_principal = matched;
+      this.venta.direccion = matched._id;
+    }
+  }
+
+  registrar_direccion(registroForm) {
+    if (registroForm.valid) {
+      let data = {
+        destinatario: this.direccion_nuevo.destinatario,
+        dni: '', // Omitido por solicitud del usuario
+        zip: this.direccion_nuevo.zip,
+        direccion: this.direccion_nuevo.direccion,
+        telefono: this.direccion_nuevo.telefono,
+        pais: this.direccion_nuevo.pais,
+        region: this.direccion_nuevo.region, // Estado
+        provincia: this.direccion_nuevo.provincia, // Ciudad
+        distrito: '', // Omitido
+        principal: this.direccion_nuevo.principal,
+        cliente: this.idcliente
+      }
+
+      this._clienteService.registro_direccion_cliente(data, this.token).subscribe(
+        response => {
+          this.direccion_nuevo = {
+            pais: '',
+            region: '',
+            provincia: '',
+            principal: true
+          };
+          this.op_nueva_direccion = false;
+          this.obtener_direcciones();
+
+          iziToast.show({
+            title: 'SUCCESS',
+            titleColor: '#1DC74C',
+            color: '#FFF',
+            class: 'text-success',
+            position: 'topRight',
+            message: 'Se agregó la nueva dirección correctamente.'
+          });
+        }
+      );
+    } else {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Los datos del formulario de dirección no son válidos.'
+      });
+    }
   }
 
   calcular_carrito() {
@@ -231,55 +428,135 @@ export class CarritoComponent implements OnInit {
   }
 
   get_token_culqi() {
+    if (!this.card_data.ncard || !this.card_data.exp || !this.card_data.cvc) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Por favor complete todos los datos de la tarjeta.'
+      });
+      return;
+    }
 
-    let month;
-    let year;
-
-    let exp_arr = this.card_data.exp.toString().split('/');
+    let exp_arr = [];
+    try {
+      exp_arr = this.card_data.exp.toString().split('/');
+      if (exp_arr.length !== 2) throw new Error("Fecha de expiración inválida");
+    } catch (e) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Formato de expiración incorrecto (use MM/AAAA o MM/AA).'
+      });
+      return;
+    }
 
     let data = {
       "card_number": this.card_data.ncard.toString().replace(/ /g, ""),
       "cvv": this.card_data.cvc,
-      "expiration_month": exp_arr[0],
-      "expiration_year": exp_arr[1].toString().substr(0, 4),
+      "expiration_month": exp_arr[0].trim(),
+      "expiration_year": exp_arr[1].trim().substr(0, 4),
       "email": this.user.email,
-    }
+    };
+    
     this.btn_load = true;
 
-    this._clienteService.get_token_culqi(data).subscribe(
+    this._clienteService.get_token_culqi(data, this.culqi_public_key).subscribe(
       response => {
-
-        let charge = {
-          "amount": this.subtotal + '00',
-          "currency_code": "USD",
-          "email": this.user.email,
-          "source_id": response.id,
-        }
-        this._clienteService.get_charge_culqi(charge).subscribe(
-          response => {
-            this.venta.transaccion = response.id;
-
-            this.venta.detalles = this.dventa;
-            this._clienteService.registro_compra_cliente(this.venta, this.token).subscribe(
-              response => {
-                this.btn_load = false;
-                this._clienteService.enviar_correo_compra_cliente(response.venta._id, this.token).subscribe(
-                  response => {
-                    this._router.navigate(['/']);
+        if (response && response.id) {
+          let charge = {
+            "amount": this.subtotal + '00',
+            "currency_code": "USD",
+            "email": this.user.email,
+            "source_id": response.id,
+          };
+          this._clienteService.get_charge_culqi(charge, this.token).subscribe(
+            resCharge => {
+              if (resCharge && resCharge.id) {
+                this.venta.transaccion = resCharge.id;
+                this.venta.detalles = this.dventa;
+                
+                this._clienteService.registro_compra_cliente(this.venta, this.token).subscribe(
+                  resVenta => {
+                    this.btn_load = false;
+                    this._clienteService.enviar_correo_compra_cliente(resVenta.venta._id, this.token).subscribe(
+                      resCorreo => {
+                        this._router.navigate(['/']);
+                      },
+                      errCorreo => {
+                        console.error("Error al enviar correo:", errCorreo);
+                        this._router.navigate(['/']);
+                      }
+                    );
+                  },
+                  errVenta => {
+                    console.error("Error al registrar compra:", errVenta);
+                    this.btn_load = false;
+                    iziToast.show({
+                      title: 'ERROR',
+                      titleColor: '#FF0000',
+                      color: '#FFF',
+                      class: 'text-danger',
+                      position: 'topRight',
+                      message: 'Error al registrar la compra en el sistema.'
+                    });
                   }
                 );
-
-
+              } else {
+                this.btn_load = false;
+                iziToast.show({
+                  title: 'ERROR',
+                  titleColor: '#FF0000',
+                  color: '#FFF',
+                  class: 'text-danger',
+                  position: 'topRight',
+                  message: 'No se pudo procesar el cargo de la tarjeta.'
+                });
               }
-            );
-
-
-          }
-        );
-
+            },
+            errCharge => {
+              console.error("Error al cobrar:", errCharge);
+              this.btn_load = false;
+              iziToast.show({
+                title: 'ERROR',
+                titleColor: '#FF0000',
+                color: '#FFF',
+                class: 'text-danger',
+                position: 'topRight',
+                message: 'Tarjeta rechazada o fondos insuficientes.'
+              });
+            }
+          );
+        } else {
+          this.btn_load = false;
+          iziToast.show({
+            title: 'ERROR',
+            titleColor: '#FF0000',
+            color: '#FFF',
+            class: 'text-danger',
+            position: 'topRight',
+            message: 'No se pudo verificar la tarjeta.'
+          });
+        }
+      },
+      errToken => {
+        console.error("Error token culqi:", errToken);
+        this.btn_load = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error de comunicación con el pasador de pagos.'
+        });
       }
     );
-
   }
 
 
@@ -314,6 +591,67 @@ export class CarritoComponent implements OnInit {
     } else {
       this.error_cupon = 'El  cupon no es valido';
     }
+  }
+
+  completar_orden() {
+    if (this.metodo_pago === 'Tarjeta') {
+      this.get_token_culqi();
+    } else if (this.metodo_pago === 'Efectivo') {
+      this.get_pago_contraentrega();
+    }
+  }
+
+  get_pago_contraentrega() {
+    if (!this.venta.direccion) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Por favor seleccione o registre una dirección de envío.'
+      });
+      return;
+    }
+
+    this.btn_load = true;
+    this.venta.transaccion = 'PAGO CONTRAENTREGA';
+    this.venta.detalles = this.dventa;
+
+    this._clienteService.registro_compra_cliente(this.venta, this.token).subscribe(
+      response => {
+        this.btn_load = false;
+        iziToast.show({
+          title: 'ÉXITO',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Tu pedido ha sido registrado con éxito.'
+        });
+        this._clienteService.enviar_correo_compra_cliente(response.venta._id, this.token).subscribe(
+          resCorreo => {
+            this._router.navigate(['/']);
+          },
+          errCorreo => {
+            console.error("Error al enviar correo:", errCorreo);
+            this._router.navigate(['/']);
+          }
+        );
+      },
+      err => {
+        console.error("Error al registrar compra contraentrega:", err);
+        this.btn_load = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Ocurrió un error al registrar el pedido.'
+        });
+      }
+    );
   }
 }
 

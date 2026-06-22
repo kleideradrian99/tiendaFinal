@@ -1,108 +1,125 @@
 <app-sidebar></app-sidebar>
 
 <!-- Page title-->
-<div class="border-bottom pt-5 mt-2 mb-5">
-    <h1 class="mt-2 mt-md-4 mb-3 pt-5">Ordenes</h1>
+<div class="border-bottom pt-5 mt-2 mb-4">
+    <h1 class="mt-2 mt-md-4 mb-3 pt-5">Órdenes / Pedidos</h1>
     <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
-        <p class="text-muted">Este módulo lista las ordenes que se realizan manualmente.</p>
+        <p class="text-muted">Este módulo lista las órdenes y ventas realizadas de forma manual o gestionadas por el administrador.</p>
         <p class="font-size-sm font-weight-medium pl-md-4">
-            <a class="text-nowrap" [routerLink]="['/panel/pedidos/registro']">Crear Nueva Orden<i
-                    class="cxi-angle-right font-size-base align-middle ml-1"></i></a>
+            <a class="text-nowrap" [routerLink]="['/panel/pedidos/registro']">
+                Crear Nueva Orden <i class="cxi-angle-right font-size-base align-middle ml-1"></i>
+            </a>
         </p>
     </div>
 </div>
 
 <div class="card box-shadow-sm">
     <div class="card-header">
-        <h5 style="margin-bottom: 0px;">Filtro de Ordenes</h5>
+        <h5 style="margin-bottom: 0px; font-weight: 600;">Filtro de Órdenes</h5>
     </div>
-    <div class="card-header">
+    <div class="card-header bg-white border-0 py-3">
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-6 col-sm-12">
                 <div class="input-group">
-                    <input class="form-control" type="text" placeholder="Buscar por **********" name="filtro"
-                        [(ngModel)]="filtro">
+                    <input class="form-control" type="text" placeholder="Buscar por código, cliente o correo..." name="filtro"
+                        [(ngModel)]="filtro" (keyup.enter)="filtrar()">
                     <div class="input-group-append">
-                        <button class="btn btn-primary" (click)="filtrar()" type="button">Filtrar</button>
+                        <button class="btn btn-primary" (click)="filtrar()" type="button"><i class="cxi-search mr-1"></i>Filtrar</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead class="thead-dark">
+    <div class="card-body pt-0">
+        <div class="table-responsive border rounded">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="thead-light">
                     <tr>
                         <th>Id Orden</th>
+                        <th>Código Venta</th>
                         <th>Cliente</th>
-                        <th>Empleado</th>
-                        <th>Valor total</th>
-                        <th>Actualizar Estado</th>
-                        <th>Opciones</th>
+                        <th>Valor Total</th>
+                        <th>Estado</th>
+                        <th>Fecha Registro</th>
+                        <th class="text-center">Opciones</th>
                     </tr>
                 </thead>
                 <tbody *ngIf="load_data">
                     <tr>
-                        <td class="text-center" colspan="5">
-                            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
-                                <span class="sr-only"></span>
+                        <td class="text-center py-5" colspan="7">
+                            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                                <span class="sr-only">Cargando...</span>
                             </div>
                         </td>
                     </tr>
                 </tbody>
 
                 <ng-container *ngIf="!load_data">
-                    <tbody *ngFor="let item of cupones| slice: (page-1)*pageSize : (page-1) * pageSize + pageSize;">
+                    <tbody *ngIf="ventas.length === 0">
                         <tr>
-                            <td>{{item.codigo}}</td>
-                            <td>{{item.tipo}}</td>
-                            <td>{{item.valor}}</td>
-                            <td>{{item.valor}}</td>
-                            <td>{{item.limite}} restantes</td>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No se encontraron órdenes registradas.
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody *ngIf="ventas.length > 0">
+                        <tr *ngFor="let item of ventas | slice: (page-1)*pageSize : (page-1) * pageSize + pageSize">
+                            <td><span class="font-size-xs text-muted font-weight-bold">{{item._id.toUpperCase()}}</span></td>
+                            <td><strong class="text-primary">{{item.nventa}}</strong></td>
                             <td>
+                                <div *ngIf="item.cliente">
+                                    <span class="font-weight-bold d-block">{{item.cliente.nombres}} {{item.cliente.apellidos}}</span>
+                                    <span class="font-size-xs text-muted">{{item.cliente.email}}</span>
+                                </div>
+                                <span *ngIf="!item.cliente" class="text-muted">N/A</span>
+                            </td>
+                            <td><strong class="text-dark">${{item.subtotal}}</strong></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="badge border-0 dropdown-toggle" type="button" id="dropdownEstado" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" [ngClass]="{
+                                        'badge-warning': item.estado === 'Procesando',
+                                        'badge-info': item.estado === 'Enviado',
+                                        'badge-success': item.estado === 'Finalizado' || item.estado === 'Entregado',
+                                        'badge-danger': item.estado === 'Cancelado',
+                                        'badge-secondary': item.estado === 'Esperando Stock' || item.estado === 'Empacado' || item.estado === 'Retrasado'
+                                    }">
+                                        {{item.estado}}
+                                    </button>
+                                    <div class="dropdown-menu shadow" aria-labelledby="dropdownEstado">
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Procesando')">Procesando</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Esperando Stock')">Esperando Stock</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Empacado')">Empacado</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Enviado')">Enviado</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Entregado')">Entregado</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Retrasado')">Retrasado</a>
+                                        <a class="dropdown-item font-size-xs" style="cursor: pointer;" (click)="actualizar_estado(item._id, 'Cancelado')">Cancelado</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{item.createdAt | date:'dd/MM/yyyy h:mm a'}}</td>
+                            <td class="text-center">
                                 <div class="btn-group dropdown">
                                     <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         OPCIONES
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a [routerLink]="['/panel/cupones',item._id]" class="dropdown-item">Editar</a>
-                                        <a class="dropdown-item" style="cursor: pointer;" data-toggle="modal"
-                                            [attr.data-target]="'#delete-'+item._id">Eliminar</a>
-                                    </div>
-                                </div>
-
-                                <div class="modal fade" id="delete-{{item._id}}" tabindex="-1" style="display: none;"
-                                    aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title">Eliminar el cupón {{item.codigo}}</h4>
-                                                <button class="close" type="button" data-dismiss="modal"
-                                                    aria-label="Close"><span aria-hidden="true">×</span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Desea eliminar este cupon?</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-secondary btn-sm" type="button"
-                                                    data-dismiss="modal">Cancelar</button>
-                                                <!-- <button class="btn btn-primary btn-shadow btn-sm" (click)="eliminar(item._id)" type="button">Si, eliminar</button> -->
-                                            </div>
-                                        </div>
+                                        <a [routerLink]="['/panel/ventas', item._id]" class="dropdown-item">
+                                            <i class="cxi-eye mr-2"></i>Ver Detalles
+                                        </a>
+                                        <a [routerLink]="['/panel/pedidos', item._id]" class="dropdown-item">
+                                            <i class="cxi-edit mr-2"></i>Editar Orden
+                                        </a>
                                     </div>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </ng-container>
-
-
             </table>
         </div>
     </div>
-    <div class="card-footer">
-        <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="cupones.length"></ngb-pagination>
+    <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+        <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="ventas.length"></ngb-pagination>
     </div>
 </div>

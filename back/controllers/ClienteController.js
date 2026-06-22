@@ -10,7 +10,7 @@ var jwt = require('../helpers/jwt');
 
 var Direccion = require('../models/direccion');
 
-const registro_cliente = async function(req, res) {
+const registro_cliente = async function (req, res) {
     //
     var data = req.body;
     var clientes_arr = [];
@@ -21,11 +21,14 @@ const registro_cliente = async function(req, res) {
         /*  */
 
         if (data.password) {
-            bcrypt.hash(data.password, 10, async function(err, hash) {
+            bcrypt.hash(data.password, 10, async function (err, hash) {
                 if (hash) {
                     data.password = hash;
                     var reg = await Cliente.create(data);
-                    res.status(200).send({ data: reg });
+                    res.status(200).send({
+                        data: reg,
+                        token: jwt.createToken(reg)
+                    });
                 } else {
                     res.status(200).send({ message: 'ErrorServer', data: undefined });
                 }
@@ -40,7 +43,7 @@ const registro_cliente = async function(req, res) {
     }
 }
 
-const login_cliente = async function(req, res) {
+const login_cliente = async function (req, res) {
     var data = req.body;
     var cliente_arr = [];
 
@@ -52,7 +55,7 @@ const login_cliente = async function(req, res) {
         //LOGIN
         let user = cliente_arr[0];
 
-        bcrypt.compare(data.password, user.password, async function(error, check) {
+        bcrypt.compare(data.password, user.password, async function (error, check) {
             if (check) {
                 res.status(200).send({
                     data: user,
@@ -65,7 +68,7 @@ const login_cliente = async function(req, res) {
 
     }
 }
-const obtener_direccion_principal_cliente = async function(req, res) {
+const obtener_direccion_principal_cliente = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
         var direccion = undefined;
@@ -83,7 +86,7 @@ const obtener_direccion_principal_cliente = async function(req, res) {
     }
 }
 
-const listar_clientes_filtro_admin = async function(req, res) {
+const listar_clientes_filtro_admin = async function (req, res) {
     // console.log(req.user);
     if (req.user) {
         if (req.user.role == 'admin') {
@@ -113,12 +116,12 @@ const listar_clientes_filtro_admin = async function(req, res) {
 
 }
 
-const registro_cliente_admin = async function(req, res) {
+const registro_cliente_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             var data = req.body;
 
-            bcrypt.hash('123456789', 10, async function(err, hash) {
+            bcrypt.hash('123456789', 10, async function (err, hash) {
                 if (hash) {
                     data.password = hash;
                     let reg = await Cliente.create(data);
@@ -136,7 +139,7 @@ const registro_cliente_admin = async function(req, res) {
     }
 }
 
-const obtener_cliente_admin = async function(req, res) {
+const obtener_cliente_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             var id = req.params['id'];
@@ -155,11 +158,18 @@ const obtener_cliente_admin = async function(req, res) {
     }
 }
 
-const obtener_cliente = async function(req, res) {
+const obtener_cliente = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             var filtro = req.params['filtro'];
-            let reg = await Cliente.find({ dni: new RegExp(filtro, 'i') });
+            let reg = await Cliente.find({
+                $or: [
+                    { dni: new RegExp(filtro, 'i') },
+                    { nombres: new RegExp(filtro, 'i') },
+                    { apellidos: new RegExp(filtro, 'i') },
+                    { email: new RegExp(filtro, 'i') }
+                ]
+            });
             res.status(200).send({ data: reg });
         } else {
             res.status(500).send({ message: 'NoAccess' });
@@ -169,7 +179,7 @@ const obtener_cliente = async function(req, res) {
     }
 }
 
-const actulizar_cliente_admin = async function(req, res) {
+const actulizar_cliente_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -196,7 +206,7 @@ const actulizar_cliente_admin = async function(req, res) {
     }
 }
 
-const eliminar_cliente_admin = async function(req, res) {
+const eliminar_cliente_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
 
@@ -213,7 +223,7 @@ const eliminar_cliente_admin = async function(req, res) {
     }
 }
 
-const obtener_cliente_guest = async function(req, res) {
+const obtener_cliente_guest = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
 
@@ -229,7 +239,7 @@ const obtener_cliente_guest = async function(req, res) {
     }
 }
 
-const actualizar_perfil_cliente_guest = async function(req, res) {
+const actualizar_perfil_cliente_guest = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
         var data = req.body;
@@ -238,7 +248,7 @@ const actualizar_perfil_cliente_guest = async function(req, res) {
 
         if (data.password) {
             console.log('Con contraseña');
-            bcrypt.hash(data.password, 10, async function(err, hash) {
+            bcrypt.hash(data.password, 10, async function (err, hash) {
                 console.log(hash);
                 var reg = await Cliente.findByIdAndUpdate({ _id: id }, {
                     nombres: data.nombres,
@@ -273,7 +283,7 @@ const actualizar_perfil_cliente_guest = async function(req, res) {
 }
 
 /**ORDENES */
-const obtener_ordenes_cliente = async function(req, res) {
+const obtener_ordenes_cliente = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
         let reg = await Venta.find({ cliente: id }).sort({ createdAt: -1 });
@@ -287,7 +297,7 @@ const obtener_ordenes_cliente = async function(req, res) {
     }
 }
 
-const obtener_detalles_ordenes_cliente = async function(req, res) {
+const obtener_detalles_ordenes_cliente = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
         try {
@@ -312,7 +322,7 @@ const obtener_detalles_ordenes_cliente = async function(req, res) {
 //DiRECIONES
 
 
-const registro_direccion_cliente = async function(req, res) {
+const registro_direccion_cliente = async function (req, res) {
     if (req.user) {
         var data = req.body;
 
@@ -332,7 +342,7 @@ const registro_direccion_cliente = async function(req, res) {
     }
 }
 
-const obtener_direccion_todos_cliente = async function(req, res) {
+const obtener_direccion_todos_cliente = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
 
@@ -343,7 +353,7 @@ const obtener_direccion_todos_cliente = async function(req, res) {
     }
 }
 
-const cambiar_direccion_principal_cliente = async function(req, res) {
+const cambiar_direccion_principal_cliente = async function (req, res) {
     if (req.user) {
         var id = req.params['id'];
         var cliente = req.params['cliente'];
@@ -363,7 +373,7 @@ const cambiar_direccion_principal_cliente = async function(req, res) {
 }
 
 /********************************CONTACTO */
-const enviar_mensaje_contacto = async function(req, res) {
+const enviar_mensaje_contacto = async function (req, res) {
     let data = req.body;
 
     data.estado = 'Abierto';
@@ -373,7 +383,7 @@ const enviar_mensaje_contacto = async function(req, res) {
 }
 
 /**REVIEWS */
-const emitir_review_producto_cliente = async function(req, res) {
+const emitir_review_producto_cliente = async function (req, res) {
     if (req.user) {
         let data = req.body;
 
@@ -385,14 +395,14 @@ const emitir_review_producto_cliente = async function(req, res) {
     }
 }
 
-const obtener_review_producto_cliente = async function(req, res) {
-        let id = req.params['id'];
+const obtener_review_producto_cliente = async function (req, res) {
+    let id = req.params['id'];
 
-        let reg = await Review.find({ producto: id }).sort({ createdAt: -1 });
-        res.status(200).send({ data: reg });
-    }
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-const obtener_reviews_cliente = async function(req, res) {
+    let reg = await Review.find({ producto: id }).sort({ createdAt: -1 });
+    res.status(200).send({ data: reg });
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+const obtener_reviews_cliente = async function (req, res) {
     if (req.user) {
         let id = req.params['id'];
 

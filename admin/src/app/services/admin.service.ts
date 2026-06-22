@@ -113,4 +113,19 @@ export class AdminService {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.get(this.url + 'kpi_ganancias_mensuales_admin', { headers: headers });
   }
+
+  registro_compra_cliente(data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.post(this.url + 'registro_compra_cliente', data, { headers: headers });
+  }
+
+  actualizar_estado_venta_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_estado_venta_admin/' + id, data, { headers: headers });
+  }
+
+  actualizar_pedido_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_pedido_admin/' + id, data, { headers: headers });
+  }
 }

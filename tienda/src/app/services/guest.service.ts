@@ -52,6 +52,10 @@ export class GuestService {
   }
 
 
+  obtener_geolocalizacion(): Observable<any> {
+    return this._http.get('https://ipapi.co/json/');
+  }
+
   get_Regiones(): Observable<any> {
     return this._http.get('./assets/regiones.json');
   }
