@@ -1,60 +1,88 @@
-<!-- Navbar-->
-<header class="navbar navbar-expand navbar-light fixed-top navbar-box-shadow bg-light px-3 px-lg-4" data-scroll-header
+<!-- Navbar (Oculto en pantallas grandes d-lg-none) -->
+<header class="navbar navbar-expand navbar-light fixed-top navbar-box-shadow bg-light px-3 d-lg-none" data-scroll-header
     data-fixed-element>
-    <a class="navbar-brand d-lg-none" href="dev-setup.html">
-        <img src="assets/img/components/logo/logo-dark.svg" alt="Createx" width="130">
+    <a class="navbar-brand mr-auto" [routerLink]="['/inicio']" (click)="closeMenu()">
+        <img src="assets/img/logo_prin.png" alt="Mb Latina" width="90">
     </a>
-    <button class="navbar-toggler d-block d-lg-none mr-3 ml-auto" type="button" data-toggle="offcanvas"
-        data-target="componentsNav">
+    <button class="navbar-toggler d-block ml-auto" type="button" (click)="toggleMenu()">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <ul class="navbar-nav ml-auto d-none d-lg-flex align-items-center">
-
-        <li class="nav-item">
-            <a class="nav-link py-0" href="../components/typography.html">
-                <i class="cxi-profile align-middle mt-n1 mr-2"></i> Cuenta
-            </a>
-        </li>
-
-    </ul>
-
 </header>
 
-<!-- Side navigation (Off-canvas)-->
-<aside class="cs-offcanvas cs-offcanvas-expand bg-dark" id="componentsNav"
-    style="background-color: #000 !important;">
-    <div class="cs-offcanvas-cap d-none d-lg-block py-4">
-        <a class="navbar-brand py-2" [routerLink]="['/inicio']">
-            <img src="assets/img/logo_prin.png" alt="Createx" width="100%">
-            <!-- <h2>Mb Latina</h2> -->
+<!-- Side navigation (Off-canvas) -->
+<aside class="cs-offcanvas cs-offcanvas-expand custom-sidebar" id="componentsNav" [class.show]="menuOpen">
+    <!-- Header/Logo section -->
+    <div
+        class="sidebar-header py-4 px-4 border-bottom border-light-subtle d-flex align-items-center justify-content-between">
+        <a class="navbar-brand py-1 m-0" [routerLink]="['/inicio']">
+            <img src="assets/img/logo_prin.png" alt="Mb Latina" class="sidebar-logo">
         </a>
-    </div>
-    <div class="cs-offcanvas-cap d-flex d-lg-none">
-        <div class="d-flex align-items-center mt-1">
-            <h5 class="text-light mb-0 mr-3">Menu</h5>
-            <span class="badge badge-warning">Docs</span>
-        </div>
-        <button class="close text-light" type="button" data-dismiss="offcanvas" aria-label="Close">
+        <button class="close d-lg-none text-light border-0 bg-transparent" type="button" (click)="toggleMenu()"
+            aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="d-flex d-lg-none align-items-center py-4 px-3 border-bottom border-light">
-        <!-- <a class="btn btn-primary btn-block mr-3 px-4" href="index.html"><i class="cxi-eye mt-n1 mr-2"></i>Preview</a>
-      <a class="btn btn-success btn-block mt-0 px-4" href="../components/typography.html"><i class="cxi-layouts mt-n1 mr-2"></i>Components</a> -->
-    </div>
-    <div class="cs-offcanvas-body px-0 pt-4 pb-grid-gutter" data-simplebar data-simplebar-inverse>
-        <hr class="hr-gradient hr-light mb-2 opacity-25">
-        <nav class="nav nav-light">
-            <a class="nav-link px-4" [routerLink]="['/inicio']" routerLinkActive="active">Inicio</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/clientes']" routerLinkActive="active">Cliente</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/productos']" routerLinkActive="active">Productos</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/cupones']" routerLinkActive="active">Cupones</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/ventas']" routerLinkActive="active">Ventas/Tienda</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/pedidos']" routerLinkActive="active">Pedidos/Al mayor</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/descuentos']" routerLinkActive="active">Descuentos</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/contactos']" routerLinkActive="active">Mensajes</a>
-            <a class="nav-link px-4" [routerLink]="['/panel/configuraciones']"
-                routerLinkActive="active">Configuraciones</a>
+
+    <!-- Navigation links container -->
+    <div class="sidebar-nav-container flex-grow-1">
+        <nav class="nav flex-column custom-nav">
+            <a class="custom-nav-link" [routerLink]="['/inicio']" routerLinkActive="active-link" (click)="closeMenu()">
+                <i class="cxi-grid mr-3 icon-nav"></i>Inicio
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/clientes']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-profile mr-3 icon-nav"></i>Clientes
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/productos']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-bag mr-3 icon-nav"></i>Productos
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/cupones']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-anchor mr-3 icon-nav"></i>Cupones
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/ventas']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-cart mr-3 icon-nav"></i>Ventas
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/pedidos']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-wallet mr-3 icon-nav"></i>Pedidos/Al Mayor
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/descuentos']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-filter-1 mr-3 icon-nav"></i>Descuentos
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/contactos']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-comment mr-3 icon-nav"></i>Mensajes
+            </a>
+            <a class="custom-nav-link" [routerLink]="['/panel/configuraciones']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-settings mr-3 icon-nav"></i>Configuraciones
+            </a>
         </nav>
     </div>
+
+    <!-- User Profile Footer (Al final) -->
+    <div class="sidebar-footer py-3 px-4 border-top border-light-subtle d-flex align-items-center justify-content-between"
+        *ngIf="user.nombres">
+        <div class="d-flex align-items-center text-truncate">
+            <div class="avatar mr-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                {{ user.nombres[0] }}{{ user.apellidos ? user.apellidos[0] : '' }}
+            </div>
+            <div class="user-info text-truncate">
+                <div class="user-name text-truncate" [title]="user.nombres + ' ' + user.apellidos">{{ user.nombres }} {{
+                    user.apellidos }}</div>
+                <div class="user-role">{{ user.role }}</div>
+            </div>
+        </div>
+        <button
+            class="btn-logout bg-transparent border-0 text-light p-2 d-flex align-items-center justify-content-center flex-shrink-0"
+            (click)="logout()" title="Cerrar sesión">
+            <i class="cxi-logout"></i>
+        </button>
+    </div>
 </aside>
+<!-- Backdrop overlay for offcanvas mobile menu -->
+<div class="cs-offcanvas-backdrop fade" [class.show]="menuOpen" *ngIf="menuOpen" (click)="closeMenu()"></div>

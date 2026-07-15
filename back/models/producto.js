@@ -9,6 +9,7 @@ var ProductoSchema = Schema({
     galeria: [{ type: Object, required: false }],
     portada: { type: String, required: false },
     precio: { type: Number, required: true },
+    precio_cop: { type: Number, default: 0, required: true },
     descripcion: { type: String, required: false },
     contenido: { type: String, required: false },
     stock: { type: Number, required: false },

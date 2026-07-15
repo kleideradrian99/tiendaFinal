@@ -5,7 +5,7 @@ import { ClienteService } from 'src/app/services/cliente.service';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, SlicePipe, NgClass } from '@angular/common';
+import { NgIf, NgFor, SlicePipe, NgClass, CurrencyPipe } from '@angular/common';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
@@ -19,7 +19,7 @@ declare var $: any;
     selector: 'app-create-pedido',
     templateUrl: './create-pedido.component.html',
     styleUrls: ['./create-pedido.component.css'],
-    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, SlicePipe, NgClass]
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, SlicePipe, NgClass, CurrencyPipe]
 })
 export class CreatePedidoComponent implements OnInit {
 
@@ -337,6 +337,7 @@ export class CreatePedidoComponent implements OnInit {
         titulo: this.producto.nombre,
         stock: total_stock,
         precio: this.producto.precio,
+        precio_cop: 0,
         descripcion: this.producto.observacion || 'Producto sin stock',
         contenido: 'Producto especial sin stock',
         categoria: 'Sin Stock'

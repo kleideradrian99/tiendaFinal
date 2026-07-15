@@ -35,7 +35,6 @@
             <table class="table table-hover mb-0 align-middle">
                 <thead class="thead-light">
                     <tr>
-                        <th>Id Orden</th>
                         <th>Código Venta</th>
                         <th>Cliente</th>
                         <th>Valor Total</th>
@@ -46,7 +45,7 @@
                 </thead>
                 <tbody *ngIf="load_data">
                     <tr>
-                        <td class="text-center py-5" colspan="7">
+                        <td class="text-center py-5" colspan="6">
                             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                                 <span class="sr-only">Cargando...</span>
                             </div>
@@ -57,15 +56,19 @@
                 <ng-container *ngIf="!load_data">
                     <tbody *ngIf="ventas.length === 0">
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">
+                            <td colspan="6" class="text-center py-4 text-muted">
                                 No se encontraron órdenes registradas.
                             </td>
                         </tr>
                     </tbody>
                     <tbody *ngIf="ventas.length > 0">
                         <tr *ngFor="let item of ventas | slice: (page-1)*pageSize : (page-1) * pageSize + pageSize">
-                            <td><span class="font-size-xs text-muted font-weight-bold">{{item._id.toUpperCase()}}</span></td>
-                            <td><strong class="text-primary">{{item.nventa}}</strong></td>
+                            <td>
+                                <strong class="text-primary mr-2">{{item.nventa}}</strong>
+                                <span *ngIf="item.detalles_pendientes > 0" class="badge badge-pill badge-danger badge-pulse" title="Productos pendientes de empaque/entrega">
+                                    {{item.detalles_pendientes}}
+                                </span>
+                            </td>
                             <td>
                                 <div *ngIf="item.cliente">
                                     <span class="font-weight-bold d-block">{{item.cliente.nombres}} {{item.cliente.apellidos}}</span>
@@ -73,7 +76,7 @@
                                 </div>
                                 <span *ngIf="!item.cliente" class="text-muted">N/A</span>
                             </td>
-                            <td><strong class="text-dark">${{item.subtotal}}</strong></td>
+                            <td><strong class="text-dark">{{item.subtotal | currency:'USD'}}</strong></td>
                             <td>
                                 <div class="dropdown">
                                     <button class="badge border-0 dropdown-toggle" type="button" id="dropdownEstado" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" [ngClass]="{

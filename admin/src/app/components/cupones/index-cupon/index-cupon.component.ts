@@ -3,7 +3,7 @@ import { CuponService } from 'src/app/services/cupon.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, SlicePipe } from '@angular/common';
+import { NgIf, NgFor, SlicePipe, CurrencyPipe } from '@angular/common';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 declare var iziToast;
 declare var jQuery:any;
@@ -13,7 +13,7 @@ declare var $:any;
     selector: 'app-index-cupon',
     templateUrl: './index-cupon.component.html',
     styleUrls: ['./index-cupon.component.css'],
-    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe]
+    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe, CurrencyPipe]
 })
 export class IndexCuponComponent implements OnInit {
 

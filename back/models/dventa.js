@@ -9,6 +9,7 @@ var DventaSchema = Schema({
     subtotal: { type: Number, require: true },
     variedad: { type: String, require: true },
     cantidad: { type: Number, require: true },
+    estado: { type: String, default: 'Solicitado', required: true },
     cliente: { type: Schema.ObjectId, ref: 'cliente', required: true },
     createdAt: { type: Date, default: Date.now, require: true }
 });

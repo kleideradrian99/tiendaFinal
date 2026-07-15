@@ -1,5 +1,168 @@
-h2{
-    color: #fff;
-    font-family: cursive;
+/* Custom Sidebar Styles */
+.custom-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #0e1320 0%, #05070c 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 6px 0 30px rgba(0, 0, 0, 0.4) !important;
+    z-index: 1060 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.cs-offcanvas-backdrop {
+    z-index: 1050 !important;
+}
+
+.sidebar-logo {
+    max-height: 40px;
+    object-fit: contain;
+    width: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Sidebar Nav Scroll Container */
+.sidebar-nav-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1.25rem 0;
+}
+
+/* Custom Scrollbar for navigation */
+.sidebar-nav-container::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar-nav-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar-nav-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.sidebar-nav-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Nav links styling */
+.custom-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.custom-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    color: #94a3b8 !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    margin: 0 0.85rem;
+    border-radius: 8px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.icon-nav {
+    font-size: 1.1rem;
+    transition: transform 0.25s ease;
+}
+
+/* Hover effects */
+.custom-nav-link:hover {
+    color: #f1f5f9 !important;
+    background-color: rgba(255, 255, 255, 0.05);
+    transform: translateX(6px);
+}
+
+.custom-nav-link:hover .icon-nav {
+    transform: scale(1.15);
+}
+
+/* Active Link design */
+.custom-nav-link.active-link {
+    background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35);
+}
+
+.custom-nav-link.active-link .icon-nav {
+    color: #ffffff !important;
+}
+
+/* User Card Footer styles */
+.sidebar-footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.35);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info {
+    max-width: 125px;
+}
+
+.user-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #f8fafc;
+    line-height: 1.25;
+}
+
+.user-role {
+    font-size: 0.725rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Logout button */
+.btn-logout {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-logout i {
+    font-size: 1.15rem;
+}
+
+.btn-logout:hover {
+    opacity: 1;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    transform: scale(1.05);
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 991.98px) {
+    .custom-sidebar {
+        transform: translateX(-100%);
+        box-shadow: none !important;
+    }
     
+    .custom-sidebar.show {
+        transform: translateX(0);
+        box-shadow: 6px 0 30px rgba(0, 0, 0, 0.5) !important;
+    }
 }

@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { NgIf, NgFor, DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: 'app-detalle-ventas',
     templateUrl: './detalle-ventas.component.html',
     styleUrls: ['./detalle-ventas.component.css'],
-    imports: [SidebarComponent, NgIf, NgFor, DatePipe]
+    imports: [SidebarComponent, NgIf, NgFor, DatePipe, CurrencyPipe]
 })
 export class DetalleVentasComponent implements OnInit {
 

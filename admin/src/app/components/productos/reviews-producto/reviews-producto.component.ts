@@ -3,14 +3,14 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
-import { NgIf, NgFor, NgClass, SlicePipe, DatePipe } from '@angular/common';
+import { NgIf, NgFor, NgClass, SlicePipe, DatePipe, CurrencyPipe } from '@angular/common';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'app-reviews-producto',
     templateUrl: './reviews-producto.component.html',
     styleUrls: ['./reviews-producto.component.css'],
-    imports: [SidebarComponent, RouterLink, NgIf, NgFor, NgClass, NgbPagination, SlicePipe, DatePipe]
+    imports: [SidebarComponent, RouterLink, NgIf, NgFor, NgClass, NgbPagination, SlicePipe, DatePipe, CurrencyPipe]
 })
 export class ReviewsProductoComponent implements OnInit {
 

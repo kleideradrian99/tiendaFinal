@@ -108,7 +108,16 @@ const obtener_ventas_admin  = async function(req,res){
             let hasta = req.params['hasta'];
 
             if(desde == 'undefined' && hasta == 'undefined'){
-                ventas = await Venta.find().populate('cliente').populate('direccion').sort({createdAt:-1});
+                let raw_ventas = await Venta.find().populate('cliente').populate('direccion').sort({createdAt:-1});
+                for(let v of raw_ventas) {
+                    let count_pendientes = 0;
+                    if (v.estado !== 'Cancelado') {
+                        count_pendientes = await Dventa.countDocuments({ venta: v._id, estado: { $ne: 'Entregado' } });
+                    }
+                    let v_obj = v.toObject();
+                    v_obj.detalles_pendientes = count_pendientes;
+                    ventas.push(v_obj);
+                }
                 res.status(200).send({data:ventas});
             }else{
                 let tt_desde = Date.parse(new Date(desde+'T00:00:00'))/1000;
@@ -119,7 +128,13 @@ const obtener_ventas_admin  = async function(req,res){
                 for(var item of tem_ventas){
                     var tt_created = Date.parse(new Date(item.createdAt))/1000;
                     if(tt_created >= tt_desde && tt_created <= tt_hasta){
-                        ventas.push(item);
+                        let count_pendientes = 0;
+                        if (item.estado !== 'Cancelado') {
+                            count_pendientes = await Dventa.countDocuments({ venta: item._id, estado: { $ne: 'Entregado' } });
+                        }
+                        let v_obj = item.toObject();
+                        v_obj.detalles_pendientes = count_pendientes;
+                        ventas.push(v_obj);
                     }
                 }
 

@@ -4,7 +4,7 @@ import { ClienteService } from 'src/app/services/cliente.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, SlicePipe, DatePipe, NgClass } from '@angular/common';
+import { NgIf, NgFor, SlicePipe, DatePipe, NgClass, CurrencyPipe } from '@angular/common';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 declare var iziToast: any;
@@ -13,7 +13,7 @@ declare var iziToast: any;
     selector: 'app-index-pedidos',
     templateUrl: './index-pedidos.component.html',
     styleUrls: ['./index-pedidos.component.css'],
-    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe, DatePipe, NgClass]
+    imports: [SidebarComponent, RouterLink, FormsModule, NgIf, NgFor, NgbPagination, SlicePipe, DatePipe, NgClass, CurrencyPipe]
 })
 export class IndexPedidosComponent implements OnInit {
 

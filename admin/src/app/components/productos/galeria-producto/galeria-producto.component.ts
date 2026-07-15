@@ -6,13 +6,13 @@ declare var iziToast;
 declare var $;
 import { v4 as uuidv4 } from 'uuid';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: 'app-galeria-producto',
     templateUrl: './galeria-producto.component.html',
     styleUrls: ['./galeria-producto.component.css'],
-    imports: [SidebarComponent, NgIf, NgFor]
+    imports: [SidebarComponent, NgIf, NgFor, CurrencyPipe]
 })
 export class GaleriaProductoComponent implements OnInit {
 

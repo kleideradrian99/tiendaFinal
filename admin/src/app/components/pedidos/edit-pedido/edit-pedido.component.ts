@@ -6,7 +6,7 @@ import { ClienteService } from 'src/app/services/cliente.service';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, SlicePipe, NgClass } from '@angular/common';
+import { NgIf, NgFor, SlicePipe, NgClass, CurrencyPipe } from '@angular/common';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
@@ -17,7 +17,7 @@ declare var $: any;
     selector: 'app-edit-pedido',
     templateUrl: './edit-pedido.component.html',
     styleUrls: ['./edit-pedido.component.css'],
-    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, RouterLink, SlicePipe, NgClass]
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, RouterLink, SlicePipe, NgClass, CurrencyPipe]
 })
 export class EditPedidoComponent implements OnInit {
 
@@ -148,7 +148,8 @@ export class EditPedidoComponent implements OnInit {
                   }
                   grouped[prodId].variedad.push({
                     titulo: det.variedad,
-                    cantidad: det.cantidad
+                    cantidad: det.cantidad,
+                    estado: det.estado || 'Solicitado'
                   });
                   grouped[prodId].total += det.subtotal;
                 }
@@ -193,6 +194,7 @@ export class EditPedidoComponent implements OnInit {
             subtotal: element.producto.precio * varItem.cantidad,
             variedad: varItem.titulo,
             cantidad: varItem.cantidad,
+            estado: varItem.estado || 'Solicitado',
             cliente: this._idCliente
           });
         });
@@ -202,6 +204,7 @@ export class EditPedidoComponent implements OnInit {
           subtotal: element.producto.precio * element.cantidad,
           variedad: element.variedad,
           cantidad: element.cantidad,
+          estado: element.estado || 'Solicitado',
           cliente: this._idCliente
         });
       }
@@ -389,15 +392,24 @@ export class EditPedidoComponent implements OnInit {
           if (existingVar) {
             existingVar.cantidad += newVar.cantidad;
           } else {
-            this.carrito_arr[existingIndex].variedad.push(newVar);
+            this.carrito_arr[existingIndex].variedad.push({
+              titulo: newVar.titulo,
+              cantidad: newVar.cantidad,
+              estado: newVar.estado || 'Solicitado'
+            });
           }
         });
         this.carrito_arr[existingIndex].total += total_item_amount;
       } else {
+        let varietiesForCart = selectedVarieties.map(v => ({
+          titulo: v.titulo,
+          cantidad: v.cantidad,
+          estado: v.estado || 'Solicitado'
+        }));
         this.carrito_arr.push({
           _id: Math.random().toString(36).substr(2, 9),
           producto: producto,
-          variedad: selectedVarieties,
+          variedad: varietiesForCart,
           total: total_item_amount
         });
       }
@@ -500,6 +512,7 @@ export class EditPedidoComponent implements OnInit {
       titulo: this.producto.nombre,
       stock: total_stock,
       precio: this.producto.precio,
+      precio_cop: 0,
       descripcion: this.producto.observacion || 'Producto sin stock',
       contenido: 'Producto especial sin stock',
       categoria: 'Sin Stock'
@@ -519,7 +532,8 @@ export class EditPedidoComponent implements OnInit {
             varResponse => {
               let varietiesForCart = this.producto.variedad.filter(v => v.cantidad > 0).map(v => ({
                 titulo: v.name,
-                cantidad: v.cantidad
+                cantidad: v.cantidad,
+                estado: 'Solicitado'
               }));
 
               this.carrito_arr.push({

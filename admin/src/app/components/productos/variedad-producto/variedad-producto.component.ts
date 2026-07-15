@@ -4,7 +4,7 @@ import { GLOBAL } from 'src/app/services/GLOBAL';
 import { ProductoService } from 'src/app/services/producto.service';
 import { IProducto } from '../../interfaces/interface';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
-import { NgIf, NgFor } from '@angular/common';
+import { NgIf, NgFor, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 declare var iziToast;
 
@@ -12,7 +12,7 @@ declare var iziToast;
     selector: 'app-variedad-producto',
     templateUrl: './variedad-producto.component.html',
     styleUrls: ['./variedad-producto.component.css'],
-    imports: [SidebarComponent, NgIf, FormsModule, NgFor]
+    imports: [SidebarComponent, NgIf, FormsModule, NgFor, CurrencyPipe]
 })
 export class VariedadProductoComponent implements OnInit {
   public producto: IProducto;

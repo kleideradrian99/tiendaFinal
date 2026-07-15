@@ -23,6 +23,7 @@ export class ProductoService {
     fd.append('titulo', data.titulo);
     fd.append('stock', data.stock);
     fd.append('precio', data.precio);
+    fd.append('precio_cop', data.precio_cop);
     fd.append('descripcion', data.descripcion);
     fd.append('contenido', data.contenido);
     fd.append('categoria', data.categoria);
@@ -48,6 +49,7 @@ export class ProductoService {
       fd.append('titulo', data.titulo);
       fd.append('stock', data.stock);
       fd.append('precio', data.precio);
+      fd.append('precio_cop', data.precio_cop);
       fd.append('descripcion', data.descripcion);
       fd.append('contenido', data.contenido);
       fd.append('categoria', data.categoria);

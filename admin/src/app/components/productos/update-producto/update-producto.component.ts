@@ -84,6 +84,7 @@ export class UpdateProductoComponent implements OnInit {
       data.titulo = this.producto.titulo;
       data.stock = this.producto.stock;
       data.precio = this.producto.precio;
+      data.precio_cop = this.producto.precio_cop;
       data.categoria = this.producto.categoria;
       data.descripcion = this.producto.descripcion;
       data.contenido = this.producto.contenido;

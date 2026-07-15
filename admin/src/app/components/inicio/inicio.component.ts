@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
 import Chart from 'chart.js/auto';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: 'app-inicio',
     templateUrl: './inicio.component.html',
     styleUrls: ['./inicio.component.css'],
-    imports: [SidebarComponent]
+    imports: [SidebarComponent, CurrencyPipe]
 })
 export class InicioComponent implements OnInit {
 
