@@ -7,7 +7,8 @@ var Dventa = require('../models/dventa');
 var Contacto = require('../models/contacto');
 var bcrypt = require('bcryptjs');
 var jwt = require('../helpers/jwt');
-const venta = require('../models/venta');
+var jsonwebtoken = require('jsonwebtoken');
+var nodemailer = require('nodemailer');
 
 const registro_admin = async function(req,res){
     //
@@ -250,11 +251,189 @@ const kpi_ganancias_mensuales_admin  = async function(req,res){
     }
 }
 
+const registrar_usuario_interno = async function(req,res){
+    if(req.user && req.user.role == 'admin'){
+        var data = req.body;
+        var admin_arr = await Admin.find({email:data.email});
+
+        if(admin_arr.length == 0){
+            if(data.password){
+                bcrypt.hash(data.password, 10, async function(err,hash){
+                    if(hash){
+                        data.password = hash;
+                        data.estado = 'Activo';
+                        var reg = await Admin.create(data);
+                        res.status(200).send({data:reg});
+                    }else{
+                        res.status(200).send({message:'ErrorServer',data:undefined});
+                    }
+                })
+            }else{
+                res.status(200).send({message:'No hay una contraseña',data:undefined});
+            }
+        }else{
+            res.status(200).send({message:'El correo ya existe en la base de datos',data:undefined});
+        }
+    }else{
+        res.status(500).send({message: 'NoAccess'});
+    }
+}
+
+const listar_usuarios_internos = async function(req,res){
+    if(req.user && req.user.role == 'admin'){
+        var filtro = req.params['filtro'];
+        let query = {};
+        if(filtro && filtro != 'undefined' && filtro != 'null'){
+            query = {
+                $or: [
+                    {nombres: new RegExp(filtro, 'i')},
+                    {apellidos: new RegExp(filtro, 'i')},
+                    {email: new RegExp(filtro, 'i')},
+                    {dni: new RegExp(filtro, 'i')}
+                ]
+            };
+        }
+        let reg = await Admin.find(query).sort({createdAt:-1});
+        res.status(200).send({data:reg});
+    }else{
+        res.status(500).send({message: 'NoAccess'});
+    }
+}
+
+const obtener_usuario_interno = async function(req,res){
+    if(req.user && req.user.role == 'admin'){
+        var id = req.params['id'];
+        try {
+            let reg = await Admin.findById({_id:id});
+            res.status(200).send({data:reg});
+        } catch (error) {
+            res.status(200).send({data:undefined});
+        }
+    }else{
+        res.status(500).send({message: 'NoAccess'});
+    }
+}
+
+const actualizar_usuario_interno = async function(req,res){
+    if(req.user && req.user.role == 'admin'){
+        var id = req.params['id'];
+        var data = req.body;
+        
+        let updateData = {
+            nombres: data.nombres,
+            apellidos: data.apellidos,
+            email: data.email,
+            telefono: data.telefono,
+            rol: data.rol,
+            dni: data.dni,
+            estado: data.estado
+        };
+
+        if(data.password && data.password.trim() !== ''){
+            updateData.password = await bcrypt.hash(data.password, 10);
+        }
+
+        let reg = await Admin.findByIdAndUpdate({_id:id}, updateData, {new: true});
+        res.status(200).send({data:reg});
+    }else{
+        res.status(500).send({message: 'NoAccess'});
+    }
+}
+
+const eliminar_usuario_interno = async function(req,res){
+    if(req.user && req.user.role == 'admin'){
+        var id = req.params['id'];
+        let reg = await Admin.findByIdAndUpdate({_id:id},{estado: 'Desactivado'}, {new: true});
+        res.status(200).send({data:reg});
+    }else{
+        res.status(500).send({message: 'NoAccess'});
+    }
+}
+
+const enviar_recuperacion_admin = async function(req,res){
+    var data = req.body;
+    var admin = await Admin.findOne({email:data.email});
+
+    if(!admin){
+        return res.status(200).send({message: 'No se encontró el correo', data: undefined});
+    }
+
+    var secret = process.env.JWT_SECRET;
+    var resetToken = jsonwebtoken.sign({
+        sub: admin._id,
+        email: admin.email,
+        type: 'reset_admin'
+    }, secret, { expiresIn: '1h' });
+
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+
+    var resetLink = (process.env.ADMIN_URL || 'http://localhost:4200') + '/restablecer-contrasena/' + resetToken;
+
+    var mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: admin.email,
+        subject: 'Recuperación de Contraseña - LATAM MODA Admin',
+        html: `<p>Hola ${admin.nombres},</p>
+               <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para ingresar una nueva clave:</p>
+               <p><a href="${resetLink}">${resetLink}</a></p>
+               <p>Este enlace expirará en 1 hora.</p>`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+            return res.status(200).send({message: 'Error al enviar el correo', data: false});
+        } else {
+            console.log('Email sent: ' + info.response);
+            return res.status(200).send({data: true});
+        }
+    });
+}
+
+const restablecer_contrasena_admin = async function(req,res){
+    var data = req.body;
+    var token = data.token;
+    var password = data.password;
+
+    try {
+        var secret = process.env.JWT_SECRET;
+        var payload = jsonwebtoken.verify(token, secret);
+        if(payload.type !== 'reset_admin'){
+            return res.status(200).send({message: 'Token no válido', data: false});
+        }
+
+        bcrypt.hash(password, 10, async function(err,hash){
+            if(hash){
+                await Admin.findByIdAndUpdate({_id: payload.sub}, {password: hash});
+                res.status(200).send({data: true});
+            }else{
+                res.status(200).send({message:'ErrorServer',data:false});
+            }
+        });
+    } catch (error) {
+        res.status(200).send({message: 'Token expirado o no válido', data: false});
+    }
+}
+
 module.exports = {
     registro_admin,
     login_admin,
     obtener_mensajes_admin,
     cerrar_mensaje_admin,
     obtener_ventas_admin,
-    kpi_ganancias_mensuales_admin
+    kpi_ganancias_mensuales_admin,
+    registrar_usuario_interno,
+    listar_usuarios_internos,
+    obtener_usuario_interno,
+    actualizar_usuario_interno,
+    eliminar_usuario_interno,
+    enviar_recuperacion_admin,
+    restablecer_contrasena_admin
 }

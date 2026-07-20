@@ -7,19 +7,22 @@ var Contacto = require('../models/contacto');
 var Review = require('../models/review');
 var bcrypt = require('bcryptjs');
 var jwt = require('../helpers/jwt');
+var jsonwebtoken = require('jsonwebtoken');
+var nodemailer = require('nodemailer');
 
 var Direccion = require('../models/direccion');
 
 const registro_cliente = async function (req, res) {
-    //
     var data = req.body;
     var clientes_arr = [];
 
-    clientes_arr = await Cliente.find({ email: data.email });
+    if (!data.telefono) {
+        return res.status(200).send({ message: 'El número de teléfono es obligatorio', data: undefined });
+    }
+
+    clientes_arr = await Cliente.find({ telefono: data.telefono });
 
     if (clientes_arr.length == 0) {
-        /*  */
-
         if (data.password) {
             bcrypt.hash(data.password, 10, async function (err, hash) {
                 if (hash) {
@@ -39,7 +42,7 @@ const registro_cliente = async function (req, res) {
 
 
     } else {
-        res.status(200).send({ message: 'El correo ya existe en la base de datos', data: undefined });
+        res.status(200).send({ message: 'El número de teléfono ya existe en la base de datos', data: undefined });
     }
 }
 
@@ -47,10 +50,14 @@ const login_cliente = async function (req, res) {
     var data = req.body;
     var cliente_arr = [];
 
-    cliente_arr = await Cliente.find({ email: data.email });
+    if (!data.telefono) {
+        return res.status(200).send({ message: 'El número de teléfono es obligatorio', data: undefined });
+    }
+
+    cliente_arr = await Cliente.find({ telefono: data.telefono });
 
     if (cliente_arr.length == 0) {
-        res.status(200).send({ message: 'No se encontro el correo', data: undefined });
+        res.status(200).send({ message: 'No se encontró el número de teléfono', data: undefined });
     } else {
         //LOGIN
         let user = cliente_arr[0];
@@ -120,6 +127,15 @@ const registro_cliente_admin = async function (req, res) {
     if (req.user) {
         if (req.user.role == 'admin') {
             var data = req.body;
+
+            if (!data.telefono) {
+                return res.status(200).send({ message: 'El número de teléfono es obligatorio', data: undefined });
+            }
+
+            var clientes_arr = await Cliente.find({ telefono: data.telefono });
+            if (clientes_arr.length > 0) {
+                return res.status(200).send({ message: 'El número de teléfono ya existe', data: undefined });
+            }
 
             bcrypt.hash('123456789', 10, async function (err, hash) {
                 if (hash) {
@@ -415,6 +431,78 @@ const obtener_reviews_cliente = async function (req, res) {
 }
 
 
+const enviar_recuperacion_cliente = async function(req,res){
+    var data = req.body;
+    var cliente = await Cliente.findOne({email:data.email});
+
+    if(!cliente){
+        return res.status(200).send({message: 'No se encontró el correo', data: undefined});
+    }
+
+    var secret = process.env.JWT_SECRET;
+    var resetToken = jsonwebtoken.sign({
+        sub: cliente._id,
+        email: cliente.email,
+        type: 'reset_cliente'
+    }, secret, { expiresIn: '1h' });
+
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+
+    var resetLink = (process.env.TIENDA_URL || 'http://localhost:4202') + '/restablecer-contrasena/' + resetToken;
+
+    var mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: cliente.email,
+        subject: 'Recuperación de Contraseña - LATAM MODA',
+        html: `<p>Hola ${cliente.nombres},</p>
+               <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para ingresar una nueva clave:</p>
+               <p><a href="${resetLink}">${resetLink}</a></p>
+               <p>Este enlace expirará en 1 hora.</p>`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+            return res.status(200).send({message: 'Error al enviar el correo', data: false});
+        } else {
+            console.log('Email sent: ' + info.response);
+            return res.status(200).send({data: true});
+        }
+    });
+}
+
+const restablecer_contrasena_cliente = async function(req,res){
+    var data = req.body;
+    var token = data.token;
+    var password = data.password;
+
+    try {
+        var secret = process.env.JWT_SECRET;
+        var payload = jsonwebtoken.verify(token, secret);
+        if(payload.type !== 'reset_cliente'){
+            return res.status(200).send({message: 'Token no válido', data: false});
+        }
+
+        bcrypt.hash(password, 10, async function(err,hash){
+            if(hash){
+                await Cliente.findByIdAndUpdate({_id: payload.sub}, {password: hash});
+                res.status(200).send({data: true});
+            }else{
+                res.status(200).send({message:'ErrorServer',data:false});
+            }
+        });
+    } catch (error) {
+        res.status(200).send({message: 'Token expirado o no válido', data: false});
+    }
+}
+
 module.exports = {
     registro_cliente,
     login_cliente,
@@ -435,5 +523,7 @@ module.exports = {
     emitir_review_producto_cliente,
     obtener_review_producto_cliente,
     obtener_reviews_cliente,
-    obtener_cliente
+    obtener_cliente,
+    enviar_recuperacion_cliente,
+    restablecer_contrasena_cliente
 }

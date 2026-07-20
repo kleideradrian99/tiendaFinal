@@ -13,10 +13,13 @@ import { ContactoComponent } from "./components/contacto/contacto.component";
 import { IndexOrdenesComponent } from "./components/usuario/ordenes/index-ordenes/index-ordenes.component";
 import { DetalleOrdenComponent } from "./components/usuario/ordenes/detalle-orden/detalle-orden.component";
 import { IndexReviewComponent } from "./components/usuario/reviews/index-review/index-review.component";
+import { RecuperarContrasenaCliente } from "./components/login/recuperar-contrasena-cliente/recuperar-contrasena-cliente";
 
 const appRoute : Routes = [
     {path: '', component: InicioComponent},
     {path: 'login', component: LoginComponent},
+    {path: 'recuperar-contrasena', component: RecuperarContrasenaCliente},
+    {path: 'restablecer-contrasena/:token', component: RecuperarContrasenaCliente},
 
     {path: 'cuenta/perfil', component: PerfilComponent, canActivate: [AuthGuard]},
     {path: 'cuenta/direcciones', component: DireccionesComponent, canActivate: [AuthGuard]},

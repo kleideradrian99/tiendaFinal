@@ -1,0 +1,117 @@
+<app-sidebar></app-sidebar>
+
+<!-- Page title-->
+<div class="border-bottom pt-0 mt-2 mb-5">
+  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Usuarios Internos</h1>
+  <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
+    <p class="text-muted">Este módulo gestiona el personal interno del sistema (asesoras, contabilidad, logística, compras, dirección, etc.).</p>
+    <p class="font-size-sm font-weight-medium pl-md-4">
+      <a class="text-nowrap" [routerLink]="['/panel/usuarios/registro']">Registrar nuevo<i
+          class="cxi-angle-right font-size-base align-middle ml-1"></i></a>
+    </p>
+  </div>
+</div>
+
+<div class="card box-shadow-sm">
+  <div class="card-header">
+    <h5 style="margin-bottom: 0px;">Filtro de usuarios</h5>
+  </div>
+  <div class="card-header">
+    <form class="form-inline pt-2">
+      <input class="form-control mb-3 mr-sm-4" (keyup)="filtro()" name="filtro_valor"
+        [(ngModel)]="filtro_valor" type="text" placeholder="Buscar por Nombre, Correo o DNI">
+    </form>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th>DNI</th>
+            <th>Nombres y Apellidos</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="load_data">
+          <tr>
+            <td class="text-center" colspan="7">
+              <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <ng-container *ngIf="!load_data">
+          <tbody>
+            <tr *ngFor="let item of usuarios | slice: (page-1)*pageSize : (page-1) * pageSize + pageSize; let indice = index">
+              <td>{{item.dni}}</td>
+              <td>{{item.nombres}} {{item.apellidos}}</td>
+              <td>{{item.email}}</td>
+              <td>{{item.telefono}}</td>
+              <td>
+                <span class="badge rounded-pill text-white" [ngClass]="{
+                  'bg-primary': item.rol === 'admin',
+                  'bg-success': item.rol === 'asesora',
+                  'bg-info': item.rol === 'direccion',
+                  'bg-warning': item.rol === 'finanzas',
+                  'bg-secondary': item.rol === 'compras',
+                  'bg-dark': item.rol === 'logistica'
+                }">
+                  {{item.rol | uppercase}}
+                </span>
+              </td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="{
+                  'bg-success text-white': item.estado === 'Activo',
+                  'bg-danger text-white': item.estado === 'Desactivado'
+                }">
+                  {{item.estado}}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-secondary btn-sm mr-2" [routerLink]="['/panel/usuarios', item._id]">
+                    Editar
+                  </button>
+                  <button *ngIf="item.estado === 'Activo'" type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" [attr.data-target]="'#delete-'+item._id">
+                    Desactivar
+                  </button>
+                </div>
+
+                <!-- Modal de Desactivación -->
+                <div class="modal fade" id="delete-{{item._id}}" tabindex="-1" style="display: none;" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title">Desactivar usuario</h4>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>¿Está seguro que desea desactivar a {{item.nombres}} {{item.apellidos}}? No podrá iniciar sesión hasta que sea reactivado.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                        <button class="btn btn-danger btn-sm" type="button" (click)="eliminar(item._id)">Confirmar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer">
+    <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="usuarios.length"></ngb-pagination>
+  </div>
+</div>

@@ -38,4 +38,7 @@ api.post('/emitir_review_producto_cliente', auth.auth, clienteController.emitir_
 api.get('/obtener_review_producto_cliente/:id', clienteController.obtener_review_producto_cliente);
 api.get('/obtener_reviews_cliente/:id', auth.auth, clienteController.obtener_reviews_cliente);
 
+api.post('/enviar_recuperacion_cliente', clienteController.enviar_recuperacion_cliente);
+api.post('/restablecer_contrasena_cliente', clienteController.restablecer_contrasena_cliente);
+
 module.exports = api;

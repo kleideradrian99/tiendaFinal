@@ -16,8 +16,9 @@ export class AdminGuard implements CanActivate {
 
   }
   
-  canActivate():any{
-    if(!this._adminService.isAuthenticated(['admin'])){
+  canActivate(route: ActivatedRouteSnapshot):any{
+    const allowedRoles = route.data['roles'] || ['admin'];
+    if(!this._adminService.isAuthenticated(allowedRoles)){
       this._router.navigate(['/login']);
       return false;
     }

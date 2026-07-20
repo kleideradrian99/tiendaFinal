@@ -39,9 +39,9 @@
             contraseña.</p>
           <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
             <div class="form-group">
-              <label for="signin-email">Correo electrónico</label>
-              <input type="email" class="form-control" placeholder="Correo electrónico" required="" name="email"
-                [(ngModel)]="user.email">
+              <label for="signin-phone">Teléfono Celular (WhatsApp) *</label>
+              <input type="text" class="form-control" placeholder="Ej: +573001234567" required="" name="telefono"
+                [(ngModel)]="user.telefono">
             </div>
             <div class="form-group">
               <label for="signin-password" class="form-label">Contraseña</label>
@@ -58,8 +58,7 @@
               </div>
             </div>
             <div class="d-flex justify-content-between align-items-center form-group">
-              <a href="#" (click)="$event.preventDefault()" class="font-size-sm text-decoration-none">¿Olvidó su
-                contraseña?</a>
+              <a [routerLink]="['/recuperar-contrasena']" class="font-size-sm text-decoration-none">¿Olvidó su contraseña?</a>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
             <p class="font-size-sm pt-4 mb-0 text-center">
@@ -78,23 +77,14 @@
           <p class="font-size-sm text-muted text-center mb-4">Crea una cuenta en unos segundos ingresando tus datos.</p>
           <form #registroForm="ngForm" (ngSubmit)="registro(registroForm)">
             <div class="form-group">
-              <div class="row">
-                <div class="col-lg-6">
-                  <label>Nombres</label>
-                  <input type="text" class="form-control" placeholder="Nombres" required="" name="nombres"
-                    [(ngModel)]="nuevoCliente.nombres">
-                </div>
-                <div class="col-lg-6 mt-3 mt-lg-0">
-                  <label>Apellidos</label>
-                  <input type="text" class="form-control" placeholder="Apellidos" required="" name="apellidos"
-                    [(ngModel)]="nuevoCliente.apellidos">
-                </div>
-              </div>
+              <label for="reg-nombres">Nombres y Apellidos *</label>
+              <input type="text" id="reg-nombres" class="form-control" placeholder="Tus nombres" required="" name="nombres"
+                [(ngModel)]="nuevoCliente.nombres">
             </div>
             <div class="form-group">
-              <label for="reg-email">Email</label>
-              <input type="email" id="reg-email" class="form-control" placeholder="Tu dirección de correo" required=""
-                name="email" [(ngModel)]="nuevoCliente.email">
+              <label for="reg-phone">Teléfono Celular (WhatsApp) *</label>
+              <input type="text" id="reg-phone" class="form-control" placeholder="Ej: +573001234567" required="" name="telefono"
+                [(ngModel)]="nuevoCliente.telefono">
             </div>
             <div class="form-group">
               <label for="reg-password" class="form-label">Contraseña</label>

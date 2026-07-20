@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import { FormsModule } from '@angular/forms';
 
@@ -11,7 +11,7 @@ declare var iziToast;
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports: [FormsModule]
+    imports: [FormsModule, RouterLink]
 })
 //////////
 export class LoginComponent implements OnInit {

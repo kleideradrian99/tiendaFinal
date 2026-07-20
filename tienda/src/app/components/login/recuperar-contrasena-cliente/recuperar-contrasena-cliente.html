@@ -1,0 +1,68 @@
+<app-nav></app-nav>
+
+<main class="cs-page-wrapper">
+  <nav class="bg-secondary mb-3" aria-label="breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb breadcrumb-alt mb-0">
+        <li class="breadcrumb-item">
+          <a href="/"><i class="cxi-home"></i></a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Recuperar contraseña</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="container pt-3 pt-md-4 pb-3 pb-sm-4 pb-lg-5 mb-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="px-md-5">
+          
+          <!-- Modo 1: Solicitar link de recuperación -->
+          <ng-container *ngIf="!hasToken">
+            <h3 class="modal-title mt-2 mb-2 text-center">Recuperar Contraseña</h3>
+            <p class="font-size-sm text-muted text-center mb-4">Ingrese su correo electrónico. Le enviaremos un enlace seguro para restablecer su contraseña.</p>
+            <form #recoveryForm="ngForm" (ngSubmit)="enviarEnlace(recoveryForm)">
+              <div class="form-group">
+                <label for="recovery-email">Correo electrónico</label>
+                <input type="email" class="form-control" placeholder="tu-correo@ejemplo.com" required="" name="email" [(ngModel)]="email">
+              </div>
+              <button *ngIf="!load_btn" type="submit" class="btn btn-primary btn-block">Enviar enlace de recuperación</button>
+              <button *ngIf="load_btn" class="btn btn-secondary btn-block" type="button" disabled>
+                <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                Enviando...
+              </button>
+              <p class="font-size-sm pt-4 mb-0 text-center">
+                ¿Recordó su contraseña?
+                <a [routerLink]="['/login']" class="font-weight-bold text-decoration-none">Iniciar sesión</a>
+              </p>
+            </form>
+          </ng-container>
+
+          <!-- Modo 2: Restablecer con nueva contraseña -->
+          <ng-container *ngIf="hasToken">
+            <h3 class="modal-title mt-2 mb-2 text-center">Restablecer Contraseña</h3>
+            <p class="font-size-sm text-muted text-center mb-4">Por favor ingrese su nueva clave de acceso.</p>
+            <form #resetForm="ngForm" (ngSubmit)="restablecerClave(resetForm)">
+              <div class="form-group">
+                <label for="new-password">Nueva contraseña</label>
+                <input type="password" class="form-control" placeholder="Mínimo 6 caracteres" required="" name="password" [(ngModel)]="password" minlength="6">
+              </div>
+              <div class="form-group">
+                <label for="confirm-password">Confirmar contraseña</label>
+                <input type="password" class="form-control" placeholder="Confirme su nueva contraseña" required="" name="confirmPassword" [(ngModel)]="confirmPassword">
+              </div>
+              <button *ngIf="!load_btn" type="submit" class="btn btn-primary btn-block">Restablecer contraseña</button>
+              <button *ngIf="load_btn" class="btn btn-secondary btn-block" type="button" disabled>
+                <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                Guardando...
+              </button>
+            </form>
+          </ng-container>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { NavComponent } from '../nav/nav.component';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ declare var iziToast;
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports: [NavComponent, FormsModule, FooterComponent, NgIf, NgClass]
+    imports: [NavComponent, FormsModule, FooterComponent, NgIf, NgClass, RouterLink]
 })
 export class LoginComponent implements OnInit {
 
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
     if(loginForm.valid){
       
       let data = {
-        email: this.user.email,
+        telefono: this.user.telefono,
         password: this.user.password
       }
       

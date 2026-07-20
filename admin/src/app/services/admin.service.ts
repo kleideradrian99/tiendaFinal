@@ -128,4 +128,39 @@ export class AdminService {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.put(this.url + 'actualizar_pedido_admin/' + id, data, { headers: headers });
   }
+
+  registrar_usuario_interno(data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.post(this.url + 'registrar_usuario_interno', data, { headers: headers });
+  }
+
+  listar_usuarios_internos(filtro, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'listar_usuarios_internos/' + filtro, { headers: headers });
+  }
+
+  obtener_usuario_interno(id, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'obtener_usuario_interno/' + id, { headers: headers });
+  }
+
+  actualizar_usuario_interno(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_usuario_interno/' + id, data, { headers: headers });
+  }
+
+  eliminar_usuario_interno(id, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.delete(this.url + 'eliminar_usuario_interno/' + id, { headers: headers });
+  }
+
+  enviar_recuperacion_admin(data): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this._http.post(this.url + 'enviar_recuperacion_admin', data, { headers: headers });
+  }
+
+  restablecer_contrasena_admin(data): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this._http.post(this.url + 'restablecer_contrasena_admin', data, { headers: headers });
+  }
 }

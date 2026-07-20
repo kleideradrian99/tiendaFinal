@@ -29,35 +29,39 @@
             <a class="custom-nav-link" [routerLink]="['/inicio']" routerLinkActive="active-link" (click)="closeMenu()">
                 <i class="cxi-grid mr-3 icon-nav"></i>Inicio
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/clientes']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'asesora', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/clientes']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-profile mr-3 icon-nav"></i>Clientes
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/productos']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'direccion', 'compras'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/productos']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-bag mr-3 icon-nav"></i>Productos
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/cupones']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/cupones']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-anchor mr-3 icon-nav"></i>Cupones
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/ventas']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'finanzas', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/ventas']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-cart mr-3 icon-nav"></i>Ventas
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/pedidos']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'asesora', 'direccion', 'compras', 'logistica'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/pedidos']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-wallet mr-3 icon-nav"></i>Pedidos/Al Mayor
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/descuentos']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/descuentos']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-filter-1 mr-3 icon-nav"></i>Descuentos
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/contactos']" routerLinkActive="active-link"
+            <a *ngIf="['admin', 'asesora', 'soporte'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/contactos']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-comment mr-3 icon-nav"></i>Mensajes
             </a>
-            <a class="custom-nav-link" [routerLink]="['/panel/configuraciones']" routerLinkActive="active-link"
+            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/usuarios']" routerLinkActive="active-link"
+                (click)="closeMenu()">
+                <i class="cxi-users mr-3 icon-nav"></i>Usuarios
+            </a>
+            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/configuraciones']" routerLinkActive="active-link"
                 (click)="closeMenu()">
                 <i class="cxi-settings mr-3 icon-nav"></i>Configuraciones
             </a>

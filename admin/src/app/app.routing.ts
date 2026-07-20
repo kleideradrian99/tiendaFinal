@@ -28,48 +28,58 @@ import { IndexPedidosComponent } from "./components/pedidos/index-pedidos/index-
 import { CreatePedidoComponent } from "./components/pedidos/create-pedido/create-pedido.component";
 import { EditPedidoComponent } from "./components/pedidos/edit-pedido/edit-pedido.component";
 
+import { IndexUsuario } from "./components/usuarios/index-usuario/index-usuario";
+import { CreateUsuario } from "./components/usuarios/create-usuario/create-usuario";
+import { EditUsuario } from "./components/usuarios/edit-usuario/edit-usuario";
+import { RecuperarContrasenaAdmin } from "./components/login/recuperar-contrasena-admin/recuperar-contrasena-admin";
+
 const appRoute: Routes = [
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-    { path: 'inicio', component: InicioComponent, canActivate: [AdminGuard] },
+    { path: 'inicio', component: InicioComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'finanzas', 'compras', 'logistica', 'soporte'] } },
 
     {
         path: 'panel', children: [
-            { path: 'clientes', component: IndexClienteComponent, canActivate: [AdminGuard] },
-            { path: 'clientes/registro', component: CreateClienteComponent, canActivate: [AdminGuard] },
-            { path: 'clientes/:id', component: EditClienteComponent, canActivate: [AdminGuard] },
+            { path: 'clientes', component: IndexClienteComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion'] } },
+            { path: 'clientes/registro', component: CreateClienteComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion'] } },
+            { path: 'clientes/:id', component: EditClienteComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion'] } },
 
-            { path: 'productos/registro', component: CreateProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos', component: IndexProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos/:id', component: UpdateProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos/inventario/:id', component: InventarioProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos/variedades/:id', component: VariedadProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos/galeria/:id', component: GaleriaProductoComponent, canActivate: [AdminGuard] },
-            { path: 'productos/reviews/:id', component: ReviewsProductoComponent, canActivate: [AdminGuard] },
+            { path: 'productos/registro', component: CreateProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos', component: IndexProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos/:id', component: UpdateProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos/inventario/:id', component: InventarioProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos/variedades/:id', component: VariedadProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos/galeria/:id', component: GaleriaProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
+            { path: 'productos/reviews/:id', component: ReviewsProductoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'compras'] } },
 
+            { path: 'pedidos', component: IndexPedidosComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'compras', 'logistica'] } },
+            { path: 'pedidos/registro', component: CreatePedidoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'compras', 'logistica'] } },
+            { path: 'pedidos/:id', component: EditPedidoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'compras', 'logistica'] } },
 
-            { path: 'pedidos', component: IndexPedidosComponent, canActivate: [AdminGuard] },
-            { path: 'pedidos/registro', component: CreatePedidoComponent, canActivate: [AdminGuard] },
-            { path: 'pedidos/:id', component: EditPedidoComponent, canActivate: [AdminGuard] },
+            { path: 'cupones/registro', component: CreateCuponComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
+            { path: 'cupones', component: IndexCuponComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
+            { path: 'cupones/:id', component: UpdateCuponComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
 
-            { path: 'cupones/registro', component: CreateCuponComponent, canActivate: [AdminGuard] },
-            { path: 'cupones', component: IndexCuponComponent, canActivate: [AdminGuard] },
-            { path: 'cupones/:id', component: UpdateCuponComponent, canActivate: [AdminGuard] },
+            { path: 'descuentos', component: IndexDescuentoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
+            { path: 'descuentos/registro', component: CreateDescuentoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
+            { path: 'descuentos/:id', component: EditDescuentoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion'] } },
 
-            { path: 'descuentos', component: IndexDescuentoComponent, canActivate: [AdminGuard] },
-            { path: 'descuentos/registro', component: CreateDescuentoComponent, canActivate: [AdminGuard] },
-            { path: 'descuentos/:id', component: EditDescuentoComponent, canActivate: [AdminGuard] },
+            { path: 'configuraciones', component: ConfigComponent, canActivate: [AdminGuard], data: { roles: ['admin'] } },
 
-            { path: 'configuraciones', component: ConfigComponent, canActivate: [AdminGuard] },
+            { path: 'ventas', component: IndexVentasComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'finanzas', 'direccion'] } },
+            { path: 'ventas/:id', component: DetalleVentasComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'finanzas', 'direccion'] } },
 
-            { path: 'ventas', component: IndexVentasComponent, canActivate: [AdminGuard] },
-            { path: 'ventas/:id', component: DetalleVentasComponent, canActivate: [AdminGuard] },
+            { path: 'contactos', component: IndexContactoComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'soporte'] } },
 
-            { path: 'contactos', component: IndexContactoComponent, canActivate: [AdminGuard] },
+            { path: 'usuarios', component: IndexUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
+            { path: 'usuarios/registro', component: CreateUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
+            { path: 'usuarios/:id', component: EditUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
         ]
     },
 
-    { path: 'login', component: LoginComponent }
-]
+    { path: 'login', component: LoginComponent },
+    { path: 'recuperar-contrasena', component: RecuperarContrasenaAdmin },
+    { path: 'restablecer-contrasena/:token', component: RecuperarContrasenaAdmin }
+];
 
 export const appRoutingPorviders: any[] = [];
 export const routing: ModuleWithProviders<any> = RouterModule.forRoot(appRoute);

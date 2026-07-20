@@ -11,6 +11,7 @@ var AdminSchema = Schema({
     telefono: {type: String, required: true},
     rol: {type: String, required: true},
     dni: {type: String, required: true},
+    estado: {type: String, default: 'Activo', required: true},
 });
 
 module.exports =  mongoose.model('admin',AdminSchema);

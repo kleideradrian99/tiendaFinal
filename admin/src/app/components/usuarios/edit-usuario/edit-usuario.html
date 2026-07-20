@@ -1,0 +1,90 @@
+<app-sidebar></app-sidebar>
+
+<!-- Page title-->
+<div class="border-bottom pt-0 mt-2 mb-5">
+  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Usuarios Internos</h1>
+  <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
+    <p class="text-muted">Este módulo permite modificar los datos del personal.</p>
+    <p class="font-size-sm font-weight-medium pl-md-4">
+      <a class="text-nowrap" [routerLink]="['/panel/usuarios']"><i
+          class="cxi-angle-left font-size-base align-middle mr-1"></i>Volver al listado</a>
+    </p>
+  </div>
+</div>
+
+<div class="card box-shadow-sm mb-5">
+  <div class="card-header">
+    <h5 style="margin-bottom: 0px;">Editar usuario interno</h5>
+  </div>
+  <div class="card-body" *ngIf="load_data">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body" *ngIf="!load_data">
+    <ng-container *ngIf="usuario === undefined">
+      <div class="alert alert-danger text-center">
+        No se encontró el usuario solicitado.
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="usuario">
+      <form #updateForm="ngForm" (ngSubmit)="actualizar(updateForm)">
+        <div class="row">
+          <div class="col-md-4 form-group">
+            <label for="nombres">Nombres *</label>
+            <input type="text" class="form-control" placeholder="Nombres" required name="nombres" [(ngModel)]="usuario.nombres">
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="apellidos">Apellidos *</label>
+            <input type="text" class="form-control" placeholder="Apellidos" required name="apellidos" [(ngModel)]="usuario.apellidos">
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="dni">DNI / Documento *</label>
+            <input type="text" class="form-control" placeholder="DNI" required name="dni" [(ngModel)]="usuario.dni">
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="email">Correo electrónico *</label>
+            <input type="email" class="form-control" placeholder="Correo" required name="email" [(ngModel)]="usuario.email">
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="telefono">Teléfono *</label>
+            <input type="text" class="form-control" placeholder="Teléfono" required name="telefono" [(ngModel)]="usuario.telefono">
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="rol">Rol del usuario *</label>
+            <select class="form-control" required name="rol" [(ngModel)]="usuario.rol">
+              <option value="admin">Administrador General</option>
+              <option value="asesora">Asesora Comercial</option>
+              <option value="direccion">Dirección Comercial</option>
+              <option value="finanzas">Administración y Finanzas</option>
+              <option value="compras">Compras y Abastecimiento</option>
+              <option value="logistica">Logística y Despacho</option>
+            </select>
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="estado">Estado *</label>
+            <select class="form-control" required name="estado" [(ngModel)]="usuario.estado">
+              <option value="Activo">Activo</option>
+              <option value="Desactivado">Desactivado</option>
+            </select>
+          </div>
+          <div class="col-md-4 form-group">
+            <label for="password">Contraseña (opcional)</label>
+            <input type="password" class="form-control" placeholder="Nueva contraseña (dejar en blanco)" name="password" [(ngModel)]="usuario.password">
+          </div>
+        </div>
+        <div class="card-footer px-0 bg-transparent border-0 mt-4">
+          <button *ngIf="!load_btn" class="btn btn-primary" type="submit">Actualizar usuario</button>
+          <button *ngIf="load_btn" class="btn btn-secondary" type="button" disabled>
+            <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+            Procesando...
+          </button>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</div>

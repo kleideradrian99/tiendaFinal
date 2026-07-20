@@ -189,4 +189,14 @@ export class ClienteService {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token || '' });
     return this._http.post(this.url + 'capturar_orden_paypal', { orderID }, { headers: headers });
   }
+
+  enviar_recuperacion_cliente(data): Observable<any> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._http.post(this.url + 'enviar_recuperacion_cliente', data, { headers: headers });
+  }
+
+  restablecer_contrasena_cliente(data): Observable<any> {
+    let headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this._http.post(this.url + 'restablecer_contrasena_cliente', data, { headers: headers });
+  }
 }
