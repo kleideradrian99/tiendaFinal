@@ -1,0 +1,73 @@
+<app-sidebar></app-sidebar>
+
+<div class="border-bottom pt-0 mt-2 mb-5">
+  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Proformas y Liquidaciones</h1>
+  <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
+    <p class="text-muted">Revise, ajuste y apruebe las proformas o cotizaciones de envíos al por mayor de sus clientes.</p>
+  </div>
+</div>
+
+<div class="card box-shadow-sm">
+  <div class="card-header">
+    <h5 style="margin-bottom: 0px;" class="h6">Listado de Proformas</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered mb-0">
+        <thead class="thead-dark">
+          <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Peso Total</th>
+            <th>Envío FedEx</th>
+            <th>Total Estimado</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="load_data">
+          <tr>
+            <td class="text-center" colspan="8">
+              <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Cargando...</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="!load_data && proformas.length == 0">
+          <tr>
+            <td class="text-center text-muted" colspan="8">
+              No hay solicitudes de proformas registradas.
+            </td>
+          </tr>
+        </tbody>
+        <ng-container *ngIf="!load_data && proformas.length > 0">
+          <tbody>
+            <tr *ngFor="let item of proformas">
+              <td class="font-weight-bold">{{item.nproforma}}</td>
+              <td>{{item.cliente?.nombres}} {{item.cliente?.apellidos}}</td>
+              <td>{{item.peso_total}} Kg</td>
+              <td>{{item.envio_precio | currency:'USD'}}</td>
+              <td class="font-weight-bold text-success">{{item.total | currency:'USD'}}</td>
+              <td>{{item.createdAt | date:'dd/MM/yyyy HH:mm'}}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-warning': item.estado === 'Pendiente',
+                  'badge-success': item.estado === 'Aprobada',
+                  'badge-danger': item.estado === 'Rechazada',
+                  'badge-info': item.estado === 'Procesada'
+                }">{{item.estado}}</span>
+              </td>
+              <td class="text-center">
+                <a [routerLink]="['/panel/proformas', item._id]" class="btn btn-primary btn-sm">
+                  Revisar / Editar
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</div>

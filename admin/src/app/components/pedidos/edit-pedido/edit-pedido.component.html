@@ -279,22 +279,50 @@
                         <p class="text-muted mb-0 font-size-sm">No hay productos en el carrito</p>
                     </div>
 
-                    <div *ngIf="carrito_arr.length > 0" class="mb-3" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
-                        <div class="media align-items-center mb-3 pb-3 border-bottom" *ngFor="let item of carrito_arr">
-                            <img [src]="url +'obtener_portada/'+item.producto.portada" class="rounded mr-2" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div *ngIf="carrito_arr.length > 0" class="mb-3" style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
+                        <div class="media align-items-start mb-3 pb-3 border-bottom" *ngFor="let item of carrito_arr">
+                            <img [src]="url +'obtener_portada/'+item.producto.portada" class="rounded mr-2 mt-1" style="width: 50px; height: 50px; object-fit: cover;">
                             <div class="media-body">
                                 <h6 class="mb-1 font-size-sm text-truncate" style="font-weight: 600; max-width: 140px;">{{item.producto.titulo}}</h6>
                                 <div class="font-size-xs text-muted">
-                                    <div *ngFor="let varData of item.variedad" class="mb-2">
-                                        <span class="d-block">Talla: {{varData.titulo}} x {{varData.cantidad}}</span>
-                                        <select class="form-control form-control-sm custom-select mt-1 py-0 px-2" style="height: 26px; font-size: 11px; max-width: 130px; display: inline-block;" [(ngModel)]="varData.estado" (change)="actualizar_dventa_local()">
-                                            <option value="Solicitado">Solicitado</option>
-                                            <option value="En Bolsa">En Bolsa</option>
-                                            <option value="En Caja">En Caja</option>
-                                            <option value="Entregado">Entregado</option>
-                                        </select>
+                                    <div *ngFor="let varData of item.variedad" class="mb-3 border-bottom pb-2">
+                                        <span class="d-block font-weight-bold">Talla: {{varData.titulo}} x {{varData.cantidad}}</span>
+                                        
+                                        <!-- Estado Dropdown -->
+                                        <div class="form-group mb-1">
+                                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Estado</label>
+                                            <select class="form-control form-control-sm custom-select py-0 px-2" style="height: 24px; font-size: 11px;" [(ngModel)]="varData.estado" (change)="actualizar_abastecimiento_item(varData)">
+                                                <option value="Solicitado">Solicitado</option>
+                                                <option value="Comprado">Comprado</option>
+                                                <option value="En taller">En taller</option>
+                                                <option value="En fabricación">En fabricación</option>
+                                                <option value="Listo">Listo</option>
+                                                <option value="Faltante">Faltante</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Proveedor Dropdown -->
+                                        <div class="form-group mb-1">
+                                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Taller / Proveedor</label>
+                                            <select class="form-control form-control-sm custom-select py-0 px-2" style="height: 24px; font-size: 11px;" [(ngModel)]="varData.proveedor" (change)="actualizar_abastecimiento_item(varData)">
+                                                <option value="">— Asignar taller —</option>
+                                                <option [value]="prov._id" *ngFor="let prov of proveedores">{{prov.razon_social}}</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Costo & Fecha Acopio -->
+                                        <div class="row no-gutters">
+                                            <div class="col-6 pr-1 form-group mb-0">
+                                                <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Costo Unit.</label>
+                                                <input type="number" class="form-control form-control-sm py-0 px-1" style="height: 24px; font-size: 11px;" [(ngModel)]="varData.costo_compra" (change)="actualizar_abastecimiento_item(varData)">
+                                            </div>
+                                            <div class="col-6 pl-1 form-group mb-0">
+                                                <label class="form-label font-size-xs mb-0" style="font-size: 10px;">F. Acopio</label>
+                                                <input type="date" class="form-control form-control-sm py-0 px-1" style="height: 24px; font-size: 10px;" [(ngModel)]="varData.fecha_estimada_acopio" (change)="actualizar_abastecimiento_item(varData)">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <strong class="text-dark d-block mt-1">{{item.total | currency:'USD'}}</strong>
+                                    <strong class="text-dark d-block mt-1">Suma Venta: {{item.total | currency:'USD'}}</strong>
                                 </div>
                             </div>
                             <button class="btn btn-link text-danger p-1" type="button" (click)="eliminar_item(item._id)" title="Eliminar">
@@ -361,6 +389,21 @@
                             <span class="text-dark font-weight-bold">Total Venta:</span>
                             <h4 class="text-primary font-weight-bold mb-0">{{calcular_subtotal() + (envio_precio * 1) | currency:'USD'}}</h4>
                         </div>
+
+                        <!-- Margen de Utilidad (Módulo 10) -->
+                        <div class="border-top pt-2 mt-2 font-size-xs">
+                            <div class="d-flex justify-content-between text-muted mb-1">
+                                <span>Costos de Confección:</span>
+                                <span>{{calcular_costo_produccion() | currency:'USD'}}</span>
+                            </div>
+                            <div class="d-flex justify-content-between font-weight-bold" [ngClass]="(calcular_subtotal() - calcular_costo_produccion()) >= 0 ? 'text-success' : 'text-danger'">
+                                <span>Margen Comercial:</span>
+                                <span>
+                                    {{(calcular_subtotal() - calcular_costo_produccion()) | currency:'USD'}} 
+                                    ({{ ((calcular_subtotal() - calcular_costo_produccion()) / (calcular_subtotal() || 1)) * 100 | number:'1.0-1' }}%)
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Observación general del pedido -->
@@ -377,6 +420,163 @@
                         <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
                         Guardando Cambios...
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD ESTADO LOGÍSTICO Y EVIDENCIAS (NUEVO) -->
+        <div class="card box-shadow-sm mb-4 border-primary" *ngIf="venta?._id">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-white font-weight-bold" style="font-size: 14px;"><i class="cxi-settings mr-2 text-warning"></i>Gestión Logística</h5>
+                <span class="badge badge-light text-primary font-weight-bold">{{venta.estado}}</span>
+            </div>
+            <div class="card-body">
+                <!-- Action Buttons for Status -->
+                <label class="form-label font-size-xs font-weight-bold mb-2">Cambiar Estado General</label>
+                <div class="d-flex flex-wrap mb-3">
+                    <button class="btn btn-outline-primary btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('En compra')">En compra</button>
+                    <button class="btn btn-outline-primary btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('En fabricación')">En fabricación</button>
+                    <button class="btn btn-outline-warning btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('Pedido incompleto')">Incompleto</button>
+                    <button class="btn btn-outline-success btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('Pedido completo')">Completo</button>
+                    <button class="btn btn-outline-info btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('En control de calidad')">Control Calidad</button>
+                    <button class="btn btn-outline-info btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('En empaque')">Empaque</button>
+                    <button class="btn btn-outline-success btn-sm mb-2 mr-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('Listo para despacho')">Listo despacho</button>
+                    <button class="btn btn-outline-danger btn-sm mb-2 py-1 px-2" style="font-size: 11px;" (click)="abrir_modal_estado('Con novedad')">Con novedad</button>
+                </div>
+
+                <!-- Notes fields -->
+                <div class="form-group mb-3">
+                    <label class="form-label font-size-xs font-weight-bold">Notas Internas (Privadas)</label>
+                    <textarea class="form-control form-control-sm" name="notas_internas" [(ngModel)]="eval_estado_data.notas_internas" rows="2" placeholder="Comentarios privados..."></textarea>
+                </div>
+
+                <!-- Evidence Upload -->
+                <div class="form-group mb-3">
+                    <label class="form-label font-size-xs font-weight-bold">Subir Evidencia de Acopio/QC</label>
+                    <div class="custom-file custom-file-sm">
+                        <input type="file" class="custom-file-input" id="evidenciaInput" (change)="subir_evidencia_archivo($event)">
+                        <label class="custom-file-label" for="evidenciaInput">Subir foto...</label>
+                    </div>
+                </div>
+
+                <!-- Evidence gallery -->
+                <div class="d-flex flex-wrap mt-2 mb-3" *ngIf="venta.evidencias?.length > 0">
+                    <div class="mr-2 mb-2 border rounded p-1" *ngFor="let img of venta.evidencias">
+                        <a [href]="url + 'obtener_evidencia_archivo/' + img" target="_blank">
+                            <img [src]="url + 'obtener_evidencia_archivo/' + img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- MÓDULO DE EMPAQUE LOGÍSTICO (Módulo 11) -->
+                <div class="border-top pt-3">
+                    <label class="form-label font-size-xs font-weight-bold mb-2"><i class="cxi-delivery text-primary mr-1"></i>Empaque y Despacho FedEx</label>
+                    <div class="row">
+                        <div class="col-6 form-group mb-2 pr-1">
+                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Peso Real (kg)</label>
+                            <input type="number" class="form-control form-control-sm" name="peso" [(ngModel)]="empaque_data.peso_real">
+                        </div>
+                        <div class="col-6 form-group mb-2 pl-1">
+                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">N° Cajas</label>
+                            <input type="number" class="form-control form-control-sm" name="cajas" [(ngModel)]="empaque_data.ncajas">
+                        </div>
+                        <div class="col-4 form-group mb-2 pr-1">
+                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Alto (cm)</label>
+                            <input type="number" class="form-control form-control-sm" name="alto" [(ngModel)]="empaque_data.dimensiones_alto">
+                        </div>
+                        <div class="col-4 form-group mb-2 px-1">
+                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Ancho (cm)</label>
+                            <input type="number" class="form-control form-control-sm" name="ancho" [(ngModel)]="empaque_data.dimensiones_ancho">
+                        </div>
+                        <div class="col-4 form-group mb-2 pl-1">
+                            <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Largo (cm)</label>
+                            <input type="number" class="form-control form-control-sm" name="largo" [(ngModel)]="empaque_data.dimensiones_largo">
+                        </div>
+                        <div class="col-12 form-group mb-3">
+                            <label class="form-label font-size-xs mb-0 font-weight-bold text-primary" style="font-size: 10px;">Guía Internacional FedEx</label>
+                            <input type="text" class="form-control form-control-sm" name="tracking" [(ngModel)]="empaque_data.tracking_fedex" placeholder="Ej: 783459201948">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm btn-block" (click)="actualizar_empaque_pedido()" [disabled]="load_btn_empaque">
+                        <span *ngIf="!load_btn_empaque">Guardar Datos de Empaque</span>
+                        <span *ngIf="load_btn_empaque" class="spinner-grow spinner-grow-sm mr-2"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD RASTREO Y NOVEDADES FEDEX (MÓDULO 12) -->
+        <div class="card box-shadow-sm mb-4 border-warning" *ngIf="venta?.tracking_fedex">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-2">
+                <h5 class="mb-0 font-weight-bold text-dark" style="font-size: 13px;"><i class="cxi-delivery mr-2"></i>Monitoreo de Tránsito FedEx</h5>
+                <span class="badge badge-dark">Activo</span>
+            </div>
+            <div class="card-body">
+                <!-- Alerta de Novedad / Excepción de Aduanas -->
+                <div class="form-group mb-3 pb-3 border-bottom">
+                    <label class="form-label font-size-xs font-weight-bold text-danger mb-1">Alerta de Incidencia / Excepción en Aduanas</label>
+                    <textarea class="form-control form-control-sm mb-2" name="alerta_novedad" [(ngModel)]="venta.alerta_novedad_envio" placeholder="Ej: Retenido en aduanas por trámite de arancel. Contactar soporte."></textarea>
+                    <button type="button" class="btn btn-danger btn-sm btn-block py-1" (click)="guardar_alerta_novedad()">
+                        Guardar / Limpiar Alerta
+                    </button>
+                </div>
+
+                <!-- Agregar Escala de Tránsito -->
+                <label class="form-label font-size-xs font-weight-bold mb-2">Registrar Escala / Suceso en Ruta</label>
+                <div class="row">
+                    <div class="col-6 form-group mb-2 pr-1">
+                        <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Estado Escala</label>
+                        <select class="form-control form-control-sm custom-select" name="escala_estado" [(ngModel)]="escala_data.estado">
+                            <option value="En Tránsito">En Tránsito</option>
+                            <option value="En Aduanas">En Aduanas</option>
+                            <option value="Retención Temporal">Retención Temporal</option>
+                            <option value="En Reparto local">En Reparto local</option>
+                            <option value="Entregado">Entregado</option>
+                        </select>
+                    </div>
+                    <div class="col-6 form-group mb-2 pl-1">
+                        <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Ubicación</label>
+                        <input type="text" class="form-control form-control-sm" name="escala_ubi" [(ngModel)]="escala_data.ubicacion" placeholder="Ej: Miami HUB, US">
+                    </div>
+                    <div class="col-12 form-group mb-3">
+                        <label class="form-label font-size-xs mb-0" style="font-size: 10px;">Descripción / Detalles</label>
+                        <input type="text" class="form-control form-control-sm" name="escala_desc" [(ngModel)]="escala_data.descripcion" placeholder="Ej: Paquete clasificado en correa transportadora">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-warning btn-sm btn-block text-dark font-weight-bold" (click)="registrar_escala()" [disabled]="load_btn_escala">
+                    <span *ngIf="!load_btn_escala">Agregar Hito en Ruta</span>
+                    <span *ngIf="load_btn_escala" class="spinner-grow spinner-grow-sm mr-2"></span>
+                </button>
+
+                <!-- Historial de escalas registradas -->
+                <div class="mt-3 pt-3 border-top" *ngIf="venta.historial_transito_fedex?.length > 0">
+                    <label class="form-label font-size-xs font-weight-bold text-muted mb-2">Hitos de Ruta Registrados</label>
+                    <div style="max-height: 180px; overflow-y: auto; padding-right: 5px;">
+                        <div class="mb-2 pb-2 border-bottom font-size-xs" *ngFor="let hito of venta.historial_transito_fedex">
+                            <div class="d-flex justify-content-between font-weight-bold text-dark">
+                                <span>{{hito.estado}} ({{hito.ubicacion}})</span>
+                                <small class="text-muted">{{hito.fecha | date:'dd/MM/yyyy HH:mm'}}</small>
+                            </div>
+                            <p class="mb-0 text-muted font-size-xs">{{hito.descripcion || 'Sin detalles'}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMELINE CARD (NUEVO) -->
+        <div class="card box-shadow-sm mb-4" *ngIf="venta.historial_estados?.length > 0">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 font-weight-bold" style="font-size: 13px;"><i class="cxi-clock mr-2 text-primary"></i>Historial de Estados (Auditoría)</h5>
+            </div>
+            <div class="card-body p-3" style="max-height: 250px; overflow-y: auto;">
+                <div class="timeline-container font-size-xs">
+                    <div class="mb-3 border-left pl-3 position-relative" *ngFor="let audit of venta.historial_estados" style="border-left: 2px solid #5c3ffc !important; margin-left: 5px;">
+                        <span class="d-block font-weight-bold text-primary">{{audit.estado}}</span>
+                        <small class="text-muted d-block">{{audit.fecha | date:'dd/MM/yyyy HH:mm'}}</small>
+                        <small class="d-block"><strong>Responsable: </strong>{{audit.responsable}}</small>
+                        <p class="text-muted mb-0 font-size-xs italic">"{{audit.motivo}}"</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -567,6 +767,36 @@
                 <button *ngIf="load_btn" type="button" class="btn btn-secondary btn-sm" disabled>
                     <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
                     Agregando...
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CAMBIAR ESTADO GENERAL (CON MOTIVO) -->
+<div class="modal fade" id="modalEstado" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-primary">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title font-weight-bold text-white">Confirmar Cambio de Estado</h5>
+                <button class="close text-white" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Estás cambiando el estado general de la orden a: <strong class="text-primary">{{eval_estado_data.estado}}</strong></p>
+                
+                <div class="form-group mb-3">
+                    <label class="form-label font-weight-bold">Motivo / Explicación del cambio *</label>
+                    <textarea class="form-control" name="motivo" [(ngModel)]="eval_estado_data.motivo" rows="2" placeholder="Ingrese el motivo (ej. Transferencia verificada por Bancolombia, Listo en fábrica...)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancelar</button>
+                <button *ngIf="!load_btn_estado" class="btn btn-primary btn-sm px-4" type="button" (click)="actualizar_estado_logistica()">Actualizar Estado</button>
+                <button *ngIf="load_btn_estado" type="button" class="btn btn-secondary btn-sm" disabled>
+                    <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+                    Guardando...
                 </button>
             </div>
         </div>

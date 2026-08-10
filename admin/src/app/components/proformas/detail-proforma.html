@@ -1,0 +1,171 @@
+<app-sidebar></app-sidebar>
+
+<div class="border-bottom pt-0 mt-2 mb-5">
+  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Detalle de Proforma</h1>
+  <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
+    <p class="text-muted">Revise los productos, ajuste tarifas de envío o impuestos, y apruebe la solicitud.</p>
+    <p class="font-size-sm font-weight-medium pl-md-4">
+      <a class="text-nowrap" [routerLink]="['/panel/proformas']">
+        <i class="cxi-angle-left font-size-base align-middle mr-1"></i>Regresar al listado
+      </a>
+    </p>
+  </div>
+</div>
+
+<div class="card box-shadow-sm" *ngIf="load_data">
+  <div class="card-body py-5 text-center">
+    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+      <span class="sr-only">Cargando...</span>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="!load_data && proforma">
+  <!-- Detalles de Artículos -->
+  <div class="col-lg-8 form-group">
+    <div class="card box-shadow-sm mb-4">
+      <div class="card-header bg-secondary py-3 d-flex justify-content-between align-items-center">
+        <h5 class="h6 mb-0">Código: {{proforma.nproforma}}</h5>
+        <span class="badge badge-lg" [ngClass]="{
+          'badge-warning': proforma.estado === 'Pendiente',
+          'badge-success': proforma.estado === 'Aprobada',
+          'badge-danger': proforma.estado === 'Rechazada',
+          'badge-info': proforma.estado === 'Procesada'
+        }">{{proforma.estado}}</span>
+      </div>
+      <div class="card-body">
+        <!-- Información del Cliente -->
+        <div class="row mb-4 pb-3 border-bottom">
+          <div class="col-md-6 form-group">
+            <label class="text-muted font-size-sm mb-1 d-block">Cliente</label>
+            <span class="font-weight-bold text-dark">{{proforma.cliente?.nombres}} {{proforma.cliente?.apellidos}}</span>
+            <small class="text-muted d-block">Teléfono: {{proforma.cliente?.telefono || 'No registrado'}}</small>
+          </div>
+          <div class="col-md-6 form-group">
+            <label class="text-muted font-size-sm mb-1 d-block font-weight-bold text-primary">Peso Total Estimado</label>
+            <span class="font-weight-bold">{{proforma.peso_total}} Kg</span>
+          </div>
+        </div>
+
+        <!-- Tabla de Artículos -->
+        <div class="table-responsive">
+          <table class="table table-bordered mb-0">
+            <thead class="thead-dark">
+              <tr>
+                <th>Producto</th>
+                <th style="width: 100px;">Variedad</th>
+                <th style="width: 110px;">Cantidad</th>
+                <th style="width: 130px;">Precio Unit. (USD)</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of proforma.detalles">
+                <td class="align-middle">
+                  <div class="d-flex align-items-center">
+                    <img [src]="url +'obtener_portada/'+item.producto?.portada" width="50" class="img-thumbnail mr-2" alt="Product thumb">
+                    <div>
+                      <span class="font-size-sm font-weight-bold d-block">{{item.producto?.titulo}}</span>
+                      <small class="text-muted">{{item.producto?.categoria}}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="align-middle text-center">{{item.variedad}}</td>
+                <td class="align-middle">
+                  <input type="number" min="1" class="form-control form-control-sm" name="cantidad_{{item._id}}" [(ngModel)]="item.cantidad" (input)="recalcular()">
+                </td>
+                <td class="align-middle">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number" min="0" step="0.01" class="form-control" name="precio_{{item._id}}" [(ngModel)]="item.precio_unitario" (input)="recalcular()">
+                  </div>
+                </td>
+                <td class="align-middle font-weight-bold text-right">
+                  {{ (item.cantidad * item.precio_unitario) | currency:'USD' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Totales y Aprobación -->
+  <div class="col-lg-4 form-group">
+    <div class="card border rounded box-shadow-sm mb-4">
+      <div class="card-header bg-secondary py-3">
+        <h5 class="h6 mb-0">Resumen y Liquidación</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>Subtotal:</span>
+          <span class="font-weight-bold">{{proforma.subtotal | currency:'USD'}}</span>
+        </div>
+        
+        <!-- Costo FedEx Editable -->
+        <div class="form-group mb-2">
+          <label class="font-weight-bold">Envío FedEx (USD)</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number" class="form-control" name="envio_precio" [(ngModel)]="proforma.envio_precio" (input)="recalcular()">
+          </div>
+        </div>
+
+        <!-- Impuestos Editables -->
+        <div class="form-group mb-3">
+          <label class="font-weight-bold">Impuestos / Recargos (USD)</label>
+          <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number" class="form-control" name="impuestos" [(ngModel)]="proforma.impuestos" (input)="recalcular()">
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-between mb-4">
+          <span class="h6 mb-0">Total Estimado:</span>
+          <span class="h6 mb-0 text-success font-weight-bold">{{proforma.total | currency:'USD'}}</span>
+        </div>
+
+        <hr>
+
+        <!-- Selección de Estado -->
+        <div class="form-group">
+          <label class="font-weight-bold">Estado de la Solicitud</label>
+          <select class="form-control custom-select" name="estado" [(ngModel)]="proforma.estado" [disabled]="proforma.estado === 'Procesada'">
+            <option value="Pendiente">Pendiente</option>
+            <option value="Aprobada">Aprobada</option>
+            <option value="Rechazada">Rechazada</option>
+            <option value="Procesada" disabled>Procesada (Venta Registrada)</option>
+          </select>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-group" *ngIf="proforma.observaciones_cliente">
+          <label class="font-weight-bold text-muted">Notas del Cliente</label>
+          <p class="font-size-sm bg-light p-2 rounded">{{proforma.observaciones_cliente}}</p>
+        </div>
+
+        <div class="form-group">
+          <label class="font-weight-bold">Notas de la Asesora</label>
+          <textarea class="form-control" rows="3" name="observaciones_asesor" [(ngModel)]="proforma.observaciones_asesor" placeholder="Notas internas o aclaraciones para el cliente"></textarea>
+        </div>
+
+        <button *ngIf="!load_btn" type="button" class="btn btn-primary btn-block" (click)="actualizar()" [disabled]="proforma.estado === 'Procesada'">
+          Guardar y Actualizar
+        </button>
+        <button *ngIf="load_btn" type="button" class="btn btn-secondary btn-block" disabled>
+          <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+          Procesando...
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

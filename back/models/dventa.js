@@ -10,6 +10,9 @@ var DventaSchema = Schema({
     variedad: { type: String, require: true },
     cantidad: { type: Number, require: true },
     estado: { type: String, default: 'Solicitado', required: true },
+    proveedor: { type: Schema.ObjectId, ref: 'proveedor', required: false },
+    costo_compra: { type: Number, default: 0, required: false },
+    fecha_estimada_acopio: { type: Date, required: false },
     cliente: { type: Schema.ObjectId, ref: 'cliente', required: true },
     createdAt: { type: Date, default: Date.now, require: true }
 });

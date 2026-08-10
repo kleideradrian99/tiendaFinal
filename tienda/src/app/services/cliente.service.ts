@@ -199,4 +199,31 @@ export class ClienteService {
     let headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this._http.post(this.url + 'restablecer_contrasena_cliente', data, { headers: headers });
   }
+
+  registro_ticket_cliente(data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.post(this.url + 'registro_ticket_cliente', data, { headers: headers });
+  }
+
+  listar_tickets_cliente(token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'listar_tickets_cliente', { headers: headers });
+  }
+
+  obtener_ticket_cliente(id, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'obtener_ticket_cliente/' + id, { headers: headers });
+  }
+
+  responder_ticket_cliente(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'responder_ticket_cliente/' + id, data, { headers: headers });
+  }
+
+  subir_evidencia_ticket_cliente(id, file: File, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Authorization': token });
+    const fd = new FormData();
+    fd.append('evidencia', file);
+    return this._http.post(this.url + 'subir_evidencia_ticket_cliente/' + id, fd, { headers: headers });
+  }
 }

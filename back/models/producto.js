@@ -19,6 +19,10 @@ var ProductoSchema = Schema({
     titulo_variedad: { type: String, default: 'Talla', required: false },
     variedades: [{ type: Object, require: false }],
     estado: { type: String, default: 'Edicion', required: true },
+    estado_disponibilidad: { type: String, default: 'Disponible', required: true },
+    en_tendencia: { type: Boolean, default: false, required: false },
+    fecha_programada: { type: Date, required: false },
+    peso: { type: Number, default: 0, required: false },
     typeProducto: { type: String, required: false },
     createdAt: { type: Date, default: Date.now, require: true }
 });

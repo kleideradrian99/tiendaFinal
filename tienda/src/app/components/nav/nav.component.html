@@ -40,10 +40,9 @@
                       Perfil
                       <!-- <span class="badge badge-pill badge-danger ml-2">3</span> -->
                     </a>
-                    <a href="#" class="dropdown-item">
+                    <a [routerLink]="['/cuenta/proformas']" routerLinkActive="active" class="dropdown-item">
                       <i class="cxi-comment mr-2"></i>
-                      Messages
-                      <span class="badge badge-pill badge-success ml-2">5</span>
+                      Mis Proformas
                     </a>
                     <a (click)="logout()" class="dropdown-item" style="cursor: pointer;">
                       <i class="cxi-logout mr-2"></i>
@@ -92,6 +91,9 @@
             <li class="nav-item">
               <a [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Inicio</a>
             </li>
+            <li class="nav-item">
+              <a [routerLink]="['/muro']" routerLinkActive="active" class="nav-link">🔥 Muro Comercial</a>
+            </li>
             <li class="nav-item dropdown">
               <a [routerLink]="['/productos']" routerLinkActive="active"  class="nav-link dropdown-toggle" data-toggle="dropdown">Tienda</a>
               <ul class="dropdown-menu">
@@ -115,7 +117,7 @@
 
     <!-- Header -->
     <div class="cs-offcanvas-cap align-items-center border-bottom">
-      <h2 class="h5 mb-0">Your cart (4)</h2>
+      <h2 class="h5 mb-0">Avión de Compras ({{carrito_arr.length}})</h2>
       <button class="close mr-n1" type="button" data-dismiss="offcanvas" aria-label="Close" (click)="op_modalcart()">
         <span class="h3 font-weight-normal mb-0" aria-hidden="true" >×</span>
       </button>
@@ -168,8 +170,8 @@
         <span class="h5 mb-0">${{subtotal}}</span>
       </div>
       <a [routerLink]="['/carrito']" class="btn btn-primary btn-lg btn-block">
-        <i class="cxi-credit-card font-size-lg mt-n1 mr-1"></i>
-        Checkout
+        <i class="cxi-cart font-size-lg mt-n1 mr-1"></i>
+        Ver mi Avión
       </a>
     </div>
   </div>

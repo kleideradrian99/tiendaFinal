@@ -57,6 +57,13 @@
                         <option value="Femenino">Femenino</option>
                     </select>
                 </div>
+                <div class="col-md-4 form-group" *ngIf="['admin', 'direccion'].includes(current_user_role)">
+                    <label for="asesor" class="form-label">Asesor Asignado</label>
+                    <select class="form-control custom-select" name="asesor" [(ngModel)]="cliente.asesor">
+                        <option value="" selected>Sin Asesor Asignado</option>
+                        <option *ngFor="let item of asesores" [value]="item._id">{{item.nombres}} {{item.apellidos}} ({{item.rol}})</option>
+                    </select>
+                </div>
             </div>
 
         </div>

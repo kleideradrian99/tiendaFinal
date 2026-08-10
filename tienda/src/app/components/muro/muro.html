@@ -1,0 +1,175 @@
+<app-nav></app-nav>
+
+<main class="cs-page-wrapper bg-secondary" style="min-height: 100vh; padding-top: 20px; padding-bottom: 50px;">
+  <div class="container">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 mt-2 px-2 gap-3">
+      <div class="d-flex align-items-center">
+        <h2 class="h3 mb-0 mr-3">🔥 Muro Comercial</h2>
+        <span class="badge badge-secondary font-weight-normal">{{productos.length}} Publicaciones</span>
+      </div>
+
+      <!-- Controles de Filtros y Ordenamiento -->
+      <div class="d-flex align-items-center flex-wrap gap-2 py-1">
+        <!-- Filtro Tendencias -->
+        <div class="custom-control custom-switch mr-3 my-1">
+          <input type="checkbox" class="custom-control-input" id="switchTendencia" [(ngModel)]="soloTendencia"
+            (change)="filtrarYOrdenar()">
+          <label class="custom-control-label font-size-sm font-weight-bold cursor-pointer" for="switchTendencia"
+            style="cursor: pointer;">🔥 Solo Tendencias</label>
+        </div>
+
+        <!-- Selector de Ordenamiento -->
+        <div class="d-flex align-items-center my-1">
+          <label class="font-size-xs text-uppercase text-muted font-weight-bold mb-0 mr-2"
+            for="selectOrden">Ordenar:</label>
+          <select class="form-control form-control-sm custom-select" id="selectOrden"
+            style="min-width: 140px; height: calc(1.5em + 0.5rem + 2px); padding-top: 0.25rem; padding-bottom: 0.25rem; font-size: 0.8125rem;"
+            [(ngModel)]="orden" (change)="filtrarYOrdenar()">
+            <option value="reciente">Más reciente</option>
+            <option value="economico">Más económico</option>
+            <option value="costoso">Más costoso</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spinner Loading -->
+    <div *ngIf="load_data" class="text-center py-5">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Cargando...</span>
+      </div>
+      <p class="text-muted mt-2">Cargando publicaciones...</p>
+    </div>
+
+    <!-- No productos -->
+    <div *ngIf="!load_data && productos.length === 0" class="text-center py-5 bg-white rounded-lg box-shadow-sm mx-2">
+      <i class="cxi-bag font-size-xl text-muted mb-3 d-block" style="font-size: 3rem !important;"></i>
+      <h4 class="h5">No hay publicaciones en el muro</h4>
+      <p class="text-muted font-size-sm">Por el momento no hay publicaciones activas.</p>
+      <a [routerLink]="['/']" class="btn btn-primary btn-sm">Volver al inicio</a>
+    </div>
+
+    <!-- Cards Feed (Se adapta a Grid en Escritorio y Flex Vertical en Móvil) -->
+    <div *ngIf="!load_data && productos.length > 0" class="muro-feed">
+      <div class="card muro-card" *ngFor="let item of productos">
+
+        <!-- Header (Profile) -->
+        <div class="card-header muro-card-header">
+          <div class="muro-avatar">LM</div>
+          <div>
+            <h6 class="font-size-sm mb-0 font-weight-bold">Latam Moda Oficial</h6>
+            <small class="text-muted font-size-xs">Moda Colombiana</small>
+          </div>
+        </div>
+
+        <!-- Image Container -->
+        <div class="muro-image-container cs-gallery" (touchstart)="onTouchStart($event)"
+          (touchend)="onTouchEnd($event, item)">
+          <!-- Badges -->
+          <div class="muro-badges">
+            <span *ngIf="item.en_tendencia" class="badge badge-danger">🔥 Tendencia</span>
+            <span class="badge" [ngClass]="{
+              'badge-success': item.estado_disponibilidad == 'Disponible' || !item.estado_disponibilidad,
+              'badge-danger': item.estado_disponibilidad == 'Agotado',
+              'badge-warning': item.estado_disponibilidad == 'Bajo fabricación'
+            }">{{item.estado_disponibilidad || 'Disponible'}}</span>
+          </div>
+
+          <!-- Cover / Galeria -->
+          <a class="cs-gallery-item" [href]="url + 'obtener_portada/' + item.portada"
+            *ngIf="selecciones[item._id].imagen_activa === 0">
+            <img [src]="url + 'obtener_portada/' + item.portada" class="muro-image" alt="Portada">
+          </a>
+          <ng-container *ngFor="let gal of item.galeria; let gIdx = index">
+            <a class="cs-gallery-item" [href]="url + 'obtener_portada/' + gal.imagen"
+              *ngIf="selecciones[item._id].imagen_activa === (gIdx + 1)">
+              <img [src]="url + 'obtener_portada/' + gal.imagen" class="muro-image" alt="Galería">
+            </a>
+          </ng-container>
+
+          <!-- Hidden anchors for lightGallery slide navigation -->
+          <div style="display: none;">
+            <a class="cs-gallery-item" [href]="url + 'obtener_portada/' + item.portada"
+              *ngIf="selecciones[item._id].imagen_activa !== 0"></a>
+            <ng-container *ngFor="let gal of item.galeria; let gIdx = index">
+              <a class="cs-gallery-item" [href]="url + 'obtener_portada/' + gal.imagen"
+                *ngIf="selecciones[item._id].imagen_activa !== (gIdx + 1)"></a>
+            </ng-container>
+          </div>
+
+          <!-- Gallery Dot Indicators -->
+          <div class="muro-dots" *ngIf="item.galeria && item.galeria.length > 0">
+            <span class="muro-dot" [class.active]="selecciones[item._id].imagen_activa === 0"
+              (click)="$event.stopPropagation(); cambiarImagen(item._id, 0)"></span>
+            <span class="muro-dot" *ngFor="let gal of item.galeria; let gIdx = index"
+              [class.active]="selecciones[item._id].imagen_activa === (gIdx + 1)"
+              (click)="$event.stopPropagation(); cambiarImagen(item._id, gIdx + 1)"></span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body muro-card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="text-uppercase text-muted font-size-xs font-weight-bold">{{item.categoria || 'Moda'}}</span>
+          </div>
+
+          <h5 class="h6 card-title mb-2 font-weight-bold" style="line-height: 1.3;">{{item.titulo}}</h5>
+
+          <!-- Precios -->
+          <div class="d-flex align-items-baseline mb-3">
+            <span class="h5 text-primary mb-0 font-weight-bold">${{item.precio}} USD</span>
+            <span class="text-muted font-size-sm ml-2" *ngIf="item.precio_cop">/ COP ${{item.precio_cop |
+              number:'1.0-0'}}</span>
+          </div>
+
+          <p class="card-text text-muted font-size-sm mb-3"
+            style="line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{item.descripcion || 'Sin descripción disponible.'}}
+          </p>
+
+          <!-- Selector de tallas (Variedades) -->
+          <div class="mb-4" *ngIf="item.variedades && item.variedades.length > 0">
+            <label class="font-weight-bold font-size-xs text-uppercase text-muted d-block mb-2">Selecciona
+              {{item.titulo_variedad || 'Talla'}}:</label>
+            <div class="muro-sizes">
+              <button type="button" class="muro-size-btn" *ngFor="let varItem of item.variedades"
+                [class.active]="selecciones[item._id].variedad === varItem.titulo"
+                (click)="seleccionarVariedad(item._id, varItem.titulo)">
+                {{varItem.titulo}}
+              </button>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="muro-actions">
+            <!-- Agregar al Avión de compras -->
+            <button *ngIf="!selecciones[item._id].btn_loading" type="button" class="btn-add-cart w-100"
+              (click)="agregarAlCarrito(item)">
+              <i class="cxi-cart mr-2"></i>
+              Agregar al Avión de Compras
+            </button>
+            <button *ngIf="selecciones[item._id].btn_loading" type="button" class="btn-add-cart w-100 mt-2" disabled>
+              <span class="spinner-grow spinner-grow-sm mr-2" role="status" aria-hidden="true"></span>
+              Agregando...
+            </button>
+
+            <!-- Consultar por WhatsApp -->
+            <a [href]="generarLinkWhatsapp(item)" target="_blank" class="btn-whatsapp w-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                class="bi bi-whatsapp mr-1" viewBox="0 0 16 16">
+                <path
+                  d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.907h.004c4.368 0 7.926-3.558 7.93-7.93a7.9 7.9 0 0 0-2.327-5.615zM7.994 14.52a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.69-4.98c-.2-.1-.1.18-.54.32-.44.14-.88.3-1.32.47-.44.17-.88.35-1.32.53-.44.18-.88.35-1.32.55s-.88.38-1.32.56c-.2.08-.4.02-.55-.13l-1.34-1.34a.8.8 0 0 1-.22-.72c.07-.37.28-.71.6-.92l.8-.5c.2-.13.43-.1.6.08l1.1 1.1c.15.15.15.4 0 .55l-.3.3c-.15.15-.15.4 0 .55l.8.8c.15.15.4.15.55 0l.3-.3c.15-.15.4-.15.55 0l1.1 1.1c.18.18.2.4.08.6-.2.32-.55.53-.92.6-.37.07-.72-.08-.72-.08z" />
+              </svg>
+              Consultar por WhatsApp
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<app-footer></app-footer>

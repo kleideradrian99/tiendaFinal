@@ -8,13 +8,17 @@ var path = require('path');
 
 const registro_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let data = req.body;
             var img_path = req.files.portada.path;
             var name = img_path.split(path.sep);
             var portada_name = name[name.length - 1];
             data.slug = data.titulo.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
             data.portada = portada_name;
+            data.en_tendencia = (data.en_tendencia == 'true' || data.en_tendencia == true);
+            if (!data.estado_disponibilidad) data.estado_disponibilidad = 'Disponible';
+            if (!data.estado) data.estado = 'Edicion';
+
             let reg = await Producto.create(data);
 
             let inventario = await Inventario.create({
@@ -36,9 +40,13 @@ const registro_producto_admin = async function (req, res) {
 
 const listar_productos_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             var filtro = req.params['filtro'];
-            let reg = await Producto.find({ titulo: new RegExp(filtro, 'i') });
+            let query = {};
+            if (filtro && filtro != 'null') {
+                query.titulo = new RegExp(filtro, 'i');
+            }
+            let reg = await Producto.find(query).sort({ createdAt: -1 });
             res.status(200).send({ data: reg });
 
         } else {
@@ -51,7 +59,6 @@ const listar_productos_admin = async function (req, res) {
 
 const obtener_portada = async function (req, res) {
     var img = req.params['img'];
-
 
     fs.stat('./uploads/productos/' + img, function (err) {
         if (!err) {
@@ -66,7 +73,7 @@ const obtener_portada = async function (req, res) {
 
 const obtener_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
 
             var id = req.params['id'];
 
@@ -88,9 +95,10 @@ const obtener_producto_admin = async function (req, res) {
 
 const actualizar_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let id = req.params['id'];
             let data = req.body;
+            let en_tendencia = (data.en_tendencia == 'true' || data.en_tendencia == true);
 
             if (req.files) {
                 //SI HAY IMAGEN
@@ -107,6 +115,11 @@ const actualizar_producto_admin = async function (req, res) {
                     categoria: data.categoria,
                     descripcion: data.descripcion,
                     contenido: data.contenido,
+                    estado: data.estado || 'Edicion',
+                    estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
+                    en_tendencia: en_tendencia,
+                    fecha_programada: data.fecha_programada || null,
+                    peso: parseFloat(data.peso) || 0,
                     portada: portada_name
                 });
 
@@ -129,6 +142,11 @@ const actualizar_producto_admin = async function (req, res) {
                     categoria: data.categoria,
                     descripcion: data.descripcion,
                     contenido: data.contenido,
+                    estado: data.estado || 'Edicion',
+                    estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
+                    en_tendencia: en_tendencia,
+                    fecha_programada: data.fecha_programada || null,
+                    peso: parseFloat(data.peso) || 0
                 });
                 res.status(200).send({ data: reg });
             }
@@ -160,7 +178,7 @@ const eliminar_producto_admin = async function (req, res) {
 
 const listar_inventario_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
 
             var id = req.params['id'];
 
@@ -177,7 +195,7 @@ const listar_inventario_producto_admin = async function (req, res) {
 
 const eliminar_inventario_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             //OBTENER ID DEL INVENTARIO
             var id = req.params['id'];
 
@@ -207,7 +225,7 @@ const eliminar_inventario_producto_admin = async function (req, res) {
 
 const registro_inventario_producto_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
 
             let data = req.body;
 
@@ -237,7 +255,7 @@ const registro_inventario_producto_admin = async function (req, res) {
 
 const actualizar_producto_variedades_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let id = req.params['id'];
             let data = req.body;
 
@@ -258,7 +276,7 @@ const actualizar_producto_variedades_admin = async function (req, res) {
 
 const agregar_imagen_galeria_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let id = req.params['id'];
             let data = req.body;
 
@@ -288,7 +306,7 @@ const agregar_imagen_galeria_admin = async function (req, res) {
 
 const eliminar_imagen_galeria_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let id = req.params['id'];
             let data = req.body;
 
@@ -310,8 +328,18 @@ const eliminar_imagen_galeria_admin = async function (req, res) {
 
 const listar_productos_publico = async function (req, res) {
     var filtro = req.params['filtro'];
+    let query = {};
+    if (filtro && filtro != 'null') {
+        query.titulo = new RegExp(filtro, 'i');
+    }
 
-    let reg = await Producto.find({ titulo: new RegExp(filtro, 'i') }).sort({ createdAt: -1 });
+    let reg = await Producto.find(query).sort({ createdAt: -1 });
+    res.status(200).send({ data: reg });
+}
+
+const listar_productos_tendencia_publico = async function (req, res) {
+    let query = { en_tendencia: true };
+    let reg = await Producto.find(query).sort({ createdAt: -1 }).limit(10);
     res.status(200).send({ data: reg });
 }
 
@@ -357,6 +385,7 @@ module.exports = {
     eliminar_inventario_producto_admin,
     registro_inventario_producto_admin,
     listar_productos_publico,
+    listar_productos_tendencia_publico,
     actualizar_producto_variedades_admin,
     agregar_imagen_galeria_admin,
     eliminar_imagen_galeria_admin,

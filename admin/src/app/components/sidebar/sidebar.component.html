@@ -1,7 +1,7 @@
 <!-- Navbar (Oculto en pantallas grandes d-lg-none) -->
 <header class="navbar navbar-expand navbar-light fixed-top navbar-box-shadow bg-light px-3 d-lg-none" data-scroll-header
     data-fixed-element>
-    <a class="navbar-brand mr-auto" [routerLink]="['/inicio']" (click)="closeMenu()">
+    <a class="navbar-brand mr-auto" [routerLink]="[homeRoute]" (click)="closeMenu()">
         <img src="assets/img/logo_prin.png" alt="Mb Latina" width="90">
     </a>
     <button class="navbar-toggler d-block ml-auto" type="button" (click)="toggleMenu()">
@@ -11,11 +11,25 @@
 
 <!-- Side navigation (Off-canvas) -->
 <aside class="cs-offcanvas cs-offcanvas-expand custom-sidebar" id="componentsNav" [class.show]="menuOpen">
+    <!-- Floating Collapse/Expand Button for Desktop -->
+    <button class="btn-toggle-sidebar d-none d-lg-flex" (click)="toggleCollapse()"
+        [attr.title]="collapsed ? 'Expandir menú' : 'Contraer menú'">
+        <svg *ngIf="!collapsed" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <svg *ngIf="collapsed" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </button>
+
     <!-- Header/Logo section -->
     <div
         class="sidebar-header py-4 px-4 border-bottom border-light-subtle d-flex align-items-center justify-content-between">
-        <a class="navbar-brand py-1 m-0" [routerLink]="['/inicio']">
+        <a class="navbar-brand py-1 m-0" [routerLink]="[homeRoute]">
             <img src="assets/img/logo_prin.png" alt="Mb Latina" class="sidebar-logo">
+            <span class="logo-collapsed">Mb</span>
         </a>
         <button class="close d-lg-none text-light border-0 bg-transparent" type="button" (click)="toggleMenu()"
             aria-label="Close">
@@ -26,44 +40,87 @@
     <!-- Navigation links container -->
     <div class="sidebar-nav-container flex-grow-1">
         <nav class="nav flex-column custom-nav">
-            <a class="custom-nav-link" [routerLink]="['/inicio']" routerLinkActive="active-link" (click)="closeMenu()">
-                <i class="cxi-grid mr-3 icon-nav"></i>Inicio
+            <a *ngIf="['admin', 'direccion', 'finanzas'].includes(user.role)" class="custom-nav-link" [routerLink]="['/inicio']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Inicio' : null">
+                <i class="cxi-grid mr-3 icon-nav"></i><span class="nav-text">Inicio</span>
             </a>
-            <a *ngIf="['admin', 'asesora', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/clientes']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-profile mr-3 icon-nav"></i>Clientes
+            <a *ngIf="['admin', 'asesora', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/clientes']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Clientes' : null">
+                <i class="cxi-profile mr-3 icon-nav"></i><span class="nav-text">Clientes</span>
             </a>
-            <a *ngIf="['admin', 'direccion', 'compras'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/productos']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-bag mr-3 icon-nav"></i>Productos
+            <a *ngIf="['admin', 'direccion', 'compras'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/productos']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Productos' : null">
+                <i class="cxi-bag mr-3 icon-nav"></i><span class="nav-text">Productos</span>
             </a>
-            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/cupones']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-anchor mr-3 icon-nav"></i>Cupones
+            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/cupones']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Cupones' : null">
+                <i class="cxi-anchor mr-3 icon-nav"></i><span class="nav-text">Cupones</span>
             </a>
-            <a *ngIf="['admin', 'finanzas', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/ventas']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-cart mr-3 icon-nav"></i>Ventas
+            <a *ngIf="['admin', 'finanzas', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/ventas']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Ventas' : null">
+                <i class="cxi-cart mr-3 icon-nav"></i><span class="nav-text">Ventas</span>
             </a>
-            <a *ngIf="['admin', 'asesora', 'direccion', 'compras', 'logistica'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/pedidos']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-wallet mr-3 icon-nav"></i>Pedidos/Al Mayor
+            <a *ngIf="['admin', 'asesora', 'direccion', 'compras', 'logistica'].includes(user.role)"
+                class="custom-nav-link" [routerLink]="['/panel/pedidos']" routerLinkActive="active-link"
+                (click)="closeMenu()" [attr.title]="collapsed ? 'Pedidos/Al Mayor' : null">
+                <i class="cxi-wallet mr-3 icon-nav"></i><span class="nav-text">Pedidos/Al Mayor</span>
             </a>
-            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/descuentos']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-filter-1 mr-3 icon-nav"></i>Descuentos
+            <a *ngIf="['admin', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/descuentos']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Descuentos' : null">
+                <i class="cxi-filter-1 mr-3 icon-nav"></i><span class="nav-text">Descuentos</span>
             </a>
-            <a *ngIf="['admin', 'asesora', 'soporte'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/contactos']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-comment mr-3 icon-nav"></i>Mensajes
+            <a *ngIf="['admin', 'asesora', 'soporte'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/contactos']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Mensajes' : null">
+                <i class="cxi-comment mr-3 icon-nav"></i><span class="nav-text">Mensajes</span>
             </a>
-            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/usuarios']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-users mr-3 icon-nav"></i>Usuarios
+            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/usuarios']"
+                routerLinkActive="active-link" (click)="closeMenu()" [attr.title]="collapsed ? 'Usuarios' : null">
+                <i class="cxi-photo mr-3 icon-nav"></i><span class="nav-text">Usuarios</span>
             </a>
-            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/configuraciones']" routerLinkActive="active-link"
-                (click)="closeMenu()">
-                <i class="cxi-settings mr-3 icon-nav"></i>Configuraciones
+            <a *ngIf="['admin'].includes(user.role)" class="custom-nav-link" [routerLink]="['/panel/configuraciones']"
+                routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Configuraciones' : null">
+                <i class="cxi-settings mr-3 icon-nav"></i><span class="nav-text">Configuraciones</span>
+            </a>
+            <a *ngIf="['admin', 'direccion', 'logistica'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/fedex']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Tarifario FedEx' : null">
+                <i class="cxi-plane mr-3 icon-nav"></i><span class="nav-text">Tarifario FedEx</span>
+            </a>
+            <a *ngIf="['admin', 'asesora', 'direccion', 'finanzas'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/proformas']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Proformas / Cotizaciones' : null">
+                <i class="cxi-comment mr-3 icon-nav"></i><span class="nav-text">Proformas / Cotizaciones</span>
+            </a>
+            <a *ngIf="['admin', 'finanzas', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/pagos']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Validación de Pagos' : null">
+                <i class="cxi-wallet mr-3 icon-nav"></i><span class="nav-text">Validación de Pagos</span>
+            </a>
+            <a *ngIf="['admin', 'finanzas', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/finanzas']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Control Financiero' : null">
+                <i class="cxi-wechat mr-3 icon-nav"></i><span class="nav-text">Control Financiero</span>
+            </a>
+            <a *ngIf="['admin', 'compras', 'direccion'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/proveedores']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Proveedores / Talleres' : null">
+                <i class="cxi-folder mr-3 icon-nav"></i><span class="nav-text">Proveedores / Talleres</span>
+            </a>
+            <a *ngIf="['admin', 'asesora', 'direccion', 'soporte'].includes(user.role)" class="custom-nav-link"
+                [routerLink]="['/panel/chat']" routerLinkActive="active-link" (click)="closeMenu()"
+                [attr.title]="collapsed ? 'Asesoría / Chats' : null">
+                <i class="cxi-chat mr-3 icon-nav"></i><span class="nav-text">Asesoría / Chats</span>
+                <span class="badge badge-unread ml-auto" *ngIf="total_unread > 0"
+                    style="background-color: #fc365b; color: white; border-radius: 10px; padding: 2px 7px; font-size: 11px;">
+                    {{total_unread}}
+                </span>
             </a>
         </nav>
     </div>

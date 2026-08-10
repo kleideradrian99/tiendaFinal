@@ -5,7 +5,7 @@ import { ClienteService } from 'src/app/services/cliente.service';
 import { GLOBAL } from 'src/app/services/GLOBAL';
 import { NavComponent } from '../../../nav/nav.component';
 import { SiderbarComponent } from '../../siderbar/siderbar.component';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { NgIf, NgFor, DatePipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../../../footer/footer.component';
 declare var iziToast;
@@ -15,7 +15,7 @@ declare var $;
     selector: 'app-detalle-orden',
     templateUrl: './detalle-orden.component.html',
     styleUrls: ['./detalle-orden.component.css'],
-    imports: [NavComponent, RouterLink, SiderbarComponent, NgIf, NgFor, FormsModule, StarRatingComponent, FooterComponent, DatePipe]
+    imports: [NavComponent, RouterLink, SiderbarComponent, NgIf, NgFor, NgClass, FormsModule, StarRatingComponent, FooterComponent, DatePipe]
 })
 export class DetalleOrdenComponent implements OnInit {
 
@@ -63,7 +63,7 @@ export class DetalleOrdenComponent implements OnInit {
                       emitido = true;
                      }
                   });
-                  element.estado = emitido;
+                  element.review_emitido = emitido;
                 }
               );
           });

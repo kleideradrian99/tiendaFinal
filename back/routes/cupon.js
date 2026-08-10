@@ -6,11 +6,11 @@ var cuponController = require('../controllers/cuponController');
 var api = express.Router();
 var auth = require('../middlewares/authenticate');
 
-api.post('/registro_cupon_admin',auth.auth,cuponController.registro_cupon_admin);
-api.get('/listar_cupones_admin/:filtro?',auth.auth,cuponController.listar_cupones_admin);
-api.get('/obtener_cupon_admin/:id',auth.auth,cuponController.obtener_cupon_admin);
-api.put('/actualizar_cupon_admin/:id',auth.auth, cuponController.actualizar_cupon_admin);
-api.delete('/eliminar_cupon_admin/:id',auth.auth,cuponController.eliminar_cupon_admin);
+api.post('/registro_cupon_admin',[auth.auth, auth.checkRole(['admin', 'direccion'])],cuponController.registro_cupon_admin);
+api.get('/listar_cupones_admin/:filtro?',[auth.auth, auth.checkRole(['admin', 'direccion'])],cuponController.listar_cupones_admin);
+api.get('/obtener_cupon_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion'])],cuponController.obtener_cupon_admin);
+api.put('/actualizar_cupon_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion'])], cuponController.actualizar_cupon_admin);
+api.delete('/eliminar_cupon_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion'])],cuponController.eliminar_cupon_admin);
 api.get('/validar_cupon_admin/:cupon',auth.auth,cuponController.validar_cupon_admin);
 
 module.exports = api;

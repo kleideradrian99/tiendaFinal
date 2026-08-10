@@ -31,3 +31,13 @@ exports.auth = function(req,res,next){
     next();
 
 }
+
+exports.checkRole = function(roles) {
+    return function(req, res, next) {
+        if (req.user && roles.includes(req.user.role)) {
+            next();
+        } else {
+            return res.status(403).send({ message: 'NoAccess' });
+        }
+    }
+}

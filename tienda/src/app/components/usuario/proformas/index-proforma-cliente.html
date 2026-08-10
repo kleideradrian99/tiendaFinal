@@ -1,0 +1,264 @@
+<app-nav></app-nav>
+
+<main class="cs-page-wrapper">
+  <!-- Breadcrumb -->
+  <nav class="bg-secondary mb-3" aria-label="breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb breadcrumb-alt mb-0">
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/']"><i class="cxi-home"></i></a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Mis Proformas</li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- Page content -->
+  <section class="container pt-3 pt-md-4 pb-5">
+    <div class="row">
+      <!-- Sidebar -->
+      <aside class="col-lg-3 col-md-4">
+        <app-siderbar></app-siderbar>
+      </aside>
+
+      <!-- Panel Content -->
+      <div class="col-lg-9 col-md-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h1 class="h3 mb-0">Mis Proformas y Liquidaciones</h1>
+        </div>
+
+        <!-- Detail Modal or View overlay -->
+        <div class="card border-primary mb-4" *ngIf="proforma_seleccionada">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="h6 text-white mb-0">Detalle de Proforma: {{proforma_seleccionada.nproforma}}</h5>
+            <button type="button" class="close text-white" (click)="cerrar_detalle()">&times;</button>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-sm-6">
+                <span class="text-muted d-block font-size-xs">Estado</span>
+                <span class="badge" [ngClass]="{
+                  'badge-warning': proforma_seleccionada.estado === 'Pendiente',
+                  'badge-success': proforma_seleccionada.estado === 'Aprobada',
+                  'badge-danger': proforma_seleccionada.estado === 'Rechazada',
+                  'badge-info': proforma_seleccionada.estado === 'Procesada'
+                }">{{proforma_seleccionada.estado}}</span>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted d-block font-size-xs">Peso Total Estimado</span>
+                <span class="font-weight-bold">{{proforma_seleccionada.peso_total}} Kg</span>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div class="table-responsive mb-4">
+              <table class="table table-bordered mb-0">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Variedad</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of proforma_seleccionada.detalles">
+                    <td>
+                      <span class="font-size-sm font-weight-bold d-block">{{item.producto?.titulo}}</span>
+                    </td>
+                    <td>{{item.variedad}}</td>
+                    <td>{{item.cantidad}}</td>
+                    <td>{{item.precio_unitario | currency:'USD'}}</td>
+                    <td class="font-weight-bold">{{item.subtotal | currency:'USD'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="bg-secondary p-3 rounded mb-3">
+                  <h6 class="h6 mb-2">Comentarios de Asesora</h6>
+                  <p class="font-size-sm mb-0 text-muted" *ngIf="proforma_seleccionada.observaciones_asesor">
+                    {{proforma_seleccionada.observaciones_asesor}}
+                  </p>
+                  <p class="font-size-sm mb-0 text-muted italic" *ngIf="!proforma_seleccionada.observaciones_asesor">
+                    Sin observaciones de la asesora.
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 text-right">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Subtotal:</span>
+                  <span class="font-weight-bold">{{proforma_seleccionada.subtotal | currency:'USD'}}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Envío FedEx:</span>
+                  <span class="font-weight-bold">{{proforma_seleccionada.envio_precio | currency:'USD'}}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Impuestos (5%):</span>
+                  <span class="font-weight-bold">{{proforma_seleccionada.impuestos | currency:'USD'}}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <span class="h6 mb-0">Total a Liquidar:</span>
+                  <span class="h5 mb-0 text-success font-weight-bold">{{proforma_seleccionada.total | currency:'USD'}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAYMENT FLOW IF APPROVED -->
+            <div class="mt-4 pt-4 border-top" *ngIf="proforma_seleccionada.estado === 'Aprobada'">
+              <h5 class="h6 mb-3">Paso Final: Confirmar y Pagar</h5>
+              
+              <!-- Address Selection -->
+              <div class="form-group">
+                <label class="font-weight-bold">Dirección de Envío Seleccionada</label>
+                <select class="custom-select" name="direccion_envio" [(ngModel)]="direccion_seleccionada_id">
+                  <option value="" disabled>Seleccione dirección</option>
+                  <option [value]="item._id" *ngFor="let item of direcciones">
+                    {{item.destinatario}} — {{item.direccion}}, {{item.provincia || ''}} ({{item.pais}})
+                  </option>
+                </select>
+                <small class="form-text text-muted" *ngIf="direcciones.length === 0">
+                  Debe registrar una dirección en su panel antes de poder pagar.
+                </small>
+              </div>
+
+              <!-- Payment Method Selection -->
+              <div class="row">
+                <div class="col-md-4 form-group">
+                  <label class="font-weight-bold">Método de Pago</label>
+                  <select class="custom-select" name="metodo_pago" [(ngModel)]="metodo_pago">
+                    <option value="Transferencia">Transferencia Bancaria / Soporte</option>
+                    <option value="Tarjeta">Tarjeta de Crédito / Débito (Automático)</option>
+                  </select>
+                </div>
+
+                <!-- Manual Payment Fields -->
+                <ng-container *ngIf="metodo_pago === 'Transferencia'">
+                  <div class="col-md-4 form-group">
+                    <label class="font-weight-bold">Banco Destino</label>
+                    <select class="custom-select" name="cuenta_destino" [(ngModel)]="pago_data.cuenta_destino">
+                      <option value="" disabled>Seleccione cuenta</option>
+                      <option value="Bancolombia Ahorros #845-00123-99">Bancolombia Ahorros #845-00123-99</option>
+                      <option value="Banco de Bogotá Corriente #231-5509-12">Banco de Bogotá Corriente #231-5509-12</option>
+                      <option value="Nequi #3154889020">Nequi #3154889020</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-4 form-group">
+                    <label class="font-weight-bold">Moneda del Pago</label>
+                    <select class="custom-select" name="moneda" [(ngModel)]="pago_data.moneda">
+                      <option value="USD">Dólares (USD)</option>
+                      <option value="COP">Pesos Colombianos (COP)</option>
+                    </select>
+                  </div>
+                </ng-container>
+              </div>
+
+              <!-- Second row of Manual Payment -->
+              <div class="row" *ngIf="metodo_pago === 'Transferencia'">
+                <div class="col-md-4 form-group">
+                  <label class="font-weight-bold">Valor Neto Pagado</label>
+                  <input type="number" class="form-control" name="monto" [(ngModel)]="pago_data.monto" placeholder="Ej: 150.00">
+                </div>
+
+                <div class="col-md-4 form-group">
+                  <label class="font-weight-bold">TRM Aplicada</label>
+                  <input type="number" class="form-control" name="trm" [(ngModel)]="pago_data.trm" [disabled]="pago_data.moneda === 'USD'">
+                  <small class="form-text text-muted" *ngIf="pago_data.moneda === 'COP'">Tasa de cambio usada (Ej: 4150)</small>
+                </div>
+
+                <div class="col-md-4 form-group">
+                  <label class="font-weight-bold">Fecha de Pago</label>
+                  <input type="date" class="form-control" name="fecha_pago" [(ngModel)]="pago_data.fecha_pago">
+                </div>
+              </div>
+
+              <!-- Upload field & comments -->
+              <div class="row" *ngIf="metodo_pago === 'Transferencia'">
+                <div class="col-md-6 form-group">
+                  <label class="font-weight-bold">Adjuntar Comprobante (Imagen o PDF)</label>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="comprobanteFile" (change)="fileChangeEvent($event)">
+                    <label class="custom-file-label" for="comprobanteFile">
+                      {{ comprobante_name || 'Seleccionar archivo...' }}
+                    </label>
+                  </div>
+                </div>
+
+                <div class="col-md-6 form-group">
+                  <label class="font-weight-bold">Observaciones / Notas adicionales</label>
+                  <textarea class="form-control" name="observaciones" [(ngModel)]="pago_data.observaciones" rows="1" placeholder="Detalles de la transferencia..."></textarea>
+                </div>
+              </div>
+
+              <div class="mt-3 d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-secondary mr-2" (click)="cerrar_detalle()">
+                  Cerrar
+                </button>
+                <button type="button" class="btn btn-success" (click)="pagar_proforma()" [disabled]="btn_load">
+                  <span *ngIf="!btn_load">Confirmar Compra</span>
+                  <span *ngIf="btn_load" class="spinner-grow spinner-grow-sm mr-2"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History List -->
+        <div class="card box-shadow-sm" *ngIf="!load_data">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered mb-0">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>Código</th>
+                    <th>Peso</th>
+                    <th>Envío</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th class="text-center">Detalle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of proformas">
+                    <td class="font-weight-bold">{{item.nproforma}}</td>
+                    <td>{{item.peso_total}} Kg</td>
+                    <td>{{item.envio_precio | currency:'USD'}}</td>
+                    <td class="font-weight-bold text-success">{{item.total | currency:'USD'}}</td>
+                    <td>{{item.createdAt | date:'dd/MM/yyyy'}}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-warning': item.estado === 'Pendiente',
+                        'badge-success': item.estado === 'Aprobada',
+                        'badge-danger': item.estado === 'Rechazada',
+                        'badge-info': item.estado === 'Procesada'
+                      }">{{item.estado}}</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-outline-primary btn-sm" (click)="ver_detalle(item._id)">
+                        Ver
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="proformas.length === 0">
+                    <td colspan="7" class="text-center text-muted">
+                      No has solicitado ninguna proforma aún.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>

@@ -69,7 +69,7 @@ const login_admin = async function(req,res){
 
 const obtener_mensajes_admin  = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'asesora', 'soporte'].includes(req.user.role)){
 
             let reg = await Contacto.find().sort({createdAt:-1});
             res.status(200).send({data:reg});
@@ -84,7 +84,7 @@ const obtener_mensajes_admin  = async function(req,res){
 
 const cerrar_mensaje_admin  = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'asesora', 'soporte'].includes(req.user.role)){
 
             let id = req.params['id'];
 
@@ -103,7 +103,7 @@ const cerrar_mensaje_admin  = async function(req,res){
 
 const obtener_ventas_admin  = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'asesora', 'direccion', 'compras', 'logistica', 'finanzas', 'soporte'].includes(req.user.role)){
             let ventas = [];
             let desde = req.params['desde'];
             let hasta = req.params['hasta'];
@@ -154,7 +154,7 @@ const obtener_ventas_admin  = async function(req,res){
 
 const kpi_ganancias_mensuales_admin  = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion', 'finanzas'].includes(req.user.role)){
            var enero = 0;
            var febrero = 0;
            var marzo = 0;
@@ -280,7 +280,7 @@ const registrar_usuario_interno = async function(req,res){
 }
 
 const listar_usuarios_internos = async function(req,res){
-    if(req.user && req.user.role == 'admin'){
+    if(req.user && ['admin', 'direccion'].includes(req.user.role)){
         var filtro = req.params['filtro'];
         let query = {};
         if(filtro && filtro != 'undefined' && filtro != 'null'){
@@ -422,6 +422,64 @@ const restablecer_contrasena_admin = async function(req,res){
     }
 }
 
+const obtener_ticket_admin = async function (req, res) {
+    if (req.user) {
+        if (['admin', 'asesora', 'direccion', 'soporte'].includes(req.user.role)) {
+            try {
+                let id = req.params['id'];
+                let reg = await Contacto.findById(id).populate({
+                    path: 'venta',
+                    populate: { path: 'cliente' }
+                });
+                res.status(200).send({ data: reg });
+            } catch (error) {
+                res.status(500).send({ message: 'Error al obtener ticket.' });
+            }
+        } else {
+            res.status(500).send({ message: 'NoAccess' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const responder_ticket_admin = async function (req, res) {
+    if (req.user) {
+        if (['admin', 'asesora', 'direccion', 'soporte'].includes(req.user.role)) {
+            try {
+                let id = req.params['id'];
+                let data = req.body;
+                
+                let ticket = await Contacto.findById(id);
+                if (!ticket) {
+                    return res.status(404).send({ message: 'Ticket no encontrado.' });
+                }
+                
+                ticket.mensajes.push({
+                    emisor: req.user.email || 'asesor',
+                    mensaje: data.mensaje,
+                    fecha: new Date()
+                });
+                
+                if (data.estado) {
+                    ticket.estado = data.estado;
+                } else {
+                    ticket.estado = 'En proceso';
+                }
+                
+                await ticket.save();
+                res.status(200).send({ data: ticket });
+            } catch (error) {
+                res.status(500).send({ message: 'Error al responder ticket.' });
+            }
+        } else {
+            res.status(500).send({ message: 'NoAccess' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
 module.exports = {
     registro_admin,
     login_admin,
@@ -435,5 +493,7 @@ module.exports = {
     actualizar_usuario_interno,
     eliminar_usuario_interno,
     enviar_recuperacion_admin,
-    restablecer_contrasena_admin
+    restablecer_contrasena_admin,
+    obtener_ticket_admin,
+    responder_ticket_admin
 }

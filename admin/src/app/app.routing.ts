@@ -32,6 +32,13 @@ import { IndexUsuario } from "./components/usuarios/index-usuario/index-usuario"
 import { CreateUsuario } from "./components/usuarios/create-usuario/create-usuario";
 import { EditUsuario } from "./components/usuarios/edit-usuario/edit-usuario";
 import { RecuperarContrasenaAdmin } from "./components/login/recuperar-contrasena-admin/recuperar-contrasena-admin";
+import { IndexFedex } from "./components/fedex/index-fedex";
+import { IndexProforma } from "./components/proformas/index-proforma";
+import { DetailProforma } from "./components/proformas/detail-proforma";
+import { IndexChat } from "./components/chat/index-chat";
+import { IndexPago } from "./components/pagos/index-pago";
+import { IndexProveedor } from "./components/proveedores/index-proveedor";
+import { IndexFinanzasComponent } from "./components/finanzas/index-finanzas";
 
 const appRoute: Routes = [
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
@@ -73,6 +80,13 @@ const appRoute: Routes = [
             { path: 'usuarios', component: IndexUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
             { path: 'usuarios/registro', component: CreateUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
             { path: 'usuarios/:id', component: EditUsuario, canActivate: [AdminGuard], data: { roles: ['admin'] } },
+            { path: 'fedex', component: IndexFedex, canActivate: [AdminGuard], data: { roles: ['admin', 'direccion', 'logistica'] } },
+            { path: 'proformas', component: IndexProforma, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'finanzas'] } },
+            { path: 'proformas/:id', component: DetailProforma, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion'] } },
+            { path: 'chat', component: IndexChat, canActivate: [AdminGuard], data: { roles: ['admin', 'asesora', 'direccion', 'soporte'] } },
+            { path: 'pagos', component: IndexPago, canActivate: [AdminGuard], data: { roles: ['admin', 'finanzas', 'direccion'] } },
+            { path: 'proveedores', component: IndexProveedor, canActivate: [AdminGuard], data: { roles: ['admin', 'compras', 'direccion'] } },
+            { path: 'finanzas', component: IndexFinanzasComponent, canActivate: [AdminGuard], data: { roles: ['admin', 'finanzas', 'direccion'] } },
         ]
     },
 

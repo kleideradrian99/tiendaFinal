@@ -9,6 +9,7 @@ import { NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from '../footer/footer.component';
 import { DescuentoPipe } from '../../pipes/descuento.pipe';
+import { ProformaService } from 'src/app/services/proforma.service';
 declare var iziToast;
 declare var Cleave;
 declare var StickySidebar;
@@ -38,7 +39,9 @@ export class CarritoComponent implements OnInit {
   public direccion_principal: any = {};
   public envios: Array<any> = [];
 
-  public precio_envio = "0";
+  public precio_envio: any = 0;
+  public peso_total = 0;
+  public impuestos = 0;
 
   public venta: any = {};
   public dventa: Array<any> = [];
@@ -68,7 +71,8 @@ export class CarritoComponent implements OnInit {
   constructor(
     private _clienteService: ClienteService,
     private _guestService: GuestService,
-    private _router: Router
+    private _router: Router,
+    private _proformaService: ProformaService
   ) {
 
     this.idcliente = localStorage.getItem('_id');
@@ -333,6 +337,7 @@ export class CarritoComponent implements OnInit {
     if (matched) {
       this.direccion_principal = matched;
       this.venta.direccion = matched._id;
+      this.calcular_carrito();
     }
   }
 
@@ -387,16 +392,35 @@ export class CarritoComponent implements OnInit {
 
   calcular_carrito() {
     this.subtotal = 0;
+    this.peso_total = 0;
     if (this.descuento_activo == undefined) {
       this.carrito_arr.forEach(element => {
-        this.subtotal = this.subtotal + parseInt(element.producto.precio);
+        this.subtotal = this.subtotal + (parseInt(element.producto.precio) * element.cantidad);
+        this.peso_total += (element.producto.peso || 0) * element.cantidad;
       });
     } else if (this.descuento_activo != undefined) {
       this.carrito_arr.forEach(element => {
         let new_precio = Math.round(parseInt(element.producto.precio) - (parseInt(element.producto.precio) * this.descuento_activo.descuento) / 100);
-        this.subtotal = this.subtotal + new_precio;
+        this.subtotal = this.subtotal + (new_precio * element.cantidad);
+        this.peso_total += (element.producto.peso || 0) * element.cantidad;
       });
     }
+    this.peso_total = Math.round(this.peso_total * 100) / 100;
+    this.impuestos = Math.round(this.subtotal * 0.05);
+
+    let pais = this.direccion_principal ? this.direccion_principal.pais : "Estados Unidos";
+
+    this._proformaService.obtener_tarifa_envio_cliente(this.peso_total, pais, this.token).subscribe(
+      res => {
+        this.precio_envio = res.precio;
+        this.cacular_total('Envío FedEx Estimado');
+      },
+      err => {
+        console.error(err);
+        this.precio_envio = 0;
+        this.cacular_total('Envío FedEx Estimado');
+      }
+    );
   }
 
   eliminar_item(id) {
@@ -418,9 +442,9 @@ export class CarritoComponent implements OnInit {
   }
 
   cacular_total(envio_titulo) {
-    this.total_pagar = parseInt(this.subtotal.toString()) + parseInt(this.precio_envio);
+    this.total_pagar = parseInt(this.subtotal.toString()) + parseFloat(this.precio_envio.toString()) + this.impuestos;
     this.venta.subtotal = this.total_pagar;
-    this.venta.envio_precio = parseInt(this.precio_envio);
+    this.venta.envio_precio = parseFloat(this.precio_envio.toString());
     this.venta.envio_titulo = envio_titulo;
 
     console.log(this.venta);
@@ -653,5 +677,54 @@ export class CarritoComponent implements OnInit {
       }
     );
   }
+
+  solicitar_proforma() {
+    if (!this.direccion_principal || !this.direccion_principal._id) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Por favor, registre o seleccione una dirección de envío.'
+      });
+      return;
+    }
+
+    this.btn_load = true;
+    let data = {
+      observaciones_cliente: this.venta.nota || '',
+      direccionId: this.direccion_principal._id
+    };
+
+    this._proformaService.solicitar_proforma_cliente(data, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'SUCCESS',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Su solicitud de proforma / liquidación ha sido creada.'
+        });
+        this.btn_load = false;
+        this.socket.emit('delete-carrito', { data: true });
+        this._router.navigate(['/cuenta/proformas']);
+      },
+      error => {
+        console.error(error);
+        this.btn_load = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error al enviar la solicitud.'
+        });
+      }
+    );
+  }
 }
+
 

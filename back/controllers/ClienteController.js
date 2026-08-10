@@ -9,8 +9,10 @@ var bcrypt = require('bcryptjs');
 var jwt = require('../helpers/jwt');
 var jsonwebtoken = require('jsonwebtoken');
 var nodemailer = require('nodemailer');
-
 var Direccion = require('../models/direccion');
+var fs = require('fs');
+var path = require('path');
+var Notificacion = require('../models/notificacion');
 
 const registro_cliente = async function (req, res) {
     var data = req.body;
@@ -94,22 +96,28 @@ const obtener_direccion_principal_cliente = async function (req, res) {
 }
 
 const listar_clientes_filtro_admin = async function (req, res) {
-    // console.log(req.user);
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'asesora', 'direccion'].includes(req.user.role)) {
             let tipo = req.params['tipo'];
             let filtro = req.params['filtro'];
 
+            let query = {};
+            if (req.user.role === 'asesora') {
+                query.asesor = req.user.sub;
+            }
+
             if (tipo == null || tipo == 'null') {
-                let reg = await Cliente.find();
+                let reg = await Cliente.find(query).populate('asesor');
                 res.status(200).send({ data: reg });
             } else {
                 if (tipo == 'apellidos') {
-                    let reg = await Cliente.find({ apellidos: new RegExp(filtro, 'i') });
+                    query.apellidos = new RegExp(filtro, 'i');
+                    let reg = await Cliente.find(query).populate('asesor');
                     res.status(200).send({ data: reg });
 
                 } else if (tipo == 'correo') {
-                    let reg = await Cliente.find({ email: new RegExp(filtro, 'i') });
+                    query.email = new RegExp(filtro, 'i');
+                    let reg = await Cliente.find(query).populate('asesor');
                     res.status(200).send({ data: reg });
                 }
             }
@@ -119,13 +127,11 @@ const listar_clientes_filtro_admin = async function (req, res) {
     } else {
         res.status(500).send({ message: 'NoAccess' });
     }
-
-
 }
 
 const registro_cliente_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'asesora', 'direccion'].includes(req.user.role)) {
             var data = req.body;
 
             if (!data.telefono) {
@@ -157,11 +163,13 @@ const registro_cliente_admin = async function (req, res) {
 
 const obtener_cliente_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'asesora', 'direccion'].includes(req.user.role)) {
             var id = req.params['id'];
             try {
-                var reg = await Cliente.findById({ _id: id });
-
+                var reg = await Cliente.findById({ _id: id }).populate('asesor');
+                if (req.user.role === 'asesora' && reg && reg.asesor && reg.asesor._id.toString() !== req.user.sub.toString()) {
+                    return res.status(403).send({ message: 'NoAccess' });
+                }
                 res.status(200).send({ data: reg });
             } catch (error) {
                 res.status(200).send({ data: undefined });
@@ -176,16 +184,20 @@ const obtener_cliente_admin = async function (req, res) {
 
 const obtener_cliente = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'asesora', 'direccion'].includes(req.user.role)) {
             var filtro = req.params['filtro'];
-            let reg = await Cliente.find({
+            let query = {
                 $or: [
                     { dni: new RegExp(filtro, 'i') },
                     { nombres: new RegExp(filtro, 'i') },
                     { apellidos: new RegExp(filtro, 'i') },
                     { email: new RegExp(filtro, 'i') }
                 ]
-            });
+            };
+            if (req.user.role === 'asesora') {
+                query.asesor = req.user.sub;
+            }
+            let reg = await Cliente.find(query).populate('asesor');
             res.status(200).send({ data: reg });
         } else {
             res.status(500).send({ message: 'NoAccess' });
@@ -197,13 +209,12 @@ const obtener_cliente = async function (req, res) {
 
 const actulizar_cliente_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'asesora', 'direccion'].includes(req.user.role)) {
 
             var id = req.params['id'];
             var data = req.body;
 
-
-            var reg = await Cliente.findByIdAndUpdate({ _id: id }, {
+            let updateObj = {
                 nombres: data.nombres,
                 apellidos: data.apellidos,
                 email: data.email,
@@ -211,7 +222,13 @@ const actulizar_cliente_admin = async function (req, res) {
                 f_nacimiento: data.f_nacimiento,
                 dni: data.dni,
                 genero: data.genero
-            })
+            };
+
+            if (['admin', 'direccion'].includes(req.user.role)) {
+                updateObj.asesor = data.asesor || null;
+            }
+
+            var reg = await Cliente.findByIdAndUpdate({ _id: id }, updateObj)
             res.status(200).send({ data: reg });
 
         } else {
@@ -224,7 +241,7 @@ const actulizar_cliente_admin = async function (req, res) {
 
 const eliminar_cliente_admin = async function (req, res) {
     if (req.user) {
-        if (req.user.role == 'admin') {
+        if (['admin', 'direccion'].includes(req.user.role)) {
 
             var id = req.params['id'];
 
@@ -318,7 +335,16 @@ const obtener_detalles_ordenes_cliente = async function (req, res) {
         var id = req.params['id'];
         try {
             let venta = await Venta.findById({ _id: id }).populate('direccion').populate('cliente');
-            let detalles = await Dventa.find({ venta: id }).populate('producto');
+            let detalles = await Dventa.find({ venta: id }).populate('producto').populate('proveedor');
+
+            if (req.user.role === 'user') {
+                detalles = detalles.map(item => {
+                    let d = item.toObject();
+                    delete d.costo_compra;
+                    delete d.proveedor;
+                    return d;
+                });
+            }
 
             res.status(200).send({ data: venta, detalles: detalles });
 
@@ -503,6 +529,130 @@ const restablecer_contrasena_cliente = async function(req,res){
     }
 }
 
+
+
+const registro_ticket_cliente = async function (req, res) {
+    if (req.user) {
+        try {
+            var data = req.body;
+            data.cliente = req.user.nombres + ' ' + req.user.apellidos;
+            data.correo = req.user.email;
+            data.telefono = req.user.telefono || '—';
+            data.estado = 'Abierto';
+            
+            let reg = await Contacto.create(data);
+            
+            // Registrar notificación de ticket
+            await Notificacion.create({
+                titulo: 'Nuevo Ticket de Soporte',
+                mensaje: 'El cliente ' + data.cliente + ' ha abierto un ticket: ' + data.asunto,
+                tipo: 'ticket'
+            });
+
+            res.status(200).send({ data: reg });
+        } catch (error) {
+            res.status(500).send({ message: 'Error al registrar el ticket de soporte.' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const listar_tickets_cliente = async function (req, res) {
+    if (req.user) {
+        try {
+            let reg = await Contacto.find({ correo: req.user.email }).sort({ createdAt: -1 });
+            res.status(200).send({ data: reg });
+        } catch (error) {
+            res.status(500).send({ message: 'Error al listar tickets.' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const obtener_ticket_cliente = async function (req, res) {
+    if (req.user) {
+        try {
+            let id = req.params['id'];
+            let reg = await Contacto.findById(id).populate({
+                path: 'venta',
+                populate: { path: 'direccion' }
+            });
+            res.status(200).send({ data: reg });
+        } catch (error) {
+            res.status(500).send({ message: 'Error al obtener ticket.' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const responder_ticket_cliente = async function (req, res) {
+    if (req.user) {
+        try {
+            let id = req.params['id'];
+            let data = req.body;
+            
+            let ticket = await Contacto.findById(id);
+            if (!ticket) {
+                return res.status(404).send({ message: 'Ticket no encontrado.' });
+            }
+            
+            ticket.mensajes.push({
+                emisor: 'cliente',
+                mensaje: data.mensaje,
+                fecha: new Date()
+            });
+            
+            ticket.estado = 'Abierto';
+            await ticket.save();
+            res.status(200).send({ data: ticket });
+        } catch (error) {
+            res.status(500).send({ message: 'Error al responder ticket.' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const subir_evidencia_ticket_cliente = async function (req, res) {
+    if (req.user) {
+        try {
+            let id = req.params['id'];
+            if (req.file) {
+                let img_name = req.file.filename;
+                let ticket = await Contacto.findById(id);
+                if (!ticket) {
+                    return res.status(404).send({ message: 'Ticket no encontrado.' });
+                }
+                ticket.evidencias.push(img_name);
+                await ticket.save();
+                res.status(200).send({ data: ticket });
+            } else {
+                res.status(400).send({ message: 'No se subió ningún archivo.' });
+            }
+        } catch (error) {
+            res.status(500).send({ message: 'Error al subir la evidencia.' });
+        }
+    } else {
+        res.status(500).send({ message: 'NoAccess' });
+    }
+}
+
+const obtener_evidencia_ticket = async function (req, res) {
+    var img = req.params['img'];
+    fs.stat('./uploads/tickets/' + img, function (err) {
+        if (!err) {
+            let path_img = './uploads/tickets/' + img;
+            res.status(200).sendFile(path.resolve(path_img));
+        } else {
+            let path_img = './uploads/default.png';
+            res.status(200).sendFile(path.resolve(path_img));
+        }
+    });
+}
+
 module.exports = {
     registro_cliente,
     login_cliente,
@@ -525,5 +675,11 @@ module.exports = {
     obtener_reviews_cliente,
     obtener_cliente,
     enviar_recuperacion_cliente,
-    restablecer_contrasena_cliente
+    restablecer_contrasena_cliente,
+    registro_ticket_cliente,
+    listar_tickets_cliente,
+    obtener_ticket_cliente,
+    responder_ticket_cliente,
+    subir_evidencia_ticket_cliente,
+    obtener_evidencia_ticket
 }

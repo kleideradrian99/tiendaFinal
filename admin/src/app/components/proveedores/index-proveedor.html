@@ -1,0 +1,129 @@
+<div class="d-flex flex-column flex-lg-row min-vh-100 bg-light">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Content Area -->
+  <div class="flex-grow-1 p-3 p-lg-4" style="margin-top: 56px; max-width: 100vw; overflow-x: hidden;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a [routerLink]="['/inicio']">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Proveedores</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-4">
+      <h1 class="h3 mb-1">Catálogo de Proveedores y Talleres</h1>
+      <p class="text-muted mb-0">Gestione los contactos de confección e insumos para el abastecimiento de prendas.</p>
+    </div>
+
+    <!-- Workspace Split -->
+    <div class="row">
+      <!-- Form Column -->
+      <div class="col-lg-4 mb-4">
+        <div class="card box-shadow border-0">
+          <div class="card-header bg-primary text-white py-3">
+            <h5 class="h6 mb-0 text-white font-weight-bold">
+              {{ proveedor_editando ? 'Editar Proveedor' : 'Registrar Nuevo Proveedor / Taller' }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- Form fields -->
+            <div class="form-group mb-3" *ngIf="!proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Razón Social *</label>
+              <input type="text" class="form-control" name="razon" [(ngModel)]="nuevo_proveedor.razon_social" placeholder="Ej: Confecciones Textiles Latam">
+            </div>
+            <div class="form-group mb-3" *ngIf="!proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Persona de Contacto</label>
+              <input type="text" class="form-control" name="contacto" [(ngModel)]="nuevo_proveedor.contacto" placeholder="Ej: Carlos Mendoza">
+            </div>
+            <div class="form-group mb-3" *ngIf="!proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Teléfono</label>
+              <input type="text" class="form-control" name="telefono" [(ngModel)]="nuevo_proveedor.telefono" placeholder="Ej: +51 987654321">
+            </div>
+            <div class="form-group mb-3" *ngIf="!proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Correo Electrónico</label>
+              <input type="email" class="form-control" name="email" [(ngModel)]="nuevo_proveedor.email" placeholder="ejemplo@proveedor.com">
+            </div>
+
+            <!-- Edit fields -->
+            <div class="form-group mb-3" *ngIf="proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Razón Social *</label>
+              <input type="text" class="form-control" name="edit_razon" [(ngModel)]="proveedor_editando.razon_social">
+            </div>
+            <div class="form-group mb-3" *ngIf="proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Persona de Contacto</label>
+              <input type="text" class="form-control" name="edit_contacto" [(ngModel)]="proveedor_editando.contacto">
+            </div>
+            <div class="form-group mb-3" *ngIf="proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Teléfono</label>
+              <input type="text" class="form-control" name="edit_telefono" [(ngModel)]="proveedor_editando.telefono">
+            </div>
+            <div class="form-group mb-3" *ngIf="proveedor_editando">
+              <label class="form-label font-weight-bold font-size-sm">Correo Electrónico</label>
+              <input type="email" class="form-control" name="edit_email" [(ngModel)]="proveedor_editando.email">
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button type="button" class="btn btn-outline-secondary mr-2 btn-sm" *ngIf="proveedor_editando" (click)="cancelar_edicion()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" *ngIf="!proveedor_editando" (click)="registrar_proveedor()" [disabled]="btn_load">
+                Registrar Taller
+              </button>
+              <button type="button" class="btn btn-success btn-sm" *ngIf="proveedor_editando" (click)="guardar_proveedor()" [disabled]="btn_load">
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List Column -->
+      <div class="col-lg-8">
+        <div class="card box-shadow border-0">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-secondary text-dark">
+                  <tr>
+                    <th>Proveedor / Razón Social</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of proveedores">
+                    <td>
+                      <span class="d-block font-weight-bold">{{item.razon_social}}</span>
+                      <small class="text-muted font-size-xs">Registrado: {{item.createdAt | date:'dd/MM/yyyy'}}</small>
+                    </td>
+                    <td>{{item.contacto || '—'}}</td>
+                    <td>{{item.telefono || '—'}}</td>
+                    <td>{{item.email || '—'}}</td>
+                    <td class="text-center">
+                      <button class="btn btn-outline-warning btn-sm btn-icon mr-2" (click)="seleccionar_editar(item)" title="Editar">
+                        <i class="cxi-edit"></i>
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm btn-icon" (click)="eliminar_proveedor(item._id)" title="Eliminar">
+                        <i class="cxi-delete"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="proveedores.length === 0">
+                    <td colspan="5" class="text-center py-5 text-muted">
+                      No se encontraron proveedores o talleres registrados.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

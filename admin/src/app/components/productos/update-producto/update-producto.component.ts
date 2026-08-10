@@ -88,6 +88,11 @@ export class UpdateProductoComponent implements OnInit {
       data.categoria = this.producto.categoria;
       data.descripcion = this.producto.descripcion;
       data.contenido = this.producto.contenido;
+      data.estado = this.producto.estado || 'Publicado';
+      data.estado_disponibilidad = this.producto.estado_disponibilidad || 'Disponible';
+      data.en_tendencia = this.producto.en_tendencia;
+      data.fecha_programada = this.producto.fecha_programada || null;
+      data.peso = this.producto.peso;
 
       this.load_btn = true;
       this._productoService.actualizar_producto_admin(data, this.id, this.token).subscribe(

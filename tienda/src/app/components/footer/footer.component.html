@@ -93,3 +93,71 @@
       </div>
     </div>
   </footer>
+
+  <!-- Floating Chat Widget -->
+  <div class="chat-widget-container">
+    <!-- Floating Action Button (FAB) -->
+    <button type="button" class="chat-btn-float" [ngClass]="{'active': chat_open}" (click)="toggle_chat()">
+      <i class="cxi-chat" *ngIf="!chat_open"></i>
+      <i class="cxi-cross" *ngIf="chat_open"></i>
+      <span class="chat-unread-badge" *ngIf="unread_count > 0">{{unread_count}}</span>
+    </button>
+
+    <!-- Expanded Chat Window -->
+    <div class="chat-card-window" *ngIf="chat_open">
+      <!-- Header -->
+      <div class="chat-header-bar">
+        <div class="chat-header-info">
+          <div class="chat-avatar">
+            <span class="chat-avatar-text">MB</span>
+          </div>
+          <div>
+            <h6 class="text-white mb-0 font-size-sm font-weight-bold">Mb Latina</h6>
+            <span class="font-size-xs text-muted"><span class="chat-status-dot"></span>En línea</span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <a href="https://wa.me/573004555000?text=Hola,%20necesito%20ayuda%20con%20mi%20proforma" target="_blank" class="text-success font-size-xl mr-3" title="Continuar por WhatsApp" style="text-decoration: none;">
+            <i class="cxi-whatsapp" style="font-size: 20px;"></i>
+          </a>
+          <button type="button" class="chat-close-btn" (click)="toggle_chat()">&times;</button>
+        </div>
+      </div>
+
+      <!-- State: Not Logged In -->
+      <div class="chat-login-prompt" *ngIf="!token">
+        <i class="cxi-lock"></i>
+        <p class="font-size-sm text-muted mb-3">Para chatear con una asesora comercial en tiempo real, necesitas iniciar sesión.</p>
+        <a [routerLink]="['/login']" class="btn btn-primary btn-sm btn-block">Iniciar Sesión</a>
+      </div>
+
+      <!-- State: Logged In -->
+      <ng-container *ngIf="token">
+        <!-- Message list -->
+        <div class="chat-history-body" #scrollContainer>
+          <div class="chat-msg-row" *ngFor="let item of mensajes" 
+               [ngClass]="{'msg-self': item.remitente === 'cliente', 'msg-other': item.remitente === 'asesor'}">
+            <div class="chat-msg-bubble">
+              {{item.mensaje}}
+            </div>
+            <span class="chat-msg-meta">
+              {{item.createdAt | date:'HH:mm'}}
+            </span>
+          </div>
+          
+          <div *ngIf="mensajes.length === 0" class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-3 text-muted">
+            <i class="cxi-chat font-size-xl mb-2"></i>
+            <p class="font-size-sm mb-0">¡Hola! Escribe un mensaje para iniciar una conversación con tu asesora comercial.</p>
+          </div>
+        </div>
+
+        <!-- Footer Input -->
+        <form (ngSubmit)="enviar_mensaje()" class="chat-footer-input">
+          <input type="text" name="nuevo_mensaje" [(ngModel)]="nuevo_mensaje" autocomplete="off" placeholder="Escribe un mensaje...">
+          <button type="submit" class="chat-send-btn">
+            <i class="cxi-arrow-right"></i>
+          </button>
+        </form>
+      </ng-container>
+    </div>
+  </div>

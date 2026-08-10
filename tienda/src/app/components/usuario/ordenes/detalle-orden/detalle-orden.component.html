@@ -24,6 +24,16 @@
 
           <!-- Content -->
           <div class="col-lg-8 ml-auto" *ngIf="orden != undefined">
+            <!-- BANNER ALERTA NOVEDAD DE TRÁNSITO (MÓDULO 12) -->
+            <div class="alert alert-warning mb-4 d-flex align-items-start" role="alert" *ngIf="orden.alerta_novedad_envio">
+                <i class="cxi-warning text-warning mr-3 mt-1 font-size-xl"></i>
+                <div>
+                    <h6 class="alert-heading mb-1 font-weight-bold" style="color: #856404;">Incidencia en el envío internacional</h6>
+                    <p class="mb-0 font-size-sm text-dark">{{orden.alerta_novedad_envio}}</p>
+                    <small class="d-block mt-2 font-weight-bold text-muted">Por favor, comuníquese con su asesora comercial para coordinar los detalles.</small>
+                </div>
+            </div>
+
             <div class="d-flex align-items-center justify-content-between mb-4 pb-sm-2">
                 <h1 class="h2 mb-0">Mi orden #{{id.toUpperCase()}}</h1>
                 
@@ -64,6 +74,21 @@
                               <th class="border-0 py-2 pl-0">Transaccion:</th>
                               <td class="border-0 py-2 px-0 text-muted">{{orden.transaccion}}</td>
                             </tr>
+                            <tr *ngIf="orden.tracking_fedex">
+                              <th class="border-0 py-2 pl-0">Guía FedEx:</th>
+                              <td class="border-0 py-2 px-0 text-primary font-weight-bold">
+                                <a href="https://www.fedex.com/fedextrack/?trknbr={{orden.tracking_fedex}}" target="_blank">
+                                  {{orden.tracking_fedex}} <i class="cxi-external-link font-size-xs"></i>
+                                </a>
+                              </td>
+                            </tr>
+                            <tr *ngIf="orden.peso_real > 0">
+                              <th class="border-0 py-2 pl-0">Detalles Bulto:</th>
+                              <td class="border-0 py-2 px-0 text-muted">
+                                {{orden.ncajas}} caja(s) - {{orden.peso_real}} kg <br>
+                                <small>Dim: {{orden.dimensiones_alto}}x{{orden.dimensiones_ancho}}x{{orden.dimensiones_largo}} cm</small>
+                              </td>
+                            </tr>
                             <tr>
                               <th class="border-0 py-2 pl-0">Estado:</th>
                               <td class="border-0 py-2 px-0 text-muted">{{orden.estado}}</td>
@@ -75,6 +100,56 @@
                     
                   </div>
                 </div>
+
+                <!-- SEGUIMIENTO LOGÍSTICO Y BARRA DE PROGRESO (NUEVO) -->
+                <div class="col-12 mb-4" *ngIf="orden.estado">
+                  <div class="card card-body py-4 box-shadow">
+                    <h5 class="font-size-sm font-weight-bold mb-3"><i class="cxi-delivery mr-2 text-primary"></i>Seguimiento Logístico de mi Pedido</h5>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3" style="height: 8px;">
+                      <div class="progress-bar bg-success" role="progressbar" [style.width.%]="
+                        orden.estado === 'Pago pendiente' ? 5 :
+                        orden.estado === 'Pago por validar' ? 15 :
+                        orden.estado === 'Pago confirmed' || orden.estado === 'Pago confirmado' ? 25 :
+                        orden.estado === 'En compra' ? 35 :
+                        orden.estado === 'En fabricación' ? 45 :
+                        orden.estado === 'Pedido incompleto' ? 55 :
+                        orden.estado === 'Pedido completo' ? 65 :
+                        orden.estado === 'En control de calidad' ? 75 :
+                        orden.estado === 'En empaque' ? 82 :
+                        orden.estado === 'Listo para despacho' ? 90 : 100
+                      " aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between font-size-xs text-muted flex-wrap">
+                      <span [ngClass]="{'text-success font-weight-bold': ['Pago confirmado', 'En compra', 'En fabricación', 'Pedido incompleto', 'Pedido completo', 'En control de calidad', 'En empaque', 'Listo para despacho', 'Entregado a FedEx', 'En tránsito', 'Entregado'].includes(orden.estado)}">1. Pago Aprobado</span>
+                      <span [ngClass]="{'text-success font-weight-bold': ['En compra', 'En fabricación', 'Pedido incompleto', 'Pedido completo', 'En control de calidad', 'En empaque', 'Listo para despacho', 'Entregado a FedEx', 'En tránsito', 'Entregado'].includes(orden.estado)}">2. Confección & Compra</span>
+                      <span [ngClass]="{'text-success font-weight-bold': ['En control de calidad', 'En empaque', 'Listo para despacho', 'Entregado a FedEx', 'En tránsito', 'Entregado'].includes(orden.estado)}">3. Control de Calidad</span>
+                      <span [ngClass]="{'text-success font-weight-bold': ['Listo para despacho', 'Entregado a FedEx', 'En tránsito', 'Entregado'].includes(orden.estado)}">4. Despachado</span>
+                    </div>
+
+                    <!-- Note or Status reason -->
+                    <div class="alert alert-secondary mt-3 mb-0 py-2 font-size-xs text-muted" *ngIf="orden.historial_estados?.length > 0">
+                      <strong>Último hito: </strong> {{orden.historial_estados[orden.historial_estados.length - 1].motivo}}
+                    </div>
+
+                    <!-- LÍNEA DE TIEMPO FEDEX (Módulo 12) -->
+                    <div class="mt-4 pt-3 border-top" *ngIf="orden.historial_transito_fedex?.length > 0">
+                      <h6 class="font-size-xs font-weight-bold mb-3 text-dark"><i class="cxi-location-marker mr-2 text-warning"></i>Ruta y Tránsito de FedEx</h6>
+                      <div class="pl-2 border-left position-relative" style="border-left: 2px solid #fd7e14 !important; margin-left: 10px;">
+                        <div class="mb-3 position-relative pl-3" *ngFor="let hito of orden.historial_transito_fedex">
+                          <div class="d-flex justify-content-between font-weight-bold text-dark font-size-xs">
+                            <span>{{hito.estado}} ({{hito.ubicacion}})</span>
+                            <small class="text-muted">{{hito.fecha | date:'dd/MM/yyyy HH:mm'}}</small>
+                          </div>
+                          <p class="mb-0 text-muted font-size-xs">{{hito.descripcion}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="col-12 mb-4" *ngIf="orden.direccion">
                   <div class="card">
                     <div class="card-body">
@@ -122,10 +197,21 @@
                                     <a href="shop-single.html" class="nav-link font-weight-bold">{{item.producto.titulo}}</a>
                                   </h3>
                                   <ul class="list-unstyled font-size-xs mt-n2 mb-2">
-                                    <li class="mb-0"><span class="text-muted">{{item.producto.titulo_variedad}}:</span> {{item.variedad}}</li>
+                                    <li class="mb-1"><span class="text-muted">{{item.producto.titulo_variedad}}:</span> {{item.variedad}}</li>
+                                    <li class="mb-0">
+                                      <span class="text-muted mr-1">Estado de prenda:</span>
+                                      <span class="badge" [ngClass]="{
+                                        'badge-secondary': item.estado === 'Solicitado',
+                                        'badge-info': ['Comprado', 'En taller', 'En fabricación'].includes(item.estado),
+                                        'badge-success': item.estado === 'Listo',
+                                        'badge-danger': item.estado === 'Faltante'
+                                      }" style="font-size: 10px; text-transform: uppercase;">
+                                        {{item.estado || 'Solicitado'}}
+                                      </span>
+                                    </li>
                                   </ul>
-                                  <a *ngIf="!item.estado" (click)="openModal(item)" style="cursor: pointer;" data-toggle="modal" [attr.data-target]="'#review-'+item._id" class="text-primary">[Emitir reseña]</a>
-                                  <span *ngIf="item.estado"  class="badge badge-warning">Comentario emitido</span>
+                                  <a *ngIf="!item.review_emitido" (click)="openModal(item)" style="cursor: pointer;" data-toggle="modal" [attr.data-target]="'#review-'+item._id" class="text-primary">[Emitir reseña]</a>
+                                  <span *ngIf="item.review_emitido"  class="badge badge-warning">Comentario emitido</span>
 
                                   <div class="modal fade" id="review-{{item._id}}" tabindex="-1" style="display: none;" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -195,6 +281,19 @@
                     </div>
                   </div>
               
+                </div>
+
+                <!-- EVIDENCIAS DE ACOPIO/QC (NUEVO) -->
+                <div class="card card-body py-3 box-shadow mb-4 mt-3" *ngIf="orden.evidencias?.length > 0">
+                    <h5 class="font-size-sm font-weight-bold mb-3"><i class="cxi-image mr-2 text-primary"></i>Evidencia de Control de Calidad y Embalaje</h5>
+                    <div class="d-flex flex-wrap">
+                      <div class="mr-3 mb-3 border rounded p-1" *ngFor="let img of orden.evidencias" style="background-color: #fff;">
+                        <a [href]="url + 'obtener_evidencia_archivo/' + img" target="_blank">
+                          <img [src]="url + 'obtener_evidencia_archivo/' + img" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                        </a>
+                      </div>
+                    </div>
+                    <span class="text-muted font-size-xs"><i class="cxi-info mr-1"></i>Puedes ver las imágenes a pantalla completa haciendo clic sobre ellas.</span>
                 </div>
               </div>
           </div>

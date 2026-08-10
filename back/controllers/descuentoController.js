@@ -3,7 +3,7 @@ var fs = require('fs');
 var path = require('path');
 const registro_descuento_admin = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             let data = req.body;
             
             var img_path = req.files.banner.path;
@@ -25,7 +25,7 @@ const registro_descuento_admin = async function(req,res){
 
 const listar_descuentos_admin = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var filtro = req.params['filtro'];
 
@@ -57,7 +57,7 @@ const obtener_banner_descuento = async function(req,res){
 
 const obtener_descuento_admin = async function(req,res){
     if(req.user){
-        if(req.user.role =='admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var id = req.params['id'];
 
@@ -80,7 +80,7 @@ const obtener_descuento_admin = async function(req,res){
 
 const actualizar_descuento_admin = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             let id = req.params['id'];
             let data = req.body;
 
@@ -129,7 +129,7 @@ const actualizar_descuento_admin = async function(req,res){
 
 const eliminar_descuento_admin = async function(req,res){
     if(req.user){
-        if(req.user.role =='admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var id = req.params['id'];
 

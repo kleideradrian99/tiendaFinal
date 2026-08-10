@@ -24,6 +24,16 @@ io.on('connection', function (socket) {
         console.log(data);
     });
 
+    socket.on('join-chat', function (room) {
+        socket.join(room);
+        console.log('Usuario unido a sala de chat: ' + room);
+    });
+
+    socket.on('send-message-chat', function (data) {
+        io.to(data.room).emit('new-message-chat', data);
+        console.log('Mensaje recibido y retransmitido a sala: ' + data.room);
+    });
+
 });
 
 
@@ -38,6 +48,12 @@ var descuento_route = require('./routes/descuento');
 var carrito_admin = require('./routes/carritoAdmin');
 var paypal_route = require('./routes/paypal');
 var culqi_route = require('./routes/culqi');
+var fedex_route = require('./routes/fedex_tarifario');
+var proforma_route = require('./routes/proforma');
+var chat_route = require('./routes/mensaje_chat');
+var comprobante_pago_route = require('./routes/comprobante_pago');
+var proveedor_route = require('./routes/proveedor');
+var contacto_route = require('./routes/contacto');
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(function () {
@@ -81,5 +97,11 @@ app.use('/api', descuento_route);
 app.use('/api', carrito_admin);
 app.use('/api', paypal_route);
 app.use('/api', culqi_route);
+app.use('/api', fedex_route);
+app.use('/api', proforma_route);
+app.use('/api', chat_route);
+app.use('/api', comprobante_pago_route);
+app.use('/api', proveedor_route);
+app.use('/api', contacto_route);
 
 module.exports = app;

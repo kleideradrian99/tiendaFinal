@@ -14,6 +14,7 @@ var ClienteSchema = Schema({
     genero: {type: String, required: false},
     f_nacimiento: {type: String, required: false},
     dni: {type: String, required: false},
+    asesor: { type: Schema.ObjectId, ref: 'admin', required: false },
     createdAt: {type:Date, default: Date.now, require: true}
 });
 

@@ -10,16 +10,16 @@ api.post('/registro_cliente', clienteController.registro_cliente);
 api.get('/obtener_direccion_principal_cliente/:id', auth.auth, clienteController.obtener_direccion_principal_cliente);
 api.post('/login_cliente', clienteController.login_cliente);
 
-api.get('/listar_clientes_filtro_admin/:tipo/:filtro', auth.auth, clienteController.listar_clientes_filtro_admin);
-api.post('/registro_cliente_admin', auth.auth, clienteController.registro_cliente_admin);
-api.get('/obtener_cliente_admin/:id', auth.auth, clienteController.obtener_cliente_admin);
-api.put('/actulizar_cliente_admin/:id', auth.auth, clienteController.actulizar_cliente_admin);
-api.delete('/eliminar_cliente_admin/:id', auth.auth, clienteController.eliminar_cliente_admin);
+api.get('/listar_clientes_filtro_admin/:tipo/:filtro', [auth.auth, auth.checkRole(['admin', 'asesora', 'direccion'])], clienteController.listar_clientes_filtro_admin);
+api.post('/registro_cliente_admin', [auth.auth, auth.checkRole(['admin', 'asesora', 'direccion'])], clienteController.registro_cliente_admin);
+api.get('/obtener_cliente_admin/:id', [auth.auth, auth.checkRole(['admin', 'asesora', 'direccion'])], clienteController.obtener_cliente_admin);
+api.put('/actulizar_cliente_admin/:id', [auth.auth, auth.checkRole(['admin', 'asesora', 'direccion'])], clienteController.actulizar_cliente_admin);
+api.delete('/eliminar_cliente_admin/:id', [auth.auth, auth.checkRole(['admin', 'direccion'])], clienteController.eliminar_cliente_admin);
 api.get('/obtener_cliente_guest/:id', auth.auth, clienteController.obtener_cliente_guest);
 api.put('/actualizar_perfil_cliente_guest/:id', auth.auth, clienteController.actualizar_perfil_cliente_guest);
 
 //PEDIDOS
-api.get('/obtener_cliente/:filtro?', auth.auth, clienteController.obtener_cliente);
+api.get('/obtener_cliente/:filtro?', [auth.auth, auth.checkRole(['admin', 'asesora', 'direccion'])], clienteController.obtener_cliente);
 
 ///DIRECCION
 api.post('/registro_direccion_cliente', auth.auth, clienteController.registro_direccion_cliente);

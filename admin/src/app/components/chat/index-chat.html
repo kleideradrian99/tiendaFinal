@@ -1,0 +1,175 @@
+<app-sidebar></app-sidebar>
+
+<div class="border-bottom pt-0 mt-2 mb-4">
+  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Asesoría Comercial & Chats</h1>
+  <p class="text-muted">Gestione consultas de clientes, coordine ventas y asista el proceso de liquidación de proformas en tiempo real.</p>
+</div>
+
+<div class="chat-dashboard-wrapper">
+  <!-- Columna 1: Conversaciones -->
+  <div class="chat-list-panel">
+    <div class="chat-list-header">
+      <h6 class="mb-0 font-weight-bold">Chats Recientes</h6>
+    </div>
+    
+    <div class="conversations-scroll">
+      <div *ngIf="load_conversaciones" class="p-3 text-center">
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+      </div>
+      
+      <div *ngIf="!load_conversaciones && conversaciones.length === 0" class="p-3 text-center text-muted font-size-sm">
+        No se registran chats.
+      </div>
+
+      <div class="chat-list-item" 
+           *ngFor="let item of conversaciones"
+           [ngClass]="{'active-chat': cliente_seleccionado?._id === item.cliente._id}"
+           (click)="seleccionar_chat(item)">
+        <div class="list-item-avatar">
+          {{item.cliente.nombres ? item.cliente.nombres.charAt(0) : ''}}{{item.cliente.apellidos ? item.cliente.apellidos.charAt(0) : ''}}
+        </div>
+        <div class="list-item-details">
+          <div class="list-item-meta">
+            <span class="list-item-name">{{item.cliente.nombres}} {{item.cliente.apellidos}}</span>
+            <span class="list-item-time">{{item.fecha | date:'dd/MM'}}</span>
+          </div>
+          <div class="list-item-body">
+            <span class="list-item-msg">
+              <i *ngIf="item.ultimo_remitente === 'asesor'" class="cxi-check mr-1 text-primary"></i>
+              {{item.ultimo_mensaje}}
+            </span>
+            <span class="list-item-badge" *ngIf="item.unread > 0">{{item.unread}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna 2: Ventana de Chat Central -->
+  <div class="chat-main-window">
+    <!-- Estado Inicial: Ningún chat seleccionado -->
+    <div *ngIf="!cliente_seleccionado" class="h-100 d-flex flex-column align-items-center justify-content-center text-center p-4 text-muted">
+      <i class="cxi-chat font-size-xl mb-3"></i>
+      <h5 class="h6 mb-1">Seleccione un chat comercial</h5>
+      <p class="font-size-sm text-muted">Haga clic en uno de los clientes en la columna izquierda para abrir la conversación activa.</p>
+    </div>
+
+    <!-- Chat Activo -->
+    <ng-container *ngIf="cliente_seleccionado">
+      <div class="chat-active-header">
+        <div class="list-item-avatar">
+          {{cliente_seleccionado.nombres ? cliente_seleccionado.nombres.charAt(0) : ''}}{{cliente_seleccionado.apellidos ? cliente_seleccionado.apellidos.charAt(0) : ''}}
+        </div>
+        <div>
+          <h6 class="mb-0 font-weight-bold">{{cliente_seleccionado.nombres}} {{cliente_seleccionado.apellidos}}</h6>
+          <span class="font-size-xs text-muted">{{cliente_seleccionado.email}}</span>
+        </div>
+      </div>
+
+      <div class="chat-messages-container" #scrollContainer>
+        <div *ngIf="load_mensajes" class="text-center p-3">
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+        </div>
+
+        <div class="msg-row" *ngFor="let item of mensajes"
+             [ngClass]="{'msg-self': item.remitente === 'asesor', 'msg-other': item.remitente === 'cliente'}">
+          <div class="msg-bubble">
+            {{item.mensaje}}
+          </div>
+          <span class="msg-meta">
+            {{item.createdAt | date:'HH:mm'}}
+          </span>
+        </div>
+      </div>
+
+      <form (ngSubmit)="enviar_mensaje()" class="chat-input-bar">
+        <input type="text" name="nuevo_mensaje" [(ngModel)]="nuevo_mensaje" autocomplete="off" placeholder="Escribe tu respuesta aquí...">
+        <button type="submit" class="btn btn-primary btn-sm px-3">Enviar</button>
+      </form>
+    </ng-container>
+  </div>
+
+  <!-- Columna 3: Información e Integración de Ventas -->
+  <div class="chat-info-sidebar">
+    <div *ngIf="!cliente_seleccionado" class="h-100 d-flex align-items-center justify-content-center p-4 text-muted text-center font-size-sm">
+      Selecciona un cliente para ver su resumen.
+    </div>
+
+    <div class="sidebar-scroll" *ngIf="cliente_seleccionado">
+      <!-- Datos Cliente -->
+      <div class="mb-4">
+        <div class="sidebar-section-title">Datos del Cliente</div>
+        <ul class="list-unstyled font-size-sm mb-0">
+          <li class="mb-2">
+            <span class="text-muted d-block font-size-xs">WhatsApp / Teléfono</span>
+            <a href="https://wa.me/{{cliente_seleccionado.telefono}}" target="_blank" class="font-weight-bold text-success">
+              <i class="cxi-whatsapp mr-1"></i> {{cliente_seleccionado.telefono}}
+            </a>
+          </li>
+          <li class="mb-2">
+            <span class="text-muted d-block font-size-xs">Correo Electrónico</span>
+            <span class="font-weight-bold">{{cliente_seleccionado.email}}</span>
+          </li>
+          <li *ngIf="!['admin', 'direccion'].includes(current_user_role) && cliente_seleccionado.asesor">
+            <span class="text-muted d-block font-size-xs">Asesor Encargado</span>
+            <span class="font-weight-bold text-info">{{cliente_seleccionado.asesor.nombres}} {{cliente_seleccionado.asesor.apellidos}}</span>
+          </li>
+          <li *ngIf="['admin', 'direccion'].includes(current_user_role)">
+            <span class="text-muted d-block font-size-xs mb-1">Asesor Asignado</span>
+            <select class="form-control form-control-sm custom-select" (change)="reasignar_asesor($event)" [(ngModel)]="cliente_seleccionado.asesorId">
+              <option value="">Sin Asesor Asignado</option>
+              <option *ngFor="let item of asesores" [value]="item._id">{{item.nombres}} {{item.apellidos}}</option>
+            </select>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Carrito / Avión de Compras (En Vivo) -->
+      <div class="mb-4">
+        <div class="sidebar-section-title">Avión de Compras (En Vivo)</div>
+        <div *ngIf="carrito_cliente.length === 0" class="font-size-xs text-muted italic">
+          El cliente no tiene productos agregados al avión de compras.
+        </div>
+        
+        <div class="cart-item-card" *ngFor="let item of carrito_cliente">
+          <div class="list-item-details">
+            <div class="cart-item-title">{{item.producto?.titulo}}</div>
+            <div class="cart-item-meta">
+              Talla: <span class="font-weight-bold">{{item.variedad}}</span> | Cant: <span class="font-weight-bold">{{item.cantidad}}</span>
+            </div>
+            <div class="text-success font-weight-bold font-size-xs mt-1">
+              {{(item.producto?.precio * item.cantidad) | currency:'USD'}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Proformas / Cotizaciones -->
+      <div>
+        <div class="sidebar-section-title">Proformas y Liquidaciones</div>
+        <div *ngIf="proformas_cliente.length === 0" class="font-size-xs text-muted italic">
+          No hay proformas registradas para este cliente.
+        </div>
+
+        <div class="proforma-item-card" *ngFor="let item of proformas_cliente">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="font-size-xs font-weight-bold">{{item.nproforma}}</span>
+            <span class="badge" [ngClass]="{
+              'badge-warning': item.estado === 'Pendiente',
+              'badge-success': item.estado === 'Aprobada',
+              'badge-danger': item.estado === 'Rechazada',
+              'badge-info': item.estado === 'Procesada'
+            }">{{item.estado}}</span>
+          </div>
+          <div class="d-flex justify-content-between font-size-xs mb-1">
+            <span class="text-muted">Total:</span>
+            <span class="font-weight-bold text-success">{{item.total | currency:'USD'}}</span>
+          </div>
+          <div class="font-size-xs text-muted">
+            F. Solic: {{item.createdAt | date:'dd/MM/yyyy'}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

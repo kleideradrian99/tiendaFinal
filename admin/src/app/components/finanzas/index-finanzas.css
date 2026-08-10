@@ -1,0 +1,11 @@
+.font-size-xxs {
+    font-size: 0.7rem;
+}
+.font-size-xxs.py-1 {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+}
+.btn-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}

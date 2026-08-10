@@ -2,7 +2,7 @@ var Cupon = require('../models/cupon');
 
 const registro_cupon_admin = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
 
             let data = req.body;
 
@@ -19,7 +19,7 @@ const registro_cupon_admin = async function(req,res){
 
 const listar_cupones_admin = async function(req,res){
     if(req.user){
-        if(req.user.role == 'admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var filtro = req.params['filtro'];
 
@@ -36,7 +36,7 @@ const listar_cupones_admin = async function(req,res){
 
 const obtener_cupon_admin = async function(req,res){
     if(req.user){
-        if(req.user.role =='admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var id = req.params['id'];
 
@@ -57,7 +57,7 @@ const obtener_cupon_admin = async function(req,res){
 
 const actualizar_cupon_admin = async function(req,res){
     if(req.user){
-        if(req.user.role =='admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var data = req.body;
             var id = req.params['id'];
@@ -82,7 +82,7 @@ const actualizar_cupon_admin = async function(req,res){
 
 const eliminar_cupon_admin = async function(req,res){
     if(req.user){
-        if(req.user.role =='admin'){
+        if(['admin', 'direccion'].includes(req.user.role)){
             
             var id = req.params['id'];
 

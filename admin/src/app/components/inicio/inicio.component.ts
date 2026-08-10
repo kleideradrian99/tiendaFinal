@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AdminService } from 'src/app/services/admin.service';
 import Chart from 'chart.js/auto';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -19,14 +20,29 @@ export class InicioComponent implements OnInit {
   public count_ventas = 0;
   ///////////
   constructor(
-    private _adminService: AdminService
+    private _adminService: AdminService,
+    private _router: Router
   ) {
     this.token = localStorage.getItem('token');
   }
 
   ngOnInit(): void {
+    const role = this._adminService.getRole();
+    if (!role) {
+      this._router.navigate(['/login']);
+      return;
+    }
+    if (!['admin', 'direccion', 'finanzas'].includes(role)) {
+      let target = '/panel/clientes';
+      if (role === 'compras' || role === 'logistica') {
+        target = '/panel/pedidos';
+      } else if (role === 'soporte') {
+        target = '/panel/chat';
+      }
+      this._router.navigate([target]);
+      return;
+    }
     this.init_data();
-
   }
 
   init_data() {

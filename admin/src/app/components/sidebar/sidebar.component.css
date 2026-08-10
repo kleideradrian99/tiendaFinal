@@ -166,3 +166,130 @@
         box-shadow: 6px 0 30px rgba(0, 0, 0, 0.5) !important;
     }
 }
+
+/* Floating Toggle Button */
+.btn-toggle-sidebar {
+    position: absolute;
+    top: 28px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1070;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none !important;
+}
+
+.btn-toggle-sidebar:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.5);
+}
+
+.btn-toggle-sidebar svg {
+    stroke: #ffffff;
+}
+
+/* Monogram logo when collapsed */
+.logo-collapsed {
+    display: none;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+/* Collapsed state styles for Desktop only */
+@media (min-width: 992px) {
+    /* Transition for width changes */
+    .custom-sidebar {
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar {
+        width: 70px !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-header {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-logo {
+        display: none !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .logo-collapsed {
+        display: block !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .custom-nav-link {
+        justify-content: center !important;
+        padding: 0.75rem 0 !important;
+        margin: 0 0.5rem !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .custom-nav-link .icon-nav {
+        margin-right: 0 !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .nav-text {
+        display: none !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .custom-nav-link:hover {
+        transform: none !important;
+    }
+
+    /* Transform unread badge to a floating dot indicator when collapsed */
+    :host-context(body.sidebar-collapsed) .custom-sidebar .custom-nav-link {
+        position: relative;
+    }
+    
+    :host-context(body.sidebar-collapsed) .custom-sidebar .badge-unread {
+        position: absolute !important;
+        top: 6px !important;
+        right: 16px !important;
+        margin-left: 0 !important;
+        padding: 4px !important;
+        width: 8px !important;
+        height: 8px !important;
+        font-size: 0 !important;
+        border-radius: 50% !important;
+    }
+
+    /* User footer collapsed vertically */
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-footer {
+        flex-direction: column !important;
+        padding: 1rem 0.25rem !important;
+        gap: 0.75rem;
+        justify-content: center !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-footer .d-flex {
+        justify-content: center !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-footer .avatar {
+        margin-right: 0 !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-footer .user-info {
+        display: none !important;
+    }
+
+    :host-context(body.sidebar-collapsed) .custom-sidebar .sidebar-footer .btn-logout {
+        margin: 0 auto;
+    }
+}

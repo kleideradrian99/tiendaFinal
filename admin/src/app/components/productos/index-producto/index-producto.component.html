@@ -42,6 +42,7 @@
             <th>Stock</th>
             <th>Precio</th>
             <th>Categoria</th>
+            <th>Disponibilidad / Estado</th>
             <th>Ventas</th>
             <th>OP</th>
           </tr>
@@ -65,11 +66,21 @@
                   <img style="width:50px" [src]="url +'obtener_portada/'+item.portada" class="img-thumbnail rounded-0"
                     alt="Square image">
                   {{item.titulo}}
+                  <span *ngIf="item.en_tendencia" class="badge badge-danger ml-1">🔥 Tendencia</span>
                 </h6>
               </td>
               <td>{{item.stock}}</td>
               <td>{{item.precio | currency:'USD'}}</td>
               <td>{{item.categoria}}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-success': item.estado_disponibilidad == 'Disponible' || !item.estado_disponibilidad,
+                  'badge-danger': item.estado_disponibilidad == 'Agotado',
+                  'badge-warning': item.estado_disponibilidad == 'Bajo fabricación'
+                }">{{item.estado_disponibilidad || 'Disponible'}}</span>
+                <br>
+                <small class="badge badge-secondary mt-1">{{item.estado || 'Edicion'}}</small>
+              </td>
               <td>{{item.nventas}}</td>
               <td>
                 <div class="btn-group dropdown d-inline-block mb-3 mr-2">

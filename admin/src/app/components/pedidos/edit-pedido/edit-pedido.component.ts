@@ -4,9 +4,10 @@ import { GLOBAL } from 'src/app/services/GLOBAL';
 import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { ProductoService } from 'src/app/services/producto.service';
+import { ProveedorService } from 'src/app/services/proveedor.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, SlicePipe, NgClass, CurrencyPipe } from '@angular/common';
+import { NgIf, NgFor, SlicePipe, NgClass, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
@@ -17,7 +18,7 @@ declare var $: any;
     selector: 'app-edit-pedido',
     templateUrl: './edit-pedido.component.html',
     styleUrls: ['./edit-pedido.component.css'],
-    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, RouterLink, SlicePipe, NgClass, CurrencyPipe]
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor, NgSelectComponent, NgbPagination, RouterLink, SlicePipe, NgClass, CurrencyPipe, DatePipe, DecimalPipe]
 })
 export class EditPedidoComponent implements OnInit {
 
@@ -26,6 +27,33 @@ export class EditPedidoComponent implements OnInit {
   public url: any;
   public load_data = true;
   public load_btn = false;
+
+  // Nuevas propiedades de Gestión y Logística (Módulo 9 y 10/11)
+  public venta: any = {};
+  public eval_estado_data: any = {
+    estado: '',
+    motivo: '',
+    notas_internas: ''
+  };
+  public load_btn_estado = false;
+  
+  public proveedores: Array<any> = [];
+  public empaque_data: any = {
+    peso_real: 0,
+    dimensiones_alto: 0,
+    dimensiones_ancho: 0,
+    dimensiones_largo: 0,
+    ncajas: 1,
+    tracking_fedex: ''
+  };
+  public load_btn_empaque = false;
+
+  public escala_data: any = {
+    estado: '',
+    ubicacion: '',
+    descripcion: ''
+  };
+  public load_btn_escala = false;
   
   // CLIENTE
   public clientes: Array<any> = [];
@@ -74,7 +102,8 @@ export class EditPedidoComponent implements OnInit {
     private _adminService: AdminService,
     private _clienteService: ClienteService,
     private _productoService: ProductoService,
-    private _router: Router
+    private _router: Router,
+    private _proveedorService: ProveedorService
   ) {
     this.token = this._adminService.getToken();
     this.url = GLOBAL.url;
@@ -86,6 +115,9 @@ export class EditPedidoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.token) {
+      this.listar_proveedores();
+    }
     this._route.params.subscribe(params => {
       this.id = params['id'];
       this.init_Data();
@@ -115,23 +147,34 @@ export class EditPedidoComponent implements OnInit {
         this._adminService.obtener_detalles_ordenes_cliente(this.id, this.token).subscribe(
           ordResponse => {
             if (ordResponse.data != undefined) {
-              let venta = ordResponse.data;
+              this.venta = ordResponse.data;
               let detalles = ordResponse.detalles || [];
               
-              this.cliente_seleccionado = venta.cliente;
-              this._idCliente = venta.cliente._id;
-              this.producto.observacion = venta.nota || '';
-              this.transaccion = venta.transaccion || 'Efectivo';
-              this.envio_titulo = venta.envio_titulo || 'Recogida en Tienda';
-              this.envio_precio = venta.envio_precio || 0;
+              this.eval_estado_data.estado = this.venta.estado;
+              this.eval_estado_data.notas_internas = this.venta.notas_internas || '';
+              this.cliente_seleccionado = this.venta.cliente;
+              this._idCliente = this.venta.cliente._id;
+              this.producto.observacion = this.venta.nota || '';
+              this.transaccion = this.venta.transaccion || 'Efectivo';
+              this.envio_titulo = this.venta.envio_titulo || 'Recogida en Tienda';
+              this.envio_precio = this.venta.envio_precio || 0;
 
               // Cargar direcciones del cliente
               this._clienteService.obtener_direccion_todos_cliente(this._idCliente, this.token).subscribe(
                 dirResponse => {
                   this.direcciones = dirResponse.data || [];
-                  this.direccion_seleccionada = this.direcciones.find(d => d._id === venta.direccion?._id) || this.direcciones.find(d => d.principal) || this.direcciones[0];
+                  this.direccion_seleccionada = this.direcciones.find(d => d._id === this.venta.direccion?._id) || this.direcciones.find(d => d.principal) || this.direcciones[0];
                 }
               );
+
+              this.empaque_data = {
+                peso_real: this.venta.peso_real || 0,
+                dimensiones_alto: this.venta.dimensiones_alto || 0,
+                dimensiones_ancho: this.venta.dimensiones_ancho || 0,
+                dimensiones_largo: this.venta.dimensiones_largo || 0,
+                ncajas: this.venta.ncajas || 1,
+                tracking_fedex: this.venta.tracking_fedex || ''
+              };
 
               // Agrupar detalles planos (Dventa) por producto
               let grouped: any = {};
@@ -147,9 +190,13 @@ export class EditPedidoComponent implements OnInit {
                     };
                   }
                   grouped[prodId].variedad.push({
+                    _id: det._id,
                     titulo: det.variedad,
                     cantidad: det.cantidad,
-                    estado: det.estado || 'Solicitado'
+                    estado: det.estado || 'Solicitado',
+                    proveedor: det.proveedor?._id || '',
+                    costo_compra: det.costo_compra || 0,
+                    fecha_estimada_acopio: det.fecha_estimada_acopio ? new Date(det.fecha_estimada_acopio).toISOString().substring(0, 10) : ''
                   });
                   grouped[prodId].total += det.subtotal;
                 }
@@ -767,6 +814,258 @@ export class EditPedidoComponent implements OnInit {
         });
         this.load_btn = false;
         console.log(error);
+      }
+    );
+  }
+
+  abrir_modal_estado(estado: string) {
+    this.eval_estado_data.estado = estado;
+    this.eval_estado_data.motivo = '';
+    this.eval_estado_data.notas_internas = this.venta.notas_internas || '';
+    $('#modalEstado').modal('show');
+  }
+
+  actualizar_estado_logistica() {
+    if (!this.eval_estado_data.motivo) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Debe ingresar un motivo para el cambio de estado.'
+      });
+      return;
+    }
+
+    this.load_btn_estado = true;
+    this._adminService.actualizar_estado_venta_admin(this.id, this.eval_estado_data, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'SUCCESS',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Se actualizó el estado del pedido.'
+        });
+        this.load_btn_estado = false;
+        $('#modalEstado').modal('hide');
+        this.init_Data(); // Recargar datos
+      },
+      error => {
+        console.error(error);
+        this.load_btn_estado = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error al cambiar el estado del pedido.'
+        });
+      }
+    );
+  }
+
+  actualizar_estado_prenda(dventaId: string, nuevo_estado: string) {
+    this._adminService.actualizar_estado_detalle_venta_admin(dventaId, { estado: nuevo_estado }, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'SUCCESS',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Prenda actualizada con éxito.'
+        });
+        this.init_Data();
+      },
+      error => {
+        console.error(error);
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error al actualizar prenda.'
+        });
+      }
+    );
+  }
+
+  subir_evidencia_archivo(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      const file: File = event.target.files[0];
+      this._adminService.subir_evidencia_pedido_admin(this.id, file, this.token).subscribe(
+        response => {
+          iziToast.show({
+            title: 'ÉXITO',
+            titleColor: '#1DC74C',
+            color: '#FFF',
+            class: 'text-success',
+            position: 'topRight',
+            message: 'Evidencia subida correctamente.'
+          });
+          this.init_Data();
+        },
+        error => {
+          console.error(error);
+          iziToast.show({
+            title: 'ERROR',
+            titleColor: '#FF0000',
+            color: '#FFF',
+            class: 'text-danger',
+            position: 'topRight',
+            message: 'Error al subir la evidencia.'
+          });
+        }
+      );
+    }
+  }
+
+  listar_proveedores() {
+    this._proveedorService.listar_proveedores_admin(this.token).subscribe(
+      response => {
+        this.proveedores = response.data || [];
+      }
+    );
+  }
+
+  actualizar_abastecimiento_item(varItem) {
+    const data = {
+      proveedor: varItem.proveedor || null,
+      costo_compra: varItem.costo_compra || 0,
+      fecha_estimada_acopio: varItem.fecha_estimada_acopio || null,
+      estado: varItem.estado
+    };
+    
+    this._adminService.actualizar_abastecimiento_prenda_admin(varItem._id, data, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'ÉXITO',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Información de abastecimiento de la prenda guardada.'
+        });
+        this.init_Data();
+      },
+      error => {
+        console.error(error);
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error al guardar el abastecimiento de la prenda.'
+        });
+      }
+    );
+  }
+
+  calcular_costo_produccion() {
+    let total_costo = 0;
+    this.carrito_arr.forEach(element => {
+      if (element.variedad && Array.isArray(element.variedad)) {
+        element.variedad.forEach(v => {
+          total_costo += (v.costo_compra || 0) * v.cantidad;
+        });
+      }
+    });
+    return total_costo;
+  }
+
+  actualizar_empaque_pedido() {
+    this.load_btn_empaque = true;
+    this._adminService.actualizar_empaque_despacho_admin(this.id, this.empaque_data, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'ÉXITO',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Datos de empaque y logística de FedEx actualizados.'
+        });
+        this.load_btn_empaque = false;
+        this.init_Data();
+      },
+      error => {
+        console.error(error);
+        this.load_btn_empaque = false;
+        iziToast.show({
+          title: 'ERROR',
+          titleColor: '#FF0000',
+          color: '#FFF',
+          class: 'text-danger',
+          position: 'topRight',
+          message: 'Error al actualizar datos de empaque.'
+        });
+      }
+    );
+  }
+
+  registrar_escala() {
+    if (!this.escala_data.estado || !this.escala_data.ubicacion) {
+      iziToast.show({
+        title: 'ERROR',
+        titleColor: '#FF0000',
+        color: '#FFF',
+        class: 'text-danger',
+        position: 'topRight',
+        message: 'Debe ingresar el estado y la ubicación de la escala.'
+      });
+      return;
+    }
+
+    this.load_btn_escala = true;
+    this._adminService.registrar_escala_transito_admin(this.id, {
+      estado: this.escala_data.estado,
+      ubicacion: this.escala_data.ubicacion,
+      descripcion: this.escala_data.descripcion,
+      alerta_novedad_envio: this.venta.alerta_novedad_envio
+    }, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'ÉXITO',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Escala de tránsito registrada.'
+        });
+        this.escala_data = { estado: '', ubicacion: '', descripcion: '' };
+        this.load_btn_escala = false;
+        this.init_Data();
+      },
+      error => {
+        console.error(error);
+        this.load_btn_escala = false;
+      }
+    );
+  }
+
+  guardar_alerta_novedad() {
+    this._adminService.registrar_escala_transito_admin(this.id, {
+      alerta_novedad_envio: this.venta.alerta_novedad_envio
+    }, this.token).subscribe(
+      response => {
+        iziToast.show({
+          title: 'ÉXITO',
+          titleColor: '#1DC74C',
+          color: '#FFF',
+          class: 'text-success',
+          position: 'topRight',
+          message: 'Alerta de novedad de envío actualizada.'
+        });
+        this.init_Data();
+      },
+      error => {
+        console.error(error);
       }
     );
   }

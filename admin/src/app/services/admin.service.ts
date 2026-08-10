@@ -59,6 +59,20 @@ export class AdminService {
     return allowRoles.includes(decodedToken['role']);
   }
 
+  getRole(): string | null {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return null;
+    }
+    try {
+      const helper = new JwtHelperService();
+      const decodedToken = helper.decodeToken(token);
+      return decodedToken ? decodedToken.role : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
   actualiza_config_admin(id, data, token): Observable<any> {
     if (data.logo) {
       let headers = new HttpHeaders({ 'Authorization': token });
@@ -97,9 +111,29 @@ export class AdminService {
     return this._http.put(this.url + 'cerrar_mensaje_admin/' + id, data, { headers: headers });
   }
 
+  obtener_ticket_admin(id, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'obtener_ticket_admin/' + id, { headers: headers });
+  }
+
+  responder_ticket_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'responder_ticket_admin/' + id, data, { headers: headers });
+  }
+
   obtener_ventas_admin(desde, hasta, token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.get(this.url + 'obtener_ventas_admin/' + desde + '/' + hasta, { headers: headers });
+  }
+
+  obtener_balance_financiero_admin(desde, hasta, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.get(this.url + 'obtener_balance_financiero_admin/' + desde + '/' + hasta, { headers: headers });
+  }
+
+  actualizar_trm_pedido_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_trm_pedido_admin/' + id, data, { headers: headers });
   }
 
   obtener_detalles_ordenes_cliente(id, token): Observable<any> {
@@ -127,6 +161,33 @@ export class AdminService {
   actualizar_pedido_admin(id, data, token): Observable<any> {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
     return this._http.put(this.url + 'actualizar_pedido_admin/' + id, data, { headers: headers });
+  }
+
+  actualizar_estado_detalle_venta_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_estado_detalle_venta_admin/' + id, data, { headers: headers });
+  }
+
+  subir_evidencia_pedido_admin(id, file: File, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Authorization': token });
+    const fd = new FormData();
+    fd.append('evidencia', file);
+    return this._http.post(this.url + 'subir_evidencia_pedido_admin/' + id, fd, { headers: headers });
+  }
+
+  actualizar_abastecimiento_prenda_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_abastecimiento_prenda_admin/' + id, data, { headers: headers });
+  }
+
+  actualizar_empaque_despacho_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'actualizar_empaque_despacho_admin/' + id, data, { headers: headers });
+  }
+
+  registrar_escala_transito_admin(id, data, token): Observable<any> {
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': token });
+    return this._http.put(this.url + 'registrar_escala_transito_admin/' + id, data, { headers: headers });
   }
 
   registrar_usuario_interno(data, token): Observable<any> {

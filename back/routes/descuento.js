@@ -8,12 +8,12 @@ var auth = require('../middlewares/authenticate');
 var upload = require('../middlewares/upload');
 var path = upload.createUpload('./uploads/descuentos');
 
-api.post('/registro_descuento_admin',[auth.auth,path],descuentoController.registro_descuento_admin);
-api.get('/listar_descuentos_admin/:filtro?',auth.auth,descuentoController.listar_descuentos_admin);
+api.post('/registro_descuento_admin',[auth.auth, auth.checkRole(['admin', 'direccion']), path],descuentoController.registro_descuento_admin);
+api.get('/listar_descuentos_admin/:filtro?',[auth.auth, auth.checkRole(['admin', 'direccion'])],descuentoController.listar_descuentos_admin);
 api.get('/obtener_banner_descuento/:img',descuentoController.obtener_banner_descuento);
-api.get('/obtener_descuento_admin/:id',auth.auth,descuentoController.obtener_descuento_admin);
-api.put('/actualizar_descuento_admin/:id',[auth.auth,path],descuentoController.actualizar_descuento_admin);
-api.delete('/eliminar_descuento_admin/:id',auth.auth,descuentoController.eliminar_descuento_admin);
+api.get('/obtener_descuento_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion'])],descuentoController.obtener_descuento_admin);
+api.put('/actualizar_descuento_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion']), path],descuentoController.actualizar_descuento_admin);
+api.delete('/eliminar_descuento_admin/:id',[auth.auth, auth.checkRole(['admin', 'direccion'])],descuentoController.eliminar_descuento_admin);
 
 api.get('/obtener_descuento_activo',descuentoController.obtener_descuento_activo);
 

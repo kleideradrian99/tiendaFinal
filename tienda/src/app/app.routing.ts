@@ -14,10 +14,14 @@ import { IndexOrdenesComponent } from "./components/usuario/ordenes/index-ordene
 import { DetalleOrdenComponent } from "./components/usuario/ordenes/detalle-orden/detalle-orden.component";
 import { IndexReviewComponent } from "./components/usuario/reviews/index-review/index-review.component";
 import { RecuperarContrasenaCliente } from "./components/login/recuperar-contrasena-cliente/recuperar-contrasena-cliente";
+import { Muro } from "./components/muro/muro";
+import { IndexProformaCliente } from "./components/usuario/proformas/index-proforma-cliente";
+import { IndexSoporteComponent } from "./components/usuario/soporte/index-soporte";
 
 const appRoute : Routes = [
     {path: '', component: InicioComponent},
     {path: 'login', component: LoginComponent},
+    {path: 'muro', component: Muro},
     {path: 'recuperar-contrasena', component: RecuperarContrasenaCliente},
     {path: 'restablecer-contrasena/:token', component: RecuperarContrasenaCliente},
 
@@ -27,6 +31,8 @@ const appRoute : Routes = [
     {path: 'cuenta/ordenes/:id', component: DetalleOrdenComponent, canActivate: [AuthGuard]},
     {path: 'cuenta/perfil', component: PerfilComponent, canActivate: [AuthGuard]},
     {path: 'cuenta/reviews', component: IndexReviewComponent, canActivate: [AuthGuard]},
+    {path: 'cuenta/proformas', component: IndexProformaCliente, canActivate: [AuthGuard]},
+    {path: 'cuenta/soporte', component: IndexSoporteComponent, canActivate: [AuthGuard]},
 
     {path: 'carrito', component: CarritoComponent, canActivate: [AuthGuard]},
 

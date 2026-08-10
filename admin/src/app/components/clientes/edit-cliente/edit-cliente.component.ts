@@ -4,7 +4,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 
 declare var iziToast;
 
@@ -12,7 +12,7 @@ declare var iziToast;
     selector: 'app-edit-cliente',
     templateUrl: './edit-cliente.component.html',
     styleUrls: ['./edit-cliente.component.css'],
-    imports: [SidebarComponent, FormsModule, NgIf, RouterLink]
+    imports: [SidebarComponent, FormsModule, NgIf, NgFor, RouterLink]
 })
 export class EditClienteComponent implements OnInit {
 
@@ -21,6 +21,8 @@ export class EditClienteComponent implements OnInit {
   public token;
   public load_btn = false;
   public load_data = true;
+  public asesores: Array<any> = [];
+  public current_user_role: string | null = '';
 
   constructor(
     private _route: ActivatedRoute,
@@ -32,6 +34,15 @@ export class EditClienteComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.current_user_role = this._adminService.getRole();
+    if (['admin', 'direccion'].includes(this.current_user_role)) {
+      this._adminService.listar_usuarios_internos('null', this.token).subscribe(
+        response => {
+          this.asesores = response.data.filter((u: any) => ['asesora', 'soporte'].includes(u.rol));
+        }
+      );
+    }
+
     this._route.params.subscribe(
       params => {
         this.id = params['id'];
