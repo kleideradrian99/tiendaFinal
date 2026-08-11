@@ -26,6 +26,9 @@ export class EditPedidoComponent implements OnInit {
   public token: any;
   public url: any;
   public load_data = true;
+  // Tab activo del panel derecho: 'resumen' | 'logistica' | 'transito'
+  public activeTab: string = 'resumen';
+
   public load_btn = false;
 
   // Nuevas propiedades de Gestión y Logística (Módulo 9 y 10/11)

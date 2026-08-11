@@ -113,7 +113,7 @@ const obtener_ventas_admin  = async function(req,res){
                 for(let v of raw_ventas) {
                     let count_pendientes = 0;
                     if (v.estado !== 'Cancelado') {
-                        count_pendientes = await Dventa.countDocuments({ venta: v._id, estado: { $ne: 'Entregado' } });
+                        count_pendientes = await Dventa.countDocuments({ venta: v._id, estado: { $nin: ['Listo', 'Entregado'] } });
                     }
                     let v_obj = v.toObject();
                     v_obj.detalles_pendientes = count_pendientes;
@@ -131,7 +131,7 @@ const obtener_ventas_admin  = async function(req,res){
                     if(tt_created >= tt_desde && tt_created <= tt_hasta){
                         let count_pendientes = 0;
                         if (item.estado !== 'Cancelado') {
-                            count_pendientes = await Dventa.countDocuments({ venta: item._id, estado: { $ne: 'Entregado' } });
+                            count_pendientes = await Dventa.countDocuments({ venta: item._id, estado: { $nin: ['Listo', 'Entregado'] } });
                         }
                         let v_obj = item.toObject();
                         v_obj.detalles_pendientes = count_pendientes;
