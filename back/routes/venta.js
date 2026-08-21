@@ -1,7 +1,7 @@
 'use strict'
 
 var express = require('express');
-var ventaController = require('../controllers/VentaController');
+var ventaController = require('../controllers/ventaController');
 
 var api = express.Router();
 var auth = require('../middlewares/authenticate');
