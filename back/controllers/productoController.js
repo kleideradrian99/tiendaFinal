@@ -70,19 +70,25 @@ const listar_productos_admin = async function (req, res) {
 const obtener_portada = async function (req, res) {
     var img = req.params['img'];
 
-    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+    if (!img || img == 'null' || img == 'undefined') {
+        return res.redirect('https://images.placeholders.dev/?width=600&height=600&text=No+Image');
+    }
+
+    if (img.startsWith('http://') || img.startsWith('https://')) {
         return res.redirect(img);
     }
 
-    fs.stat('./uploads/productos/' + img, function (err) {
-        if (!err) {
-            let path_img = './uploads/productos/' + img;
-            res.status(200).sendFile(path.resolve(path_img));
+    let path_img = path.resolve('./uploads/productos/' + img);
+    if (fs.existsSync(path_img)) {
+        return res.status(200).sendFile(path_img);
+    } else {
+        let default_img = path.resolve('./uploads/default.jpg');
+        if (fs.existsSync(default_img)) {
+            return res.status(200).sendFile(default_img);
         } else {
-            let path_img = './uploads/default.jpg';
-            res.status(200).sendFile(path.resolve(path_img));
+            return res.redirect('https://images.placeholders.dev/?width=600&height=600&text=No+Image');
         }
-    })
+    }
 }
 
 const obtener_producto_admin = async function (req, res) {
@@ -114,67 +120,77 @@ const actualizar_producto_admin = async function (req, res) {
             let data = req.body;
             let en_tendencia = (data.en_tendencia == 'true' || data.en_tendencia == true);
 
-            if (req.files && req.files.portada) {
-                //SI HAY IMAGEN
-                var portada_name = '';
-                if (process.env.CLOUDINARY_CLOUD_NAME) {
-                    portada_name = await cloudinaryHelper.uploadImage(req.files.portada.path, 'productos');
-                } else {
-                    var img_path = req.files.portada.path;
-                    var name = img_path.split(path.sep);
-                    portada_name = name[name.length - 1];
-                }
-
-
-                let reg = await Producto.findByIdAndUpdate({ _id: id }, {
-                    titulo: data.titulo,
-                    stock: data.stock,
-                    precio: data.precio,
-                    precio_cop: data.precio_cop,
-                    categoria: data.categoria,
-                    descripcion: data.descripcion,
-                    contenido: data.contenido,
-                    estado: data.estado || 'Edicion',
-                    estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
-                    en_tendencia: en_tendencia,
-                    fecha_programada: data.fecha_programada || null,
-                    peso: parseFloat(data.peso) || 0,
-                    portada: portada_name
-                });
-
-                fs.stat('./uploads/productos/' + reg.portada, function (err) {
-                    if (!err) {
-                        fs.unlink('./uploads/productos/' + reg.portada, (err) => {
-                            if (err) throw err;
-                        });
+            try {
+                if (req.files && req.files.portada) {
+                    //SI HAY IMAGEN
+                    var portada_name = '';
+                    if (process.env.CLOUDINARY_CLOUD_NAME) {
+                        try {
+                            portada_name = await cloudinaryHelper.uploadImage(req.files.portada.path, 'productos');
+                        } catch (err) {
+                            console.error('Cloudinary upload error:', err);
+                            var img_path = req.files.portada.path;
+                            var name = img_path.split(path.sep);
+                            portada_name = name[name.length - 1];
+                        }
+                    } else {
+                        var img_path = req.files.portada.path;
+                        var name = img_path.split(path.sep);
+                        portada_name = name[name.length - 1];
                     }
-                })
 
-                res.status(200).send({ data: reg });
-            } else {
-                //NO HAY IMAGEN
-                let reg = await Producto.findByIdAndUpdate({ _id: id }, {
-                    titulo: data.titulo,
-                    stock: data.stock,
-                    precio: data.precio,
-                    precio_cop: data.precio_cop,
-                    categoria: data.categoria,
-                    descripcion: data.descripcion,
-                    contenido: data.contenido,
-                    estado: data.estado || 'Edicion',
-                    estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
-                    en_tendencia: en_tendencia,
-                    fecha_programada: data.fecha_programada || null,
-                    peso: parseFloat(data.peso) || 0
-                });
-                res.status(200).send({ data: reg });
+                    let reg = await Producto.findByIdAndUpdate({ _id: id }, {
+                        titulo: data.titulo,
+                        stock: data.stock,
+                        precio: data.precio,
+                        precio_cop: data.precio_cop,
+                        categoria: data.categoria,
+                        descripcion: data.descripcion,
+                        contenido: data.contenido,
+                        estado: data.estado || 'Edicion',
+                        estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
+                        en_tendencia: en_tendencia,
+                        fecha_programada: data.fecha_programada || null,
+                        peso: parseFloat(data.peso) || 0,
+                        portada: portada_name
+                    });
+
+                    if (reg && reg.portada && !reg.portada.startsWith('http')) {
+                        let old_path = './uploads/productos/' + reg.portada;
+                        if (fs.existsSync(old_path)) {
+                            fs.unlink(old_path, () => {});
+                        }
+                    }
+
+                    return res.status(200).send({ data: reg });
+                } else {
+                    //NO HAY IMAGEN
+                    let reg = await Producto.findByIdAndUpdate({ _id: id }, {
+                        titulo: data.titulo,
+                        stock: data.stock,
+                        precio: data.precio,
+                        precio_cop: data.precio_cop,
+                        categoria: data.categoria,
+                        descripcion: data.descripcion,
+                        contenido: data.contenido,
+                        estado: data.estado || 'Edicion',
+                        estado_disponibilidad: data.estado_disponibilidad || 'Disponible',
+                        en_tendencia: en_tendencia,
+                        fecha_programada: data.fecha_programada || null,
+                        peso: parseFloat(data.peso) || 0
+                    });
+
+                    return res.status(200).send({ data: reg });
+                }
+            } catch (error) {
+                console.error('Error al actualizar producto:', error);
+                return res.status(500).send({ message: 'Error en el servidor', error: error.message });
             }
-
         } else {
-            res.status(500).send({ message: 'NoAccess' });
+            return res.status(500).send({ message: 'NoAccess' });
         }
     } else {
-        res.status(500).send({ message: 'NoAccess' });
+        return res.status(500).send({ message: 'NoAccess' });
     }
 }
 

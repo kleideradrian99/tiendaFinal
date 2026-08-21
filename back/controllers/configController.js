@@ -85,20 +85,25 @@ const actualiza_config_admin = async function (req, res) {
 const obtener_logo = async function (req, res) {
     var img = req.params['img'];
 
-    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+    if (!img || img == 'null' || img == 'undefined') {
+        return res.redirect('https://images.placeholders.dev/?width=300&height=100&text=Logo');
+    }
+
+    if (img.startsWith('http://') || img.startsWith('https://')) {
         return res.redirect(img);
     }
 
-    console.log(img);
-    fs.stat('./uploads/configuraciones/' + img, function (err) {
-        if (!err) {
-            let path_img = './uploads/configuraciones/' + img;
-            res.status(200).sendFile(path.resolve(path_img));
+    let path_img = path.resolve('./uploads/configuraciones/' + img);
+    if (fs.existsSync(path_img)) {
+        return res.status(200).sendFile(path_img);
+    } else {
+        let default_img = path.resolve('./uploads/default.jpg');
+        if (fs.existsSync(default_img)) {
+            return res.status(200).sendFile(default_img);
         } else {
-            let path_img = './uploads/default.jpg';
-            res.status(200).sendFile(path.resolve(path_img));
+            return res.redirect('https://images.placeholders.dev/?width=300&height=100&text=Logo');
         }
-    })
+    }
 }
 
 const obtener_config_publico = async function (req, res) {

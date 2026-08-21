@@ -52,19 +52,25 @@ const listar_descuentos_admin = async function(req,res){
 const obtener_banner_descuento = async function(req,res){
     var img = req.params['img'];
 
-    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+    if (!img || img == 'null' || img == 'undefined') {
+        return res.redirect('https://images.placeholders.dev/?width=1200&height=400&text=No+Banner');
+    }
+
+    if (img.startsWith('http://') || img.startsWith('https://')) {
         return res.redirect(img);
     }
 
-    fs.stat('./uploads/descuentos/'+img, function(err){
-        if(!err){
-            let path_img = './uploads/descuentos/'+img;
-            res.status(200).sendFile(path.resolve(path_img));
-        }else{
-            let path_img = './uploads/default.jpg';
-            res.status(200).sendFile(path.resolve(path_img));
+    let path_img = path.resolve('./uploads/descuentos/' + img);
+    if (fs.existsSync(path_img)) {
+        return res.status(200).sendFile(path_img);
+    } else {
+        let default_img = path.resolve('./uploads/default.jpg');
+        if (fs.existsSync(default_img)) {
+            return res.status(200).sendFile(default_img);
+        } else {
+            return res.redirect('https://images.placeholders.dev/?width=1200&height=400&text=No+Banner');
         }
-    })
+    }
 }
 
 const obtener_descuento_admin = async function(req,res){
