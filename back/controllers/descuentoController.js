@@ -1,14 +1,23 @@
 var Descuento = require('../models/descuento');
 var fs = require('fs');
 var path = require('path');
+var cloudinaryHelper = require('../helpers/cloudinary');
+
 const registro_descuento_admin = async function(req,res){
     if(req.user){
         if(['admin', 'direccion'].includes(req.user.role)){
             let data = req.body;
-            
-            var img_path = req.files.banner.path;
-            var name = img_path.split('\\');
-            var banner_name = name[2];
+            var banner_name = '';
+
+            if (req.files && req.files.banner) {
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    banner_name = await cloudinaryHelper.uploadImage(req.files.banner.path, 'descuentos');
+                } else {
+                    var img_path = req.files.banner.path;
+                    var name = img_path.split(path.sep);
+                    banner_name = name[name.length - 1];
+                }
+            }
 
             data.banner = banner_name;
             let reg = await Descuento.create(data);
@@ -43,6 +52,9 @@ const listar_descuentos_admin = async function(req,res){
 const obtener_banner_descuento = async function(req,res){
     var img = req.params['img'];
 
+    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+        return res.redirect(img);
+    }
 
     fs.stat('./uploads/descuentos/'+img, function(err){
         if(!err){
@@ -84,11 +96,16 @@ const actualizar_descuento_admin = async function(req,res){
             let id = req.params['id'];
             let data = req.body;
 
-            if(req.files){
+            if(req.files && req.files.banner){
                 //SI HAY IMAGEN
-                var img_path = req.files.banner.path;
-                var name = img_path.split('\\');
-                var banner_name = name[2];
+                var banner_name = '';
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    banner_name = await cloudinaryHelper.uploadImage(req.files.banner.path, 'descuentos');
+                } else {
+                    var img_path = req.files.banner.path;
+                    var name = img_path.split(path.sep);
+                    banner_name = name[name.length - 1];
+                }
 
                 
                 let reg = await Descuento.findByIdAndUpdate({_id:id},{

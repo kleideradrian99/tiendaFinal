@@ -5,14 +5,24 @@ var Inventario = require('../models/inventario');
 var Review = require('../models/review');
 var fs = require('fs');
 var path = require('path');
+var cloudinaryHelper = require('../helpers/cloudinary');
 
 const registro_producto_admin = async function (req, res) {
     if (req.user) {
         if (['admin', 'direccion', 'compras'].includes(req.user.role)) {
             let data = req.body;
-            var img_path = req.files.portada.path;
-            var name = img_path.split(path.sep);
-            var portada_name = name[name.length - 1];
+            var portada_name = '';
+
+            if (req.files && req.files.portada) {
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    portada_name = await cloudinaryHelper.uploadImage(req.files.portada.path, 'productos');
+                } else {
+                    var img_path = req.files.portada.path;
+                    var name = img_path.split(path.sep);
+                    portada_name = name[name.length - 1];
+                }
+            }
+
             data.slug = data.titulo.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
             data.portada = portada_name;
             data.en_tendencia = (data.en_tendencia == 'true' || data.en_tendencia == true);
@@ -60,6 +70,10 @@ const listar_productos_admin = async function (req, res) {
 const obtener_portada = async function (req, res) {
     var img = req.params['img'];
 
+    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+        return res.redirect(img);
+    }
+
     fs.stat('./uploads/productos/' + img, function (err) {
         if (!err) {
             let path_img = './uploads/productos/' + img;
@@ -100,11 +114,16 @@ const actualizar_producto_admin = async function (req, res) {
             let data = req.body;
             let en_tendencia = (data.en_tendencia == 'true' || data.en_tendencia == true);
 
-            if (req.files) {
+            if (req.files && req.files.portada) {
                 //SI HAY IMAGEN
-                var img_path = req.files.portada.path;
-                var name = img_path.split(path.sep);
-                var portada_name = name[name.length - 1];
+                var portada_name = '';
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    portada_name = await cloudinaryHelper.uploadImage(req.files.portada.path, 'productos');
+                } else {
+                    var img_path = req.files.portada.path;
+                    var name = img_path.split(path.sep);
+                    portada_name = name[name.length - 1];
+                }
 
 
                 let reg = await Producto.findByIdAndUpdate({ _id: id }, {
@@ -280,9 +299,16 @@ const agregar_imagen_galeria_admin = async function (req, res) {
             let id = req.params['id'];
             let data = req.body;
 
-            var img_path = req.files.imagen.path;
-            var name = img_path.split(path.sep);
-            var imagen_name = name[name.length - 1];
+            var imagen_name = '';
+            if (req.files && req.files.imagen) {
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    imagen_name = await cloudinaryHelper.uploadImage(req.files.imagen.path, 'productos');
+                } else {
+                    var img_path = req.files.imagen.path;
+                    var name = img_path.split(path.sep);
+                    imagen_name = name[name.length - 1];
+                }
+            }
 
             let reg = await Producto.findByIdAndUpdate({ _id: id }, {
                 $push: {

@@ -1,6 +1,7 @@
 var Config = require('../models/config');
 var fs = require('fs');
 var path = require('path');
+var cloudinaryHelper = require('../helpers/cloudinary');
 
 const getOrCreateConfig = async function () {
     let reg = await Config.findById("664526b432ea5f7527aeef3a");
@@ -37,10 +38,15 @@ const actualiza_config_admin = async function (req, res) {
         if (req.user.role == 'admin') {
 
             let data = req.body;
-            if (req.files) {
-                var img_path = req.files.logo.path;
-                var name = img_path.split('\\');
-                var logo_name = name[2];
+            if (req.files && req.files.logo) {
+                var logo_name = '';
+                if (process.env.CLOUDINARY_CLOUD_NAME) {
+                    logo_name = await cloudinaryHelper.uploadImage(req.files.logo.path, 'configuraciones');
+                } else {
+                    var img_path = req.files.logo.path;
+                    var name = img_path.split(path.sep);
+                    logo_name = name[name.length - 1];
+                }
 
                 let reg = await Config.findByIdAndUpdate({ _id: "664526b432ea5f7527aeef3a" }, {
                     categorias: JSON.parse(data.categorias),
@@ -78,6 +84,10 @@ const actualiza_config_admin = async function (req, res) {
 
 const obtener_logo = async function (req, res) {
     var img = req.params['img'];
+
+    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+        return res.redirect(img);
+    }
 
     console.log(img);
     fs.stat('./uploads/configuraciones/' + img, function (err) {
