@@ -33,7 +33,7 @@ export class ShowProductoComponent implements OnInit {
     cantidad: 1
   };
   public btn_cart = false;
-  public socket = io('http://localhost:4201');
+  public socket = io(GLOBAL.url.replace('/api/', ''));
 
   public descuento_activo: any = undefined;
   public reviews: Array<any> = [];

@@ -24,7 +24,7 @@ export class Muro implements OnInit {
   public load_data = true;
   public url;
   public token;
-  public socket = io('http://localhost:4201');
+  public socket = io(GLOBAL.url.replace('/api/', ''));
 
   // Filtros y ordenamiento
   public soloTendencia = false;

@@ -34,7 +34,7 @@ export class CarritoComponent implements OnInit {
   public url;
   public subtotal = 0;
   public total_pagar: any = 0;
-  public socket = io('http://localhost:4201');
+  public socket = io(GLOBAL.url.replace('/api/', ''));
 
   public direccion_principal: any = {};
   public envios: Array<any> = [];

@@ -27,7 +27,7 @@ export class NavComponent implements OnInit {
   public carrito_arr: Array<any> = [];
   public url;
   public subtotal = 0;
-  public socket = io('http://localhost:4201');
+  public socket = io(GLOBAL.url.replace('/api/', ''));
   public descuento_activo: any = undefined;
 
   constructor(

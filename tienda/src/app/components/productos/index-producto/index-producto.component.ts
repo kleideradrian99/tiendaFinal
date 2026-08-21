@@ -42,7 +42,7 @@ export class IndexProductoComponent implements OnInit {
   public btn_cart = false;
   public token;
 
-  public socket = io('http://localhost:4201');
+  public socket = io(GLOBAL.url.replace('/api/', ''));
 
   public descuento_activo: any = undefined;
 
