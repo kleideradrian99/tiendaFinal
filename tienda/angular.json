@@ -43,6 +43,7 @@
               "debug"
             ]
           },
+          "defaultConfiguration": "production",
           "configurations": {
             "production": {
               "fileReplacements": [
