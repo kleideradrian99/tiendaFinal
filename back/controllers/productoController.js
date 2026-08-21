@@ -153,7 +153,7 @@ const actualizar_producto_admin = async function (req, res) {
                         fecha_programada: data.fecha_programada || null,
                         peso: parseFloat(data.peso) || 0,
                         portada: portada_name
-                    });
+                    }, { new: true });
 
                     if (reg && reg.portada && !reg.portada.startsWith('http')) {
                         let old_path = './uploads/productos/' + reg.portada;
@@ -178,7 +178,7 @@ const actualizar_producto_admin = async function (req, res) {
                         en_tendencia: en_tendencia,
                         fecha_programada: data.fecha_programada || null,
                         peso: parseFloat(data.peso) || 0
-                    });
+                    }, { new: true });
 
                     return res.status(200).send({ data: reg });
                 }
@@ -297,7 +297,7 @@ const actualizar_producto_variedades_admin = async function (req, res) {
             let reg = await Producto.findByIdAndUpdate({ _id: id }, {
                 titulo_variedad: data.titulo_variedad,
                 variedades: data.variedades
-            });
+            }, { new: true });
             res.status(200).send({ data: reg });
 
         } else {
@@ -333,7 +333,7 @@ const agregar_imagen_galeria_admin = async function (req, res) {
                         _id: data._id
                     }
                 }
-            });
+            }, { new: true });
 
             res.status(200).send({ data: reg });
 

@@ -120,7 +120,7 @@ const actualizar_descuento_admin = async function(req,res){
                     fecha_inicio: data.fecha_inicio,
                     fecha_fin: data.fecha_fin,
                     banner: banner_name
-                });
+                }, { new: true });
 
                 fs.stat('./uploads/descuentos/'+reg.banner, function(err){
                     if(!err){
@@ -137,8 +137,8 @@ const actualizar_descuento_admin = async function(req,res){
                     titulo: data.titulo,
                     descuento: data.descuento,
                     fecha_inicio: data.fecha_inicio,
-                    fecha_fin: data.fecha_fin,
-               });
+                    fecha_fin: data.fecha_fin
+                }, { new: true });
                res.status(200).send({data:reg});
             }
             

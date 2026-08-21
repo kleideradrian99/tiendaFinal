@@ -54,7 +54,7 @@ const actualiza_config_admin = async function (req, res) {
                     serie: data.serie,
                     logo: logo_name,
                     correlativo: data.correlativo,
-                });
+                }, { new: true });
 
                 fs.stat('./uploads/configuraciones/' + reg.logo, function (err) {
                     if (!err) {
@@ -71,7 +71,7 @@ const actualiza_config_admin = async function (req, res) {
                     titulo: data.titulo,
                     serie: data.serie,
                     correlativo: data.correlativo,
-                });
+                }, { new: true });
                 res.status(200).send({ data: reg });
             }
         } else {
